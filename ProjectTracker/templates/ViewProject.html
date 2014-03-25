@@ -1,0 +1,303 @@
+﻿<div class="row" id="view-project-page">
+    <div class="large-16 columns">
+     
+    <div id="project-description-div">
+        <div id="project-map-div">
+            <div id="displayMapImage"></div>
+                            
+            <div id="choose-map-image-button" class="hidden">
+                <button id="chooseMapImageButton" type="button" ></button>
+            </div>
+                            
+        </div>
+        <h3>${Name}</h3>
+        <p>${Description}</p>
+     </div>
+    <div class="section-container tabs" data-section>
+
+  <section class="section active">
+    <p class="title top-rounded"><a id="summary-panel" href="#panel1">Summary</a></p>
+    <div class="content">
+    <div class="project-details">
+          <div class="project-details-toolbar">
+            
+            <div title="Print" class="project-tool"><a class="project-tool" href="#" onclick="printProject();"><img src="/jsdemo/images/tool-print.png" /></a></div>
+            <div title="Edit Project" class="project-tool"><a class="project-tool" href="#" onclick="editProject();"><img src="/jsdemo/images/tool-edit.png" /></a></div>
+            <div title="Open in CBFish" class="project-tool" id="cbfish-tool"><a class="project-tool" id="cbfish-link" href="#"><img src="/jsdemo/images/tool-cbfish.png" /></a></div>
+          </div>
+          <div class="panel">
+                <div class="row">
+                  <div class="large-6 columns project-details-side1">
+                    <h5>Project Statement/Goal:</h5>
+                    <p>${metadata_9}</p>
+
+                    <h5>Project Objectives:</h5>
+                    <p>${metadata_20}</p>
+
+                    <h5>Outputs: (specific 6 month accomplishments)</h5>
+                    <p id="outputs">${metadata_1}</p>
+
+                    <h5>Outcomes:</h5>
+                    <p id="outcomes">${metadata_14}</p>
+
+                    <h5>Impacts:</h5>
+                    <p id="impacts">${metadata_15}</p>
+
+                    <h5>Project Owner:</h5>
+                    <p>${Owner.Fullname}/${Owner.Department.Name}</p>
+                  </div>
+
+                  <div class="large-6 columns project-details-side2">
+                        <h5>Project Inputs:</h5>
+                        <table class="foundation">
+                            <tr>
+                                <td>Funding:</td>
+                                <td>
+                                    ${metadata_3}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Staff:</td>
+                                <td>
+                                    ${metadata_4}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Collaborators:</td>
+                                <td>${metadata_5}</td>
+                            </tr>
+                        </table>
+
+
+                        <div id="quad-images-div">
+                            <div id="displayQuadImages"></div>
+                            
+                            <div id="choose-images-button" class="hidden">
+                                <button id="chooseQuadImagesButton" type="button" ></button>
+                            </div>
+                            
+                        </div>
+
+                        
+                            
+                    </div>
+                </div>
+          </div>
+    
+    </div>
+    </div>
+    </section>
+
+
+   
+
+    <section class="section">
+        <p class="title top-rounded"><a href="#panel5">Gallery</a></p>
+    <div class="content">
+        <div class="project-photos">
+        <div class="project-details-toolbar">
+              <div title="Delete Photo" class="project-tool"><a class="project-tool" href="#" onclick="deletePhoto();"><img src="/jsdemo/images/tool-delete.png" /></a></div>
+              <div title="Edit Photo" class="project-tool"><a class="project-tool" href="#" onclick="editSelectedFile(gallerygrid);"><img src="/jsdemo/images/tool-edit.png" /></a></div>
+              <div title="Add Photo" class="project-tool"><a class="project-tool" href="#" onclick="OpenAddFile();"><img src="/jsdemo/images/tool-add.png" /></a></div>
+          </div>
+            <div class="detail-search">
+                <input id="search-gallery"><a id="search-gallery-icon" href="#" onclick="gallerygrid.refresh();"><img src="images/search-sm.png" /></a>
+            </div>
+            <div id="gallery"></div>
+        </div>
+    </div>
+
+
+    </section>
+    
+    
+    <section class="section">
+    <p class="title top-rounded"><a href="#panel4">Details</a></p>
+        <div class="content">
+          <div class="project-details-toolbar">
+              <div title="Delete" class="project-tool"><a class="project-tool" href="#" onclick="deleteProject();"><img src="/jsdemo/images/tool-delete.png"/></a></div>
+              <div title="Edit" class="project-tool"><a class="project-tool" href="#" onclick="editProject();"><img src="/jsdemo/images/tool-edit.png" /></a></div>              
+          </div>
+            <div class="row">
+              <div class="large-10 columns">
+              
+                <div class="project-attributes">
+                    <table class="foundation metadata">
+                      <tbody>
+                      <tr>
+                         <td class="metadata-field" style="width: 200px;">Program</td>
+                         <td class="metadata-value">${metadata_23}</td>
+                        </tr>
+                        <tr>
+                         <td class="metadata-field">Sub-program</td>
+                         <td class="metadata-value">${metadata_24}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field" style="width: 200px;">Organization</td>
+                         <td class="metadata-value">${Organization.Name}</td>
+                        </tr>
+                        
+                        <tr>
+                         <td class="metadata-field">Description</td>
+                         <td class="metadata-value">${Description}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field">Owner</td>
+                         <td class="metadata-value">${Owner.Fullname}</td>
+                        </tr>
+                        <tr>
+                         <td class="metadata-field">Owner Department</td>
+                         <td class="metadata-value">${Owner.Department.Name}</td>
+                        </tr>
+
+                        
+
+                        <tr>
+                         <td class="metadata-field">Period Description</td>
+                         <td class="metadata-value">${metadata_22}</td>
+                        </tr>
+                        
+                        <tr>
+                         <td class="metadata-field">Start Date</td>
+                         <td class="metadata-value">${DisplayStartDate}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field">End Date</td>
+                         <td class="metadata-value">${DisplayEndDate}</td>
+                        </tr>
+
+
+                        <tr>
+                         <td class="metadata-field">Project Statement/Goal</td>
+                         <td class="metadata-value">${metadata_9}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field">Project Objectives</td>
+                         <td class="metadata-value" id="details_objectives">${metadata_20}</td>
+                        </tr>
+
+                        <tr class="program-fields hidden">
+                         <td class="metadata-field">BPA Contract Number</td>
+                         <td class="metadata-value">${metadata_16}</td>
+                        </tr>
+
+                      <tr>
+                         <td class="metadata-field">Inputs: Funding</td>
+                         <td class="metadata-value">${metadata_3}</td>
+                        </tr>
+                      <tr>
+                         <td class="metadata-field">Inputs: Staff</td>
+                         <td class="metadata-value">${metadata_4}</td>
+                        </tr>
+                      <tr>
+                         <td class="metadata-field">Inputs: Collaborators</td>
+                         <td class="metadata-value">${metadata_5}</td>
+                        </tr>
+                        <tr>
+                         <td class="metadata-field">Outputs</td>
+                         <td class="metadata-value" id="details_outputs">${metadata_1}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field">Outcomes (progress and trends resulting from outputs)</td>
+                         <td class="metadata-value" id="details_outcomes">${metadata_14}</td>
+                        </tr>
+
+                        <tr>
+                         <td class="metadata-field">Impacts (long-term accomplishments and vision)</td>
+                         <td class="metadata-value" id="details_impacts">${metadata_15}</td>
+                        </tr>
+
+
+                        <tr>
+                         <td class="metadata-field">First Foods</td>
+                         <td class="metadata-value">${metadata_6}</td>
+                        </tr>
+                        <tr>
+                         <td class="metadata-field">River Vision Touchstone</td>
+                         <td class="metadata-value">${metadata_8}</td>
+                        </tr>
+                        <tr>
+                         <td class="metadata-field">Basin/Sub-basin</td>
+                         <td class="metadata-value">${metadata_7}</td>
+                        </tr>
+                        <tr>
+                        
+                        <tr class="habitat-fields hidden">
+                         <td class="metadata-field">Habitat Objectives</td>
+                         <td class="metadata-value">${metadata_10}</td>
+                        </tr>
+                        <tr class="habitat-fields hidden">
+                         <td class="metadata-field">Limiting Factors</td>
+                         <td class="metadata-value">${metadata_21}</td>
+                        </tr>
+                        <tr class="habitat-fields hidden">
+                         <td class="metadata-field">NOAA Ecological Concerns</td>
+                         <td class="metadata-value">${metadata_19}</td>
+                        </tr>
+                        <tr class="habitat-fields hidden">
+                         <td class="metadata-field">NOAA Ecological Concerns Sub-Categories</td>
+                         <td class="metadata-value">${metadata_18}</td>
+                        </tr>
+            
+                       </tbody>
+                    
+                    </table>
+              
+            
+                  
+
+                    <br /><br />
+
+
+                </div>
+              </div>
+          </div>
+        </div>
+    </section>
+
+
+     <section class="section">
+    <p class="title top-rounded"><a href="#panel5">Documents</a></p>
+    <div class="content">
+         <div class="project-files">
+            <div class="project-details-toolbar">
+              <div title="Delete File" class="project-tool"><a class="project-tool" href="#" onclick="deleteFile();"><img src="/jsdemo/images/tool-delete.png" /></a></div>
+              <div title="Edit File" class="project-tool"><a class="project-tool" href="#" onclick="editSelectedFile(docsgrid);"><img src="/jsdemo/images/tool-edit.png" /></a></div>
+              <div title="Add File" class="project-tool"><a onclick="OpenAddFile();" class="project-tool" href="#"><img src="/jsdemo/images/tool-add.png" /></a></div>
+          </div>
+
+            <div class="detail-search">
+                <input id="search-docs" /><a id="search-docs-icon" href="#" onclick="docsgrid.refresh();"><img src="images/search-sm.png" /></a>
+            </div>
+            
+            <div id="docs-grid"></div>
+
+                
+                    
+        </div>
+    </div>
+    </section>
+
+    <section class="section">
+        <p class="title top-rounded"><a href="#panel6">Data</a></p>
+        <div class="content">
+            <div id="data-grid"></div>
+        </div>
+    </section>
+
+    </div>
+    
+
+
+    </div>
+
+  
+
+
+</div>
+

@@ -1,0 +1,30 @@
+﻿ <div id="edit-file-page">
+    <div class="panel">
+    <form class="custom" id="edit-file-form" >
+        <div class="row">
+            <div class="large-6 columns">
+            <center>
+                <img id="linkNode" src="${Link}" />
+                <p>${Name}</p>
+            </center>
+            </div>
+
+            <div class="large-6 columns">
+
+                <label for="FileTitle">Title</label>
+                <input name="FileTitle" id="FileTitle" value="${Title}" data-dojo-type="dijit/form/TextBox" />
+
+                <label for="FileDescription">Description</label>
+                <input name="FileDescription" id="FileDescription" data-dojo-type="dijit/form/Textarea"  value="${Description}"/>
+            </div>
+        </div>
+       
+        <div class="row">
+            <div class="large-12 columns">
+                <a class="button" onclick="submitEditFile(); return false;" href="#" style="float: right;">Save</a>
+                <a class="button" onclick="EditFileDialog.hide(); return false;" href="#" style="float: right;">Cancel</a>
+            </div>
+        </div>                        
+    </form>
+    </div>
+</div>

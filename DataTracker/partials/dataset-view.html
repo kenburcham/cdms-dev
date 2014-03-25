@@ -1,0 +1,43 @@
+<ul class="breadcrumb">
+    <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
+    <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
+    <li><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
+    
+    <li class="active">Activity Detail for {{grid.Header.Activity.ActivityDate | date: 'MM/dd/yyyy'}}</li>
+</ul>
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span6">
+
+            <div class="right small-graph-box" ng-include="'partials/graphs/BarGraph-View.html'"></div>
+
+            <div class="header-box">
+                <div class="header-label">Location:</div>
+                <div class="header-value">{{grid.Header.Activity.Location.Label}}&nbsp;</div>
+
+                <div class="header-label">Activity Date:</div>
+                <div class="header-value">{{grid.Header.Activity.ActivityDate | date: 'MM/dd/yyyy'}}&nbsp;</div>            
+
+                <div ng-repeat="field in headerFields">
+                <div class="header-column">
+                    <div class="header-label">{{field.Label}}:</div>
+                    <div class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
+                </div>
+                </div>
+
+                <div class="header-label">QA Status:</div>
+                <div class="header-value"></div>            
+
+            
+            </div>
+            
+            <hr/>
+            <div class="gridStyle" ng-grid="gridDatasheetOptions">
+            </div>
+            Total Records: {{grid.Details.length}} <img ng-show="query.loading" src="images/FishLoading.gif"/></div>           
+            <button project-role="editor" class="btn" ng-click="openEdit()">Edit</button>
+
+        </div>
+    </div>
+</div>

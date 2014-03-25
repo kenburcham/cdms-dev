@@ -1,0 +1,168 @@
+﻿
+    <div id="edit-project-page" class="edit-project">
+            <form class="custom" id="new-project" data-dojo-type="dojox/form/Manager">
+
+     <div class="section-container tabs" data-section>
+
+      <section class="section">
+        <p class="title top-rounded"><a href="#panel1">Settings</a></p>
+            <div class="content">
+
+           
+
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Name</label>
+                    <input type="text" name="Name" required="true" placeholder="Project Name/Title" data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Please give your project a name." >
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>Description:</label>
+                    <textarea name="Description"></textarea>
+                  </div>
+                </div>
+                
+                 <div class="row">
+                  <div class="large-6 columns">
+                    Here is the big select:
+                        <div id="project-type-select"></div>
+              </div></div>
+
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Project Start Date</label>
+                    <input type="text" name="StartDate" data-dojo-type="dijit/form/DateTextBox" >
+                  </div>
+                </div>
+
+
+                  <div class="row">
+                  <div class="large-6 columns">
+                    <label>Project End Date</label>
+                    <input type="text" name="EndDate" data-dojo-type="dijit/form/DateTextBox"  >
+                  </div>
+                </div>
+
+
+
+            </div>
+        </section>
+
+
+
+
+
+
+
+        <section class="section">
+            <p class="title top-rounded"><a href="#panel2">Details</a></p>
+            <div class="content">
+
+             <div class="row">
+                  <div class="large-12 columns">
+                    <label>Project Statement/Goal:</label>
+                    <textarea rows="10" name="metadata_9"></textarea>
+                  </div>
+                </div>
+
+               
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label><span data-tooltip class="has-tip" title="Specific products this project will create. Separate each output on a new line.">Outputs:</span> (specific 6 month accomplishments)</label>
+                    <textarea name="metadata_1"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>Inputs - <span data-tooltip class="has-tip" title="Specific monetary resources this project will require. Separate each element on a new line.">Funding</span>:</label>
+                    <textarea name="metadata_3"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>Inputs - <span data-tooltip class="has-tip" title="Specific human resources this project will require. Separate each element on a new line.">Staff</span>:</label>
+                    <textarea name="metadata_4"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>Inputs - <span data-tooltip class="has-tip" title="Specific external resources this project will require.">Collaborators:</span></label>
+                    <textarea name="metadata_5"></textarea>
+                  </div>
+                </div>
+
+                <div class="row">
+                <div class="large-6 columns">
+                 <label for="projectBasin"><span data-tooltip class="has-tip" title="Basin this project is in.">Basin/Sub-basin</span></label>
+                  <select multiple="true" id="basin" class="medium" name="metadata_7">
+                    <option>Umatilla</option>
+                    <option>John Day</option>
+                    <option>Walla Walla</option>
+                  </select>
+              </div></div>
+
+
+                <div class="row">
+                  <div class="large-6 columns">
+                  <label>First Foods</label>
+                   <select multiple="true"  name="metadata_6" >
+                      <option value="Salmon">Salmon</option>
+                      <option value="Water">Water</option>
+                      <option value="Deer">Deer</option>
+                      <option value="Cous">Cous</option>
+                      <option value="Huckleberry">Huckleberry</option>
+                 </select>
+
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="large-6 columns">
+                  <label>River Vision Touchstone</label>
+                   <select multiple="true"  name="metadata_8" >
+                      <option value="1">Riparian Vegetation</option>
+                      <option value="2">Connectivity</option>
+                      <option value="3">Geomorphology</option>
+                      <option value="4">Hydrology</option>
+                 </select>
+
+                  </div>
+                </div>
+
+
+                  <div class="row">
+                  <div class="large-6 columns">
+                  <label>Project Objectives</label>
+                   <select multiple="true"  name="metadata_10" >
+                      <option value="1">Increase Connectivity</option>
+                      <option value="2">Enhance diversity</option>
+                      <option value="3">Reduce sediment</option>
+                      <option value="4">Decrease temperature</option>
+                      <option value="5">Habitat restoration</option>
+                 </select>
+
+                  </div>
+                </div>
+
+                 
+            </div>
+        </section>
+
+        </div>
+
+
+              <div class="dijitDialogPaneActionBar" style="width: 100%;">
+                    <button data-dojo-type="dijit/form/Button" type="button" onClick="SaveNewProject();" id="save">Save</button>
+                    <button data-dojo-type="dijit/form/Button" type="button" onClick="CloseEditProjectDialog();"
+                            id="cancel">Cancel</button>
+              </div>
+
+            </form>
+
+</div>

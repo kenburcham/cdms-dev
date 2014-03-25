@@ -1,0 +1,21 @@
+Dataset details for CC/UGR:
+
+<div class="panel" style="margin: 20px 20px 45px 20px; background-color: #F5FBEF; padding: 4px 10px 45px 10px;">
+    <table class="table table-striped">
+        <thead>
+        <tr style="background-color: #E6E6E6;">
+            <th>Metadata Field</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="md in metadataList">
+            <td><b>{{ md.field }}</b></td>
+            <td>{{ md.value }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="top-divider"></div>
+    <button class="btn right" style="margin-top: 5px; margin-left: 5px;">Close</button>
+   
+</div>

@@ -1,0 +1,1915 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Project Tracker v.1.1</title>
+
+<link rel="stylesheet" href="../assets/js/vendor/foundation/css/normalize.css" />
+<link rel="stylesheet" href="../assets/js/vendor/foundation/css/foundation.css?v2" />
+
+<link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="//js.arcgis.com/3.6/js/esri/css/esri.css">
+<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css" />
+<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dojox/form/resources/CheckedMultiSelect.css" />
+<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dojox/form/resources/UploaderFileList.css" />
+
+
+<link rel="stylesheet" type="text/css" href="ptgrid.css?v1" />
+
+<script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+<script src="../assets/js/vendor/foundation/js/vendor/custom.modernizr.js"></script>
+<script src="ctuir/Core.js"></script>
+
+
+<!-- Load the library references for ArcGIS API for JavaScript -->
+<script>var dojoConfig = {
+    parseOnLoad: true,
+    isDebug: true,
+    packages: [
+        {
+            name: 'dgrid', location: location.pathname.replace(/\/[^/]+$/, '') + '/../assets/js/vendor/dgrid'
+        },
+        {
+            name: 'xstyle', location: location.pathname.replace(/\/[^/]+$/, '') + '/../assets/js/vendor/xstyle'
+        },
+        {
+            name: 'put-selector', location: location.pathname.replace(/\/[^/]+$/, '') + '/../assets/js/vendor/put-selector'
+        },
+        {
+            name: 'ctuir', location: location.pathname.replace(/\/[^/]+$/, '') + '/ctuir'
+        },
+        {
+            name: 'templates', location: location.pathname.replace(/\/[^/]+$/, '') + '/templates'
+        }
+    ]
+
+};</script>
+
+<script src="//js.arcgis.com/3.6/"></script>
+
+<script>
+
+    //require https
+    //if (!isSecure())
+    //    window.location = "https:" + window.location.href.substr(5);
+
+    var current_user;
+    var currentdate = new Date();
+    var projectMap, projectStore, projectGrid, dialog;
+    var toolbar;
+    var actionCreatingProject = false;
+    var actionGridToggled = false;
+    var isFirstGridExpand = true;
+    var currentProjectId; //store id/grid id (not key)
+    var currentProjectKey; //key
+    var current_project; //current project
+    var standby;
+    var log;
+    var gallerygrid, docsgrid, datagrid, datalocationgrid, imagegrid;
+    var viewwidget;
+    var editwidget;
+    var editfilewidget;
+    var metadataproperties, servicedropdown; //cached things
+    var dijits = [];
+    var logintries = 0;
+    var debugobject;
+    var basemapGallery;
+    
+    //var PROJECT_DATA_URL = "ptgrid_data.json?" + currentdate.getTime();
+    var PROJECT_DATA_URL = "/services/api/projects/";
+    var USER_DATA_URL = "/services/api/users/";
+    var PROJECT_DETAILS_SAVE_URL = "/services/action/SaveProjectDetails";
+    var PROJECT_FILE_URL = "/services/api/files/";
+    var PROJECT_DETAILS_URL = "projectDetails.html?" + currentdate.getTime();
+    var PROJECT_EDIT_URL = "editProject.html?" + currentdate.getTime();
+    var PROJECT_NEW_URL = "newProject.html?" + currentdate.getTime();
+    var WHOAMI_URL = "/services/action/WhoAmI?" + currentdate.getTime();
+    var CBFISH_URL = "//www.cbfish.org/Project.mvc/Display/"; //1990-005-01
+    var BING_KEY = "AuaAtT6zhx1rfuP1hR_e0zh5pxy6u7Echhe9KbwfCcQRG_Y_ewSg5OcFDm-DF-8w";
+    var DEFAULT_BASEMAP = "BingMapsRoad";
+    
+
+    dojo.require("esri.dijit.BasemapGallery");
+    dojo.require("esri.layers.FeatureLayer");
+    dojo.require("dojo.parser");
+    dojo.require("dijit.Tooltip");
+    dojo.require("dijit.Menu");
+    dojo.require("dijit.MenuItem");
+    dojo.require("dojo.fx");
+    dojo.require("dojox.widget.Standby");
+    dojo.require("esri.dijit.editing.TemplatePicker-all");
+    dojo.require("dojox.form.Manager");
+//    dojo.require("dojox.form.Uploader");
+//    dojo.require("dojox.form.uploader.plugins.IFrame");
+
+    dojo.ready(init);
+
+    //which basemaps do you want to appear in the dropdown (and in this order)
+    var basemapConfig = [
+       // { type: 'streets', title: 'ESRI Roads'},
+        //{ type: 'topo', title: 'Topographical'},
+        //{ type: 'hybrid', title: 'Hybrid' },
+        { type: 'BingMapsRoad', title: 'Roads' },
+        { type: 'BingMapsAerial', title: 'Aerial' },
+        { type: 'BingMapsHybrid', title: 'Hybrid' },
+        { type: 'OpenStreetMap', title: 'OSM' },
+    ];
+
+    //which location layers do you want to appear on the map (and in this order)
+    // a unique key field is required.  We assume there is one called "OBJECTID" unless you specify the "objidfield" parameter.
+    //NOTE: someday these will come from the SDE_FEATURES table in the db
+    //NOTE: don't use UNDERSCORES in the name since we split on that.
+    var layerConfig = [
+        //{ Id: 3, Name: 'Polygons', Service: '/CDMS/DNR_CDMS/FeatureServer/2' },
+        //{ Id: 2, Name: 'Lines', Service: '/CDMS/DNR_CDMS/FeatureServer/1'},
+        { Id: 1, Name: 'Points', Service: '/CDMS/DNR_CDMS/FeatureServer/0'},
+    ];
+
+    function handleError(error) {
+            log.debug(error.src, error.id);
+            
+            //log.debug(error);
+            log.debug(error.info);
+    }
+
+    function loadData() {
+        require(["ctuir/ProjectStore", "ctuir/ProjectMap", "ctuir/ProjectGrid"], function (ProjectStore, ProjectMap, ProjectGrid) {
+            projectStore = new ProjectStore(PROJECT_DATA_URL);
+            projectMap = new ProjectMap(layerConfig, "mapDiv");
+            projectGrid = new ProjectGrid(projectStore.getProjectStore());
+        });
+    }
+
+    function afterLogin() {
+
+        log.debug("And we are logged in as user: " + current_user.Username);
+
+        try{
+
+            loadData();
+
+            createProjectDropdown();
+            createLoginDropdown();
+            setupBehaviors();
+
+            //createBasemapDropdown(basemapConfig);
+
+            if (current_user.Fullname == current_user.Username)
+                viewPreferences();
+
+        } catch (e) {
+            log.debug(e);
+        }
+        standby.hide();
+        standby = new dojox.widget.Standby({ target: "mapDiv", text: "Please wait..." });
+    }
+
+    function submitLogin() {
+        logintries++;
+
+        //encrypt password with aes
+
+
+        require(["dojo/request/iframe"], function (request) {
+            console.log("trying to login");
+            request("/services/account/login", {
+                method: "POST",
+                form: "LoginForm",
+                handleAs: "json",
+            }).then(function (data) {
+                console.dir(data);
+                console.log("We're back and logged in");
+                if(data.message == "Success")
+                    whoami("Success!"); //fetches and sets current user
+                else
+                    whoami("Username or password were not correct.");
+            }, function (err) {
+                //if (err.message && err.message.indexOf("403") != -1) {
+                    console.dir(err.response);
+                    console.log("Oops -- looks like we aren't logged in.");
+                    whoami("Verifying...");
+                //    log.error("Error handling login: " + err.message);
+                //}
+            });
+        });
+
+    }
+
+    function init() {
+
+
+        require(["ctuir/Logger"], function (Logger) {
+            log = new Logger();
+        });
+
+        log.debug("Here we go!");
+
+        require(["dojo/parser"], function (parser) {
+            try{
+                parser.parse();
+            } catch (e) {
+                log.debug("ERROR: " + e.message, e);
+            }
+        });
+
+
+        standby = new dojox.widget.Standby({ target: "mapDiv", text: "Checking authentication..." });
+        document.body.appendChild(standby.domNode);
+        standby.startup();
+        standby.show();
+
+        require.on("error", handleError);
+
+        whoami();
+
+        setTimeout(function () {
+            require(["dojo/dom-construct", "dojo/domReady!"], function (domConst) {
+                domConst.destroy(dojo.byId("init-overlay"));
+            });
+        }, 400);
+
+        standby.hide();
+        log.debug("Initialization Complete");
+    }
+    
+
+    function whoami(message) {
+        if (message)
+            dojo.byId("login-message").innerHTML = message;
+
+        require(["dojo/request/xhr"], function (request) {
+            console.log("trying... whoami?!");
+                request(WHOAMI_URL, {
+                handleAs: "json",
+                method: "GET",
+                headers: { 'Content-Type': 'application/json' }, //don't forget this -- default is url-encoded form
+                }).then(function (data) {
+                dojo.byId("login-message").innerHTML = "Successful login.";
+                console.log("We're back and already logged in!");
+                console.dir(data);
+                current_user = data;
+                LoginDialog.hide();
+                afterLogin();
+            }, function (err) {
+                if (err.message && err.message.indexOf("403") != -1) {
+                    console.log("Oops -- looks like we aren't logged in.");
+                    console.dir(err);
+                    LoginDialog.closeButtonNode.style.display = "none";
+                    if (logintries > 0)
+                        dojo.byId("login-message").innerHTML = "Username or Password were not correct.";
+                    LoginDialog.show();
+                } else {
+                    alert("There was an error processing your request.  Please click refresh to reload the application and try again or contact the Helpdesk.");
+                    log.error("Error handling login: " + err.message);
+                }
+            });
+        });
+    }
+
+    //note: we do NOT fuss with the map in this function...
+    function showAllProjectsInGrid() {
+        var grid = projectGrid.getGrid();
+        grid.query = null;
+        projectGrid.refresh();
+        dojo.byId("grid-control-content").innerHTML = "Projects";
+    }
+
+
+    //toggles the grid and map display of projects and their locations
+    function toggleMyProjects(data) {
+        require(["dojo/dom-class"], function (domClass) {
+            //domClass.toggle("allProjectsToggle", "active");
+            //domClass.toggle("myProjectsToggle", "active");
+            standby.show();
+            var grid = projectGrid.getGrid();
+
+            if (!data) {
+                if (dojo.byId("grid-control-content").innerHTML == "My Favorites")
+                    data = "allprojects";
+                else {
+                    data = "myprojects";
+                }
+            }
+
+            if (data == 'myprojects') {
+                dojo.byId("grid-control-content").innerHTML = "My Favorites";
+                grid.query = { favorite: true };
+                projectMap.limitMapFeatures({ favorite: true });
+            }
+            else if (data == 'programs') {
+                dojo.byId("grid-control-content").innerHTML = "Programs";
+                grid.query = { ProjectTypeId: 14 } ; // 14 == programs
+                projectMap.limitMapFeatures({});
+            }
+            else {
+                dojo.byId("grid-control-content").innerHTML = "Projects";
+                grid.query = { ProjectTypeId: 15 }; //15 == generic project
+                projectMap.limitMapFeatures({});
+            }
+
+            projectGrid.refresh();
+            standby.hide();
+        });
+        projectMap.isShowingAllFeatures = false;
+    }
+
+
+
+    function createBasemapDropdown(basemapConfig) {
+        
+        //create an array of Basemap objects corresponding to the above list
+        var basemaps = dojo.map(basemapConfig, function (item) {
+            return new esri.dijit.Basemap({
+                layers: [new esri.dijit.BasemapLayer({
+                    type: item.type
+                })], id: item.type, title: item.title
+            });
+        });
+
+        try{
+
+            basemapGallery = new esri.dijit.BasemapGallery({
+                basemaps: basemaps,
+                //showArcGISBasemaps: true,
+                bingMapsKey: BING_KEY,
+                map: projectMap.getMap(),
+            });
+
+            //add each one to the existing "basemapMenu" dropdown and wire up an onclick to set the basemap.
+            dojo.forEach(basemaps, function (basemap) {
+                dijit.byId("basemapMenu").addChild(new dijit.MenuItem({
+                    label: basemap.title,
+                    onClick: dojo.hitch(this, function () {
+                        log.debug("selecting basemap: ", basemap.id);
+                        if (basemap.id == "streets")
+                            projectMap.setBasemap(basemap.id);
+                        else {
+                            basemapGallery.select(basemap.id);
+                            //projectMap.setBasemap(basemap.id);
+                        }
+                        
+                    })
+                }));
+            });
+        
+            basemapGallery.select("BingMapsRoad");
+
+        } catch (e) {
+            log.debug(e);
+        }
+
+    }
+
+    function createProjectDropdown() {
+        dijit.byId("projectMenu").addChild(new dijit.MenuItem({
+            label: "My Favorites",
+            onClick: dojo.hitch(this, function () {
+                toggleMyProjects('myprojects');
+            })
+        }));
+
+        dijit.byId("projectMenu").addChild(new dijit.MenuItem({
+            label: "Projects",
+            onClick: dojo.hitch(this, function () {
+                toggleMyProjects('allprojects');
+            })
+        }));
+
+        dijit.byId("projectMenu").addChild(new dijit.MenuItem({
+            label: "Programs",
+            onClick: dojo.hitch(this, function () {
+                toggleMyProjects('programs');
+            })
+        }));
+
+        /*
+        dijit.byId("projectMenu").addChild(new dijit.MenuItem({
+            label: "All features",
+            onClick: dojo.hitch(this, function () {
+                projectMap.showAllFeatures();
+            })
+        }));
+        */
+
+
+    }
+
+
+    function createLoginDropdown() {
+
+        dijit.byId("loginButton").set("label", current_user.Fullname);
+
+        var loginmenu = dijit.byId("loginMenu");
+
+        loginmenu.addChild(new dijit.MenuItem({
+            label: "Preferences",
+            onClick: dojo.hitch(this, function () {
+                viewPreferences();
+            })
+        }));
+
+        loginmenu.addChild(new dijit.MenuItem({
+            label: "Logout",
+            onClick: dojo.hitch(this, function () {
+                var confirmed = confirm("Are you sure you want to logout?");
+                if (confirmed)
+                    logout();
+            })
+        }));
+
+        
+    }
+    
+
+  
+
+    //fires when someone clicks a map feature
+    function eventMapFeatureSelected(key) {
+
+        currentProjectKey = key;
+
+        selectGridProjectsByKey(key);
+
+        //if we didn't select anything in the grid, then select manually to highlight the feature.
+        var numselected = projectGrid.getNumSelected();
+        if (numselected == 0)
+            selectMapFeatureByKey(key);
+
+    }
+
+    function eventGridProjectSelected(id) {
+        log.debug("eventGridProjectSelected: " + id);
+        currentProjectId = id;
+        var key = projectGrid.getKeyById(id);
+
+        currentProjectKey = key;
+
+        selectMapFeatureByKey(key);
+
+        current_project = projectStore.get(currentProjectId);
+        toggleFavoriteClass(current_project.favorite);
+
+        setNewProjectSelectionText(key); //TODO:  better way?
+
+    }
+
+    //select the project by id (projectLayer_id, ie: projectpoint_2)
+    function selectGridProjectsByKey(key) {
+        try{
+            log.debug("Select Grid Projects by key: " + key);
+            if (key) {
+                if (currentProjectKey)
+                    projectGrid.deselectKeys(currentProjectKey);
+
+                currentProjectKey = key;
+                log.debug("selecting keys");
+                projectGrid.selectKeys(key);
+
+                log.debug("selected keys");
+            }
+            else {
+                log.debug("here with no key");
+            }
+        
+            setNewProjectSelectionText(key); //TODO: where should this really live? or is this fine...
+            log.debug(" selectGridProjectByKey == done");
+        } catch (e) {
+            log.debug(e);
+        }
+    }
+
+    
+    //highlights a map featuer in the map for the given key (eg: somelayer_objectid)
+    function selectMapFeatureByKey(key) {
+        if (!key) {
+            log.debug("ERROR ------------------------- >> key not specified");
+            return;
+        }
+
+        log.debug("Selecting map feature by key: " + key);
+
+        projectMap.clearSelections();
+
+        var parts = key.split("_");
+        var part_layer = parts[0];
+        var part_objectid = parts[1];
+
+        layer = projectMap.getLayer(part_layer);
+        log.debug("layer = " + part_layer);
+
+        var query = new esri.tasks.Query();
+        query.objectIds = [part_objectid];
+        query.outFields = ["*"];
+
+        try
+        {
+            layer.selectFeatures(query, esri.layers.FeatureLayer.SELECTION_NEW, function (features) {
+
+                if (actionCreatingProject) {
+                    return;
+                }
+                var projects = projectMap.getProjectsByLayer(part_layer, part_objectid);
+                projectMap.showInfoWindow(projects, features, part_layer, part_objectid);
+
+                //projectMap.zoomToFeature(features[0]);
+                log.debug("done selected map feature");
+            });
+        } catch (e) {
+            log.debug(e);
+            log.error("There was a problem selecting the geometry for key : " + key);
+        }
+        
+    }
+
+   
+
+
+
+    function getMyProjectData() {
+        return projectStore.query({ favorite: true });
+    }
+
+    
+    function getAllProjectData() {
+        return projectStore.query({ });
+    }
+
+    
+
+    function getProjectHtml(projects) {
+        //if it is more than one, give a list of the projects at this spot with a view link
+        if(projects.length > 1)
+        {
+            var result =
+            "<div class='project-infowindow'>" +
+            "<h5>Projects at this location:</h5><ul>";
+
+            require(["dojo/_base/array"], function (array) {
+                array.forEach(projects, function (project) {
+                    result += "<li>" + project.Name + " (<a href='#' onClick='ShowProjectWindow("+project.Id+");'>view</a>)";
+                });
+            });
+            
+            result += "</ul></div>";
+        }else{
+            var project = projects[0];
+            //if it is just one then give a summary
+
+            var result =
+            "<div class='project-more-link project-tool right'><a href='#' onClick='ShowProjectWindow(" + project.Id + ");'><img src='images/open.png?v1'/></a></div>" +
+            //"<div class='project-more-link project-tool right'><a href='#' onClick='favoriteProject(" + project.Id + ");'><img class='off' src='images/favorite-sm-off.png?v4'/><img class='on' src='images/favorite-sm-on.png?v4'/></a></div>" +
+            "<div class='project-infowindow'>" +
+            "<h5>" + project.Name + "</h5>" +
+            "<p><b>Owner:</b> " + project.Owner.Fullname + " / " + project.Owner.Department.Name + "</p>" +
+            "<p>" + project.Description + "</p>" +
+            "</div>";
+        }
+
+        return result;
+    }
+
+
+
+    //might move this into the viewProjectWidget . startup -- just make sure we are calling startup!
+    function ShowProjectWindow(id) {
+        require(["dojo/on", "dojo/dom", "ctuir/widget/ViewProjectWidget", "dojo/dom-construct", "dojo/dom-class", "dojo/domReady!"],
+           function (on, dom, ViewProject, domConst, domClass) {
+
+               if(id)
+                    currentProjectId = id;
+
+               //TODO: how much of this destruction is really required?
+               destroyDijits("gallery-grid", "view-project-page", viewwidget);
+
+
+               current_project = projectStore.get(currentProjectId);
+               log.debug("the project?" , current_project); //, "the metadata" , current_project.Metadata);
+
+               viewwidget = new ViewProject(current_project).placeAt("project-details-window");
+                viewwidget.startup();
+ 
+               //var selections = getImageSelections();
+               //log.debug(selections, "SELECTIONS-------------------------");
+               /*
+               for (var selection in selections) {
+                   selection = selections[selection];
+                   imagegrid.select(selection);
+                   log.debug("selecting: " + selection);
+               }*/
+
+               var selectionhtml = getImageSelectionsHtml();
+               if(selectionhtml)
+                    dojo.byId("displayQuadImages").innerHTML = selectionhtml;
+
+               var mapimagehtml = getMapImageHtml();
+               if (mapimagehtml)
+                   dojo.byId("displayMapImage").innerHTML = mapimagehtml;
+
+               //conditionally show the cbfish tool - only if there is a value and it is a PROGRAM (not a project).
+               if (!hasOwnProperty.call(current_project, "metadata_16") || is_empty(current_project["metadata_16"]) || current_project.ProjectTypeId != PROJECT_TYPE_PROGRAM) {
+                   domClass.add("cbfish-tool", "hidden");
+               }
+               else {
+                   on(dojo.byId("cbfish-link"), "click", function () { window.open(CBFISH_URL + current_project.metadata_16, "newTarget"); } );
+               }
+
+               ViewProjectDialog.show();
+
+               //project-details-window
+
+               $('#summary-panel').click(); //hack hack hack
+               
+
+           });
+
+    }
+
+    /* --------------------- */
+
+    
+
+
+   
+    
+    function createProject() {
+        if (actionCreatingProject || !current_user)
+            return;
+
+        actionCreatingProject = true; //set us into our create mode (TODO: would this be better as an "on" something?)
+
+        showAllProjectsInGrid();
+
+        projectMap.showAllFeatures();
+
+        projectMap.enableEditing(1); //layerid == 1
+
+        showCreateProjectSidebar();
+
+
+    }
+
+    function toggleLegend() {
+        toggleRightSidebar("legend-sidebar", "legendDiv", 220);
+    }
+
+    function toggleHelp() {
+        //toggleRightSidebar("help-sidebar", "helpDiv", 280);
+
+    }
+
+
+    function toggleRightSidebar(node, contentnode, offset) {
+        require(["dojo/dom-construct", "dojo/dom-geometry", "dojo/fx"],
+          function (domConst, domgeo, coreFx) {
+
+              var divInfo = domgeo.position(dojo.byId("mapDiv"), true);
+              var width = divInfo.w;
+              //var height = divInfo.h - 275;
+
+              if (!dojo.byId(node)) {
+                  //log.debug(width);
+
+                  domConst.create("div", {
+                      id: node,
+                      class: 'sliding-sidebar',
+                      innerHTML: dojo.byId(contentnode).innerHTML,
+                  }, "right-sidebar");
+
+
+                  coreFx.slideTo({
+                      node: node,
+                      top: "55",
+                      left: width - offset,
+                      units: "px"
+                  }).play();
+
+              }
+              else {
+                      coreFx.slideTo({
+                          node: node,
+                          top: "55",
+                          left: width + offset,
+                          units: "px"
+                      }).play();
+                  
+                      setTimeout(function(){
+                          domConst.destroy(node);
+                      }, 350);
+              }
+          });
+    }
+
+    //TODO: remove this to someplace to keep as an idea for the future.
+    function toggleGridWindow() {
+
+        require(["dojo/dom-geometry", "dojo/fx"],
+          function (domgeo, coreFx) {
+
+              var gridnode = dojo.byId("grid-window");
+
+              
+              var mapInfo = domgeo.position(dojo.byId("mapDiv"));
+              var gridInfo = domgeo.position(gridnode, true);
+              var width = gridInfo.w;
+              var height = gridInfo.h;
+
+              var x = gridInfo.x;
+              if (isFirstGridExpand) {
+                  isFirstGridExpand = false;
+                  x = x - 8;
+
+              }
+
+              if (actionGridToggled) {
+                  dojo.byId("grid-control-expander").innerHTML = '<img src="images/down-expand.png" />';
+                  coreFx.slideTo({
+                      node: gridnode,
+                      top: mapInfo.h -260,
+                      left: x,
+                      units: "px"
+                  }).play();
+                  //dojo.style(gridnode, "position", "relative");
+              }
+              else {
+                  dojo.byId("grid-control-expander").innerHTML = '<img src="images/up-expand.png" />';
+                  coreFx.slideTo({
+                      node: gridnode,
+                      top: mapInfo.h - 20,
+                      left: x,
+                      units: "px"
+                  }).play();
+              }
+
+              actionGridToggled = !actionGridToggled;
+
+          });
+    }
+
+    function showCreateProjectSidebar() {
+        require(["dojo/dom-construct", "dojo/fx"],
+           function (domConst, coreFx) {
+
+               //dojo.style("grid-window", "display", "none");
+
+               var newProjectLayerOptions = getNewProjectLayerOptions();
+               //log.debug(newProjectLayerOptions);
+
+               /*
+               if (!dojo.byId("new-project-sidebar")) {
+                   domConst.create("div", {
+                       id: 'new-project-sidebar',
+                       class: 'sliding-sidebar',
+                       //innerHTML: dojo.byId("new-project-content").innerHTML,
+
+                   }, "left-sidebar");
+               }
+               */
+
+               //move the new-project-content div into the div we just created above.
+               //domConst.place("new-project-sidebar", "new-project-content", "last"); //move the templatepicker in here.
+
+               //add programmatically assembled dropdown list into placeholder found in new-project-content div.
+
+               //not using this any longer 
+               //if (dojo.byId("replace-select"))
+               //     domConst.place("<select id='selectLayer' onchange='selectNewProjectLayer();'>" + newProjectLayerOptions + "</select>", "replace-select", "replace");
+
+               //dojo.style("templatePickerDiv", "display", "block");
+               //domConst.place("templatePickerDiv", "new-project-content", "after"); //move the templatepicker in here.
+
+               if (currentProjectKey) {
+                   currentProjectKey = null; //clear current selection.
+                   projectMap.clearSelections();
+                   setNewProjectSelectionTextValue("none.");
+               }
+
+               coreFx.slideTo({
+                   node: "new-project-sidebar",
+                   top: "100",
+                   left: "0",
+                   units: "px"
+               }).play();
+
+
+           });
+
+
+    }
+
+    //not used -- the dropdown to select this was removed.
+    function selectNewProjectLayer() {
+        standby.show();
+        var selection = dojo.byId("selectLayer").value;
+        if (selection == 'ALL')
+            projectMap.showAllFeatures();
+        else
+            projectMap.showLayerFeatures(selection);
+
+        standby.hide();
+    }
+
+    //returns the HTML options for filling in the new project layer select dropdown
+    function getNewProjectLayerOptions()
+    {
+        var options = "<option value='All'>Show all locations</option>";
+        
+        require(["dojo/_base/array"], function (array) {
+            array.forEach(layerConfig, function (item) {
+                options += "<option value='" + item.Id + "'>" + item.Name + "</option>";
+            });
+        });
+
+        return options;
+        
+    }
+
+    function selectNewProjectLocation() {
+        if (!currentProjectKey && !projectMap.hasNewGraphic()) {
+            alert("Please select a location to link your new project to.");
+            return;
+        }
+
+        hideProjectCreateSidebar();
+        //projectGrid.refresh();
+        toggleMyProjects('myprojects');
+        showEditProjectWindow();
+
+        log.debug("Save editing -------");
+        projectMap.saveEditing(1); //layerid
+        log.debug("and here.");
+        actionCreatingProject = false; //has to happen after showEditProjectWindow for it to say "New" instead of "Edit"
+
+    }
+
+    function editProject() {
+        if (!currentProjectKey) {
+            alert("Please select a project to edit and then try again.");
+            return;
+        }
+
+        if(!actionCreatingProject)
+            showEditProjectWindow();
+    }
+
+    function openProject() {
+        if (!currentProjectKey) {
+            alert("Please select a project to open and then try again.");
+            return;
+        }
+
+        if (!actionCreatingProject)
+            ShowProjectWindow(currentProjectId);
+    }
+
+    //also used to show New Project window
+    function showEditProjectWindow() {
+        
+        if (!actionCreatingProject && current_project.Owner.Id != current_user.Id) {
+            alert("You can only edit projects you own.");
+            return;
+        }
+
+        standby.show();
+
+        require(["dijit/registry", "dojo/request/xhr", "dojo/dom", "ctuir/widget/EditProjectWidget", "dojo/_base/array"],
+           function (registry, xhr, dom, EditProject, array) {
+               
+               if (actionCreatingProject) {
+                   EditProjectDialog.set("title", "New Project");
+                   current_project = {};
+               }
+               else {
+                   EditProjectDialog.set("title", "Edit Project");
+                   current_project = projectStore.get(currentProjectId);
+               }
+
+               /*
+               xhr(url).then(function (data) {
+                   dojo.byId("project-edit-window").innerHTML = data;
+               */
+
+               //TODO: how much of this destruction is really required?
+               destroyDijits("project-edit-window", "edit-project-page", editwidget);
+
+               
+               log.debug("the project?", current_project); //, "the metadata" , current_project.Metadata);
+
+               editwidget = new EditProject(current_project).placeAt("project-edit-window");
+               editwidget.startup();
+
+               //widget.setMetadataProperties(metadataproperties
+
+               //fire up the dojo form
+
+               require(["dojo/parser", "dijit/form/Select",
+                     /* dojox/ validate resources */
+                     "dojox/validate/us", "dojox/validate/web",
+                     /* basic dijit classes */
+                     "dijit/form/CheckBox", "dijit/form/Textarea",  "dijit/form/TextBox",
+                     "dijit/form/ValidationTextBox", "dijit/form/DateTextBox", "dijit/form/TimeTextBox",
+                     "dijit/form/Button", "dijit/form/RadioButton", "dijit/form/Form", "dijit/form/DateTextBox",
+                     /* basic dojox classes */
+                     "dojox/form/BusyButton", "dojox/form/CheckedMultiSelect",
+                     "dojox/form/Manager", 
+                     "dojo/domReady!"], function (parser, Select) {
+                         //"dojox/form/manager/_Mixin", "dojox/form/manager/_ValueMixin",
+                         log.debug("running parser");
+                         parser.parse();
+                         log.debug("done");
+
+                         EditProjectDialog.show();
+                         $(window).trigger('resize.fndtn.section'); //hack hack hack - and only works for IE apparently...
+                         
+                         /*
+                        var select = new Select({
+                            name: "ProjectTypeId",
+                            options: servicedropdown.getSelectOptions("ProjectTypes", current_project.ProjectTypeId),
+                            //labelAttr: "label",
+                            onChange: function () { setEditProjectType(this); }
+                        }, "project-type-select");
+
+                        select.startup();
+
+                        dijits.push(select); //TODO: tracking control in our own list. Can't seem to get to it any other way in dojo.
+                          */
+                         log.debug("here at create new cool things");
+
+                         var select = new Select({
+                             id: "metadata_23",
+                             name: "metadata_23",
+                             style: "width: 200px", //TODO probably a way to do this in css but it wasn't working for me.
+                             readOnly: false,
+                             onChange: function () { setEditProjectType(this); },
+                             options: metadataproperties.getSelectOptions(23, current_project["metadata_23"])
+                         }, "program-select");
+                         select.startup();
+                         dijits.push(select); 
+
+                         select = new Select({
+                             id: "metadata_24",
+                             name: "metadata_24",
+                             style: "width: 200px",
+                             readOnly: false,
+                             onChange: function () { setEditProjectType(this); },
+                             options: metadataproperties.getSelectOptions(24, current_project["metadata_24"])
+                         }, "subprogram-select");
+                         select.startup();
+                         dijits.push(select);
+
+                         //populate our metadata lists
+
+                         /*
+                         <select multiple="true"  name="metadata_6" >
+                               <option>Salmon</option>
+                               <option>Water</option>
+                               <option>Deer</option>
+                               <option>Cous</option>
+                               <option>Huckleberry</option>
+                          </select>
+                          */
+
+                         /* -- nice SELECT .. now for a multiselect --
+                         
+                         require(["dijit/form/Select", "dojo/json", "dojo/domReady!"], function (Select, json) {
+         
+                             var options = metadataproperties.getSelectOptions(6, "Deer");
+         
+                             log.debug("got some options", options);
+                             var soptions = json.stringify(options);
+         
+                             var koptions = [{ "label": "Water", "value": "Water" }, { "label": "Salmon", "value": "Salmon" }, { "label": "Deer", "value": "Deer", "selected": true }, { "label": "Cous", "value": "Cous" }, { "label": "Huckleberry", "value": "Huckleberry" }];
+         
+                             log.debug("stringed = ", soptions);
+         
+                             var select = new Select({
+                                 name: "metadata_6",
+                                 options: options,
+                                 labelAttr: "First Foods",
+                             }, "select-metadata-6");
+                             select.startup();
+                             //this.formDijits.push(select); //TODO see above
+         
+                             log.debug("and select is done!", select);
+                         });
+                         */
+
+                         //gotcha note: ItemReadFileStore doesn't implement the data api required by checkedmultiselect. use ObjectStore instead.
+                        require(["dojox/form/CheckedMultiSelect"],
+                            function (MultiSelect) {
+
+                                //var options = metadataproperties.getSelectOptions(6, current_project.metadata_6);
+
+                                var arr_ids = [6, 7, 8, 10, 19, 18, 21];
+                                
+                                for (var id in arr_ids) {
+                                    var field = "metadata_" + arr_ids[id];
+                                    log.debug("field = " + field, current_project[field]);
+                                    var select = new MultiSelect({
+                                        id: field,
+                                        name: field,
+                                        multiple: true,
+                                        readOnly: false,
+                                        options: metadataproperties.getSelectOptions(arr_ids[id], current_project[field])
+                                    }, "select-metadata-" + arr_ids[id]);
+                                    select.startup();
+                                    dijits.push(select); //TODO: see above
+                                }
+                                
+                            });
+
+                        standby.hide();
+                        
+
+                       
+                         
+                     });
+
+              
+           });
+
+
+
+    }
+
+ 
+    function OpenAddFile() {
+        if (current_project.Owner.Id != current_user.Id) {
+            alert("Currently, you can only add files to projects you own.");
+            return;
+        }
+
+        dojo.byId("file-dialog-projectid").setAttribute("value", current_project.Id);
+        AddFileDialog.show();
+    }
+
+    function setNewProjectSelectionText(project) {
+        if (dojo.byId("new-project-selection"))
+        {
+            var parts = project.split("_");
+            setNewProjectSelectionTextValue(parts[1]);
+            //dojo.byId("new-project-selection").innerHTML = "Location selected! (" + parts[1] +")";
+        }
+    }
+
+    function setNewProjectSelectionTextValue(text) {
+        dojo.byId("new-project-selection").innerHTML = "Location selected! (" + text + ")";
+    }
+
+    function cancelCreateProject() {
+
+        projectMap.abortEditing(1); //layerid
+
+        actionCreatingProject = false;
+        toggleMyProjects('myprojects');
+        hideProjectCreateSidebar();
+    }
+
+    function CloseEditProjectDialog() {
+        if (projectMap.hasNewGraphic())
+            projectMap.deleteNewGraphic(1); //layerId
+
+        EditProjectDialog.hide();
+    }
+
+
+
+    function SaveProject() {
+        log.debug("Saving project");
+        standby.show();
+        require(["dijit/registry", "dojo/_base/array", "dojo/date/stamp", "dojo/request/xhr", "dojo/json", "dojo/query", "dojo/dom", "dojo/domReady!"],
+            function (registry, array, stamp, request, json, query, dom) {
+
+            var form = registry.byId("new-project");
+
+            if (!form.validate()) {
+                standby.hide();
+                alert("There is a problem with your form submissions.  Please check the form for errors and try again.");
+                return;
+            }
+
+            var key_parts = currentProjectKey.split("_");
+            var values = form.gatherFormValues();
+            var now = new Date();
+
+            var saveArray = {
+                OrganizationId: 1, //default project org ... refactor me
+                ProjectTypeId: PROJECT_TYPE_PROJECT, // TODO: we'll add an admin capability soon.
+                Name: values.Name,
+                Description: values.Description,
+                CreateDateTime: "8/14/2013 4:29 PM", //this is ignored 
+                StartDate: dijit.byId("StartDate").displayedValue, //values.StartDate,
+                EndDate: dijit.byId("EndDate").displayedValue,//values.EndDate,
+                //ProjectTypeId: values.ProjectTypeId
+                //Metadata: { ProjectStatement: values.ProjectStatement }
+            };
+
+            array.forEach(dijits, function (dijit) {
+                if (dijit) {
+                    log.debug("Got a dijit: " + dijit.name);
+
+                    values[dijit.name] = de_stringify_number(dijit.value); //dumb dojo concession workaround here.
+                    saveArray[dijit.name] = de_stringify_number(dijit.value);
+                }
+            });
+
+        //TODO: totally RIPE for refactoring here!  :)
+            var url = PROJECT_DATA_URL;
+            var mode = "POST";
+            
+            if (values.Id != 0) //then we are saving an UPDATE not a NEW record
+            {
+                url += "/" + values.Id;
+                mode = "PUT";
+                saveArray.Id = values.Id;
+            }
+
+            restSend(url, saveArray, mode, function (data) {
+
+                var the_id = 0;
+
+                if (mode == "PUT")
+                    the_id = values.Id;
+                else {
+                    console.dir(data);
+                    console.log("Your new id is: " + data.Id);
+                    the_id = data.Id;
+                }
+
+                //Now save the project details (location + metadata)
+                
+                var metadata = [];
+
+                //log.debug("Looking for metadata");
+
+                //var names = [];
+               
+                /*
+                query("[name^=metadata]", dom.byId("new-project")).forEach(function (node) {
+                    if (array.lastIndexOf(names, node.name, names.length - 1) === -1) {
+                        names.push(node.name);
+                    }
+                });
+                */
+                //array.forEach(names, function (formfield) {
+
+                for (var formfield in values) {
+                    //log.debug("formfield: ", formfield);
+                    if(formfield.substring(0,8) == 'metadata') {
+                        //log.debug("found metadata...");
+                        key = formfield.substring(9);
+                        value = values[formfield];
+                        var md = {};
+                        md.MetadataPropertyId = key;
+                        md.Values = value.toString();
+                        //md[key] = value.toString();
+                        metadata.push(md);
+                        log.debug(key, value);
+                    }
+                    
+                };
+
+                //log.debug("done searching", metadata);
+
+                var saveDetailsArray = {
+                    Location: { SdeFeatureClassId: key_parts[0], SdeObjectId: key_parts[1] },
+                    Project: { Id: the_id },
+                    Metadata:  metadata
+                };
+
+                restSend(PROJECT_DETAILS_SAVE_URL, saveDetailsArray, "POST", function (project) {
+                    //log.debug("back");
+
+                    //var project = json.parse(projectdata);
+
+                    //log.debug("Project: " , project);
+                    //log.debug("ProjectData: " , projectdata);
+                    //Now add the new project to our list
+                    try {
+                        log.debug("before flattening!");
+
+                        flattenProject(project);
+                        setFavoriteStatus(project);
+
+                        log.debug("After flattening: ", project);
+                        projectStore.put(project);
+                        //log.debug("after put");
+                        projectGrid.refresh();
+                        //log.debug("after refresh");
+                        //projectGrid.select(project.Id);  //id
+                        //log.debug("after select");
+                        toggleMyProjects("myprojects");
+                        
+                    } catch (e) {
+                        log.error("An exception occurred trying to save a project: " + e.message);
+                        standby.hide();
+                        alert("There was a problem saving.  Please try again or contact technical support.");
+                    }
+
+                    log.debug("done saving!");
+                    log.audit("User ["+current_user.Id +" - "+ current_user.Fullname+"] updated project [" + project.Name + "(" + project.Id + ")]");
+                    EditProjectDialog.hide();
+                    
+                    setTimeout(function () {
+                        projectGrid.select(project.Id);
+                    }, 350);
+                    
+                    if (ViewProjectDialog.open) {
+                        //reload the view dialog if they had it open when editing.
+                        openProject();
+                    }
+
+                    standby.hide();
+                    log.debug("Done saving project!");
+
+                });
+            });
+            
+        });
+
+    }
+
+    /**
+    * json POST to given url
+    * Calls the url with the given data and returns a promise
+    *  Note: will convert the 'data' param to json stringify
+    *  Note: you can specifiy PUT as mode, but make sure in url to add the /id to the end (someaction/4)
+    */
+    function restSend(url, in_data, mode, todo) {
+
+        require(["dojo/request/xhr", "dojo/json"], function (request, json) {
+
+            log.debug("JSONPOST [" + mode + "] -> " + url);
+            log.debug("The Data: " , json.stringify(in_data));
+            
+            request(url,
+            {
+                handleAs: "json",
+                method: mode,
+                headers: { 'Content-Type': 'application/json' }, //don't forget this -- default is url-encoded form
+                data: json.stringify(in_data)
+            }).then(function (data) { todo(data); 
+            }, function (err) {
+                alert("There was a problem processing your request.  Please check your submission and try again or contact support.");
+                log.error(err);
+
+            });
+            
+        });
+    }
+
+
+    function hideProjectCreateSidebar() {
+        require(["dojo/dom-construct", "dojo/fx"], function (domConst, coreFx) {
+            coreFx.slideTo({
+                node: "new-project-sidebar",
+                top: "100",
+                left: "-450",
+                units: "px"
+            }).play();
+        });
+        HideSpecifyCoordinates();
+        //dojo.style("grid-window", "display", "block");
+    }
+
+
+    require(["dijit/form/TextBox", "dojo/on", "dojo/keys", "dojo/dom", "dojo/domReady!"], function (TextBox, on, keys, dom) {
+        var myTextBox = new dijit.form.TextBox({
+            name: "search-box",
+            value: "" /* no or empty value! */,
+            placeHolder: "Find Projects or Programs",
+        }, "search-box");
+
+        on(myTextBox, "keyup", function (e) {
+            if (e.keyCode == keys.ENTER) //comment out if you want it to do the typeahead thing...
+            {
+                e.stopPropagation();
+            }
+
+            dom.byId('search-icon').click();
+        });
+
+    });
+
+   
+
+    /** we give this to projectGrid.query **/
+    var filterQuery = function (item, index, items) {
+        var filterString = dojo.byId("search-box").value;
+
+        // early exits
+        if (filterString.length < 2) return true;
+        if (!item.Name) return false;
+
+        // compare
+        var name = (item.Name + "").toLowerCase();
+        var program = (item.program + "").toLowerCase();
+        log.debug("------------ " + program);
+        if (~name.indexOf(filterString.toLowerCase()) || (~program.indexOf(filterString.toLowerCase()))) {
+            return true;
+        }
+        return false;
+    };
+
+
+    function searchProjects() {
+        projectMap.isShowingAllFeatures = false;
+        dojo.byId("grid-control-content").innerHTML = "Search Results";
+        //have to set this at a deeper level:
+        var grid = projectGrid.getGrid();
+        grid.query = filterQuery;
+
+        projectGrid.refresh();
+    }
+
+    //this is to workaround a horrific bug in dijit/form/Select that won't
+    //  allow ints as id field.  
+    function stringify_number(someint) {
+        return "VAL_" + someint;
+    }
+
+    function de_stringify_number(somestr) {
+        if (somestr && typeof somestr === 'string' && somestr.search(/VAL_/) != -1)
+            return somestr.substring(4);
+
+        return somestr;
+    }
+
+
+  
+
+    function uploadFiles() {
+
+        require(["dojo/on", "dijit/registry"], function (on, registry) {
+            var uploader = registry.byId("uploader");
+            dojo.byId("file-save-results").innerHTML = "Sending files...";
+            //console.dir(uploader);
+
+
+            var refreshFiles = function (result) {
+                require(["dojo/on", "dijit/registry"], function (on, registry) {
+                    dojo.byId("file-save-results").innerHTML = "Success!";
+
+                    var uploader = registry.byId("uploader");
+                    refreshProjectFiles(current_project.Id);
+                    
+                    AddFileDialog.hide();
+                    dojo.byId("file-save-results").innerHTML = "";
+                    uploader.reset();
+                });
+            };
+
+            //set them both since we need to handle response either way
+            uploader.onComplete = refreshFiles;
+            uploader.onError = refreshFiles;
+            uploader.upload();
+
+
+            
+            
+        });
+    }
+
+    function cancelUpload() {
+        require(["dojo/on", "dijit/registry"], function (on, registry) {
+            var uploader = registry.byId("uploader");
+            uploader.reset();
+            AddFileDialog.hide();
+        });
+    }
+
+
+    function refreshProjectFiles(id) {
+        require([
+                "dojo/request/xhr", "dojo/store/Memory", "dojo/dom"
+        ],
+                function (request, Memory, dom) {
+                    request("/services/action/ProjectFiles?ProjectId="+id,
+                        {
+                            handleAs: "json",
+                        }).then(function (files) {
+                            //refresh files
+                            console.log("back with files?!");
+                            log.debug(files);
+                            try {
+
+                                //clear any search parms
+                                dom.byId("search-gallery").value = "";
+                                dom.byId("search-docs").value = "";
+
+                                log.debug("do we have the id in this context? == " + id);
+                                current_project.Files = files;
+                                projectStore.remove(id);
+                                projectStore.put(current_project);
+                                log.debug("after remove/put");
+                                projectGrid.refresh();
+
+                                log.debug("after refresh");
+                                projectGrid.select(current_project.Id);  //id
+                                log.debug("after select");
+                                //current_project = project;
+
+                                log.debug("setting file stores");
+                                docsgrid.setStore(new Memory({ data: current_project.Files, idProperty: "Id" }));
+                                gallerygrid.setStore(new Memory({ data: current_project.Files, idProperty: "Id" }));
+                                docsgrid.refresh();
+                                gallerygrid.refresh();
+                                
+
+
+                            }catch(e) {
+                                log.debug("Error: ",e);
+                            }
+                            
+                        });
+
+                });
+    }
+
+
+    function setupBehaviors() {
+        require(["dojo/on", "ctuir/MetadataProperties", "ctuir/ServiceBackedDropdown", "dojo/domReady!"],
+            function (on,
+                MetadataProperties,
+                ServiceDropdown)
+            {
+                on(dojo.byId("grid-control-content"), "click", function (e) {
+                    toggleMyProjects();
+                });
+                metadataproperties = new MetadataProperties();
+                servicedropdown = new ServiceDropdown();
+            });
+
+        
+        require(['dojox/form/Uploader',
+                 "ctuir/form/FileList",
+                 'dojox/form/uploader/plugins/IFrame', 
+                 "dojo/domReady!"], function (Uploader, FileList, dom, registry) {
+            try {
+
+                console.log("------------->>> uploader <<<------------------");
+
+                var myUploader = new dojox.form.Uploader({
+                    label: 'Select files',
+                    multiple: true
+                }, "uploader"); // disregard reference argument
+
+                myUploader.startup();
+                //dojo.byId("uploader").appendChild(myUploader.domNode);
+
+                var filelist = new ctuir.form.FileList({uploaderId: 'uploader'}, "file-list");
+                filelist.startup();
+
+                console.log("ready!");
+                //console.dir(myUploader);
+            } catch (e) {
+                console.log("Error. " + e.message);
+                console.dir(e);
+            }
+        });
+
+    }
+
+    function createByLatLong() {
+        var lat = dojo.byId("latitude").value;
+        var long = dojo.byId("longitude").value;
+        if(lat != "" && long != "")
+            projectMap.addPointByLatLong(lat, long, 1); //layerId
+    }
+ 
+    function ShowSpecifyCoordinates() {
+        require(["dojo/dom-class"], function (domClass) {
+            domClass.remove("latlong", "hidden");
+            domClass.add("open-latlong", "hidden");
+        });
+    }
+    function HideSpecifyCoordinates() {
+        require(["dojo/dom-class"], function (domClass) {
+            domClass.add("latlong", "hidden");
+            domClass.remove("open-latlong", "hidden");
+        });
+    }
+
+    function viewPreferences() {
+        dojo.byId("PrefUsername").value = current_user.Username;
+        dojo.byId("PrefFullname").value = current_user.Fullname;
+        if (is_empty(current_user.Description)) current_user.Description = "";
+        dojo.byId("PrefDescription").value = current_user.Description;
+
+        var dijit = getDijit("PrefDepartment");
+        if (!dijit) {
+            require(["dijit/form/Select"], function (Select) {
+                var select = new Select({
+                    id: "PrefDepartment",
+                    name: "PrefDepartment",
+                    style: "width: 250px;",
+                    readOnly: false,
+                    options: servicedropdown.getSelectOptions("Departments", current_user.Department.Id),
+                }, "pref-department-select");
+                select.startup();
+                dijits.push(select);
+            });
+        }
+
+        PreferencesDialog.show();
+    }
+
+    //again -- this is dumb -- somehow the dijit registry isn't working right for me so we are keeping our own list.  TODO!
+    function getDijit(name){
+
+        var the_dijit;
+
+        require(["dojo/_base/array"], function(array){
+            array.forEach(dijits, function (dijit) {
+                if (dijit && dijit.name == name) {
+                    the_dijit = dijit;
+                }
+            });
+        });
+
+        return the_dijit;
+
+    }
+
+    function savePreferences() {
+
+        var saveArray = current_user;
+        saveArray['Fullname'] = dojo.byId("PrefFullname").value;
+        saveArray['Description'] = dojo.byId("PrefDescription").value;
+        saveArray['DepartmentId'] = de_stringify_number(getDijit("PrefDepartment").value);
+        
+        delete saveArray['Department'];
+        delete saveArray['Organization'];
+        delete saveArray['UserPreferences'];
+
+        var url = USER_DATA_URL + current_user.Id;
+
+        log.debug("Save array :: ", saveArray);
+        
+        restSend(url, saveArray, "PUT", function (data) {
+            log.debug("Successfully saved preferences.");
+            current_user.Fullname = saveArray.Fullname;
+            current_user.Description = saveArray.Description;
+            dojo.byId("div-preferences").innerHTML = "<center><br/>Success!<br/>Please wait while we refresh all data.<br/><br/></center>";
+
+            setTimeout(function () {
+                document.location.reload(true);
+            }, 800);
+
+            
+        });
+        
+
+        log.audit("User ["+current_user.Fullname+"] updated their preferences [" + saveArray.Fullname + "," + saveArray.Description + "]");
+
+    }
+
+</script>
+
+</head>
+<body class="claro">
+
+ <div id="init-overlay"><div id="init-heading">CTUIR Project Tracker v.1.0</div><img src="images/init.gif" />
+    <div id="init-loading">Loading...<br /><br /><br /><br /><img src="images/FirstFoodsBanner.png" style="width: 100%;" /></div></div>
+    
+    <div class="row" id="header-row">
+
+        <div class="large-12 columns pt-panel map-div">
+            
+                <div id="mapDiv"></div>
+
+                <div id="top-header">
+
+                    <div id="top-heading">CTUIR DNR Project Tracker</div>
+
+                    <div id="top-toolbar">
+
+                        <button id="projectButton" label="View" data-dojo-type="dijit.form.DropDownButton">
+                            <div data-dojo-type="dijit.Menu" id="projectMenu">
+                            </div>
+                        </button>
+
+                        <button id="dropdownButton" label="Basemaps" data-dojo-type="dijit.form.DropDownButton">
+                            <div data-dojo-type="dijit.Menu" id="basemapMenu">
+                                <!--The menu items are dynamically created using the basemap layers-->
+                            </div>
+                        </button>
+
+                        <button id="loginButton" label="LoginMenu" data-dojo-type="dijit.form.DropDownButton">
+                            <div data-dojo-type="dijit.Menu" id="loginMenu">
+                            </div>
+                        </button>
+                    
+                        <div title="Open Help Documentation" id="helpMenu" class="project-tool"><a href="/cdms/docs/Welcome%20to%20the%20DNR%20Project%20Tracker.pdf"><img  class="header-tool-image" src="images/help-button.png" /></a></div>
+                        <!-- div title="Toggle Legend" id="legendMenu" class="project-tool"><a href="#" onclick="toggleLegend();"><img class="header-tool-image" src="images/tool-legend.png" /></a></!-->
+                    </div>
+                </div>
+                <div id="left-sidebar"></div>
+                <div id="right-sidebar"></div>
+        </div>
+
+      </div>
+      
+      <div class="row pt-panel-grid" id="grid-window">
+        <div class="large-12 columns pt-panel pt-panel-grid">
+
+            <div id="grid-toolbar" class="row">
+                <div id="grid-control"><div id="grid-control-content">My Favorites</div></div>
+                <div class="large-9 columns">
+                    <div class="search-field" title="Filter projects by name">
+                            <input id="search-box"><a id="search-icon" href="#" onclick="searchProjects();"><img src="images/search-sm.png" /></a>
+
+                    </div>
+                </div>
+                
+                <div id="project-toolbar" class="large-3 columns">
+                <div class="right">
+                    <div title="Toggle 'Favorite' status" id="tool-favoriteproject" class="project-tool"><a href='#' onClick="favoriteProject();"><img id="favorite-active" class="on" src='images/favorite-on.png'/><img id="favorite-inactive" class="off" src='images/favorite-off.png'/></a></div>
+                    <div title="Open Project"  id="tool-viewproject" class="project-tool"><a href='#' onClick="openProject();"><img src='images/tool-open.png'/></a></div>
+                    <div title="Edit Project" id="tool-editproject" class="project-tool"><a href="#" onclick="editProject();"><img src="images/tool-edit.png" /></a></div>
+                    <div title="Add Project" id="tool-newproject" class="project-tool"><a href="#" onclick="createProject();"><img src="images/tool-add.png" /></a></div>
+                </div>
+                </div>
+            </div>
+
+            <div id="grid" ondblclick="openProject();">
+                        
+
+            </div>
+
+        </div>
+    </div><!-- end footer row -->
+
+
+
+<div id="dialog-box-edit" data-dojo-type="dijit/Dialog" data-dojo-id="EditProjectDialog" title="Edit Project">
+    <div class="dijitDialogPaneContentArea">
+        <div>
+                <div id="project-edit-window">
+                </div>
+        </div>
+    </div>
+</div>
+
+<div id="dialog-add-file" data-dojo-type="dijit/Dialog" data-dojo-id="AddFileDialog" title="Add File">
+    <div class="dijitDialogPaneContentArea">
+        <div style="width: 520px; height: 450px; overflow: auto;">
+                    <div class="add-file">
+                        <form class="custom" action="/services/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
+                        <input type="hidden" id="file-dialog-projectid" name="ProjectId" value="${current_project.Id}" />
+                        <h4>Add new documents</h4>
+                        <p>Click the browse button and select the file(s) you would like to add to your project.  Next, add a title and description for each file.</p>
+                             <div class="row">
+                                 <div class="large-10 columns">
+                                    <div class="browseButton" id="uploader"></div>
+                                 </div>
+                                 
+                             </div>
+                            
+                             <div class="row">
+                                <div class="large-12 columns uploader-filelist">
+                                        <div id="file-list"></div>                                </div>
+                             </div>
+
+                              <div class="row">
+                                <div class="large-12 columns file-buttons">
+                                    <input type="submit" label="Upload" onclick="return uploadFiles();" data-dojo-type="dijit/form/Button" />
+                                    <button onclick="cancelUpload();" data-dojo-type="dijit/form/Button">Cancel</button>
+                                </div>
+                             </div>
+
+                             <div class="row">
+                                <div class="large-10 columns">
+                                    <div id="file-save-results"></div>
+                                </div>
+                             </div>
+                        </form>
+
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="dialog-box-view" data-dojo-type="dijit/Dialog" data-dojo-id="ViewProjectDialog" title="View Project">
+    <div class="dijitDialogPaneContentArea">
+                <div id="project-details-window">
+                </div>
+    </div>
+</div>
+
+      <div id="choose-summary-images" data-dojo-type="dijit/Dialog" data-dojo-id="SummaryImageDialog" title="Choose Summary Images...">
+        <div class="dijitDialogPaneContentArea">
+            <div id="summary-image-dialog">
+                <div class="panel">
+                <div class="row">
+                            <div class="large-12 columns">
+                                <div id="choose-image-grid"></div>
+                                </div>
+                                </div>
+<div class="row">
+                            <div class="large-12 columns">
+                             <div class="dijitDialogPaneActionBar" style="width: 100%;">
+                    <button id="clear-images" data-dojo-type="dijit/form/Button">Clear Selections
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            imagegrid.clearSelection();
+                            imagegrid.refresh();
+                        </script>
+                    </button>
+                    <button id="cancel-images" data-dojo-type="dijit/form/Button">Cancel
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            SummaryImageDialog.hide();
+                        </script>
+                    </button>
+                    <button id="save-images" data-dojo-type="dijit/form/Button">Save
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            SaveImageSelections(imagegrid);
+                            SummaryImageDialog.hide();
+                        </script>
+                    </button>
+                    </div>
+                    </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <div id="choose-map-image" data-dojo-type="dijit/Dialog" data-dojo-id="MapImageDialog" title="Choose Map Image...">
+        <div class="dijitDialogPaneContentArea">
+            <div id="map-image-dialog">
+                <div class="panel">
+                <div class="row">
+                            <div class="large-12 columns">
+                                <div id="choose-map-image-grid"></div>
+                                </div>
+                                </div>
+<div class="row">
+                            <div class="large-12 columns">
+                             <div class="dijitDialogPaneActionBar" style="width: 100%;">
+                    <button id="clear-map-image" data-dojo-type="dijit/form/Button">Clear Selections
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            imagegrid.clearSelection();
+                            imagegrid.refresh();
+                        </script>
+                    </button>
+                    <button id="cancel-map-image" data-dojo-type="dijit/form/Button">Cancel
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            MapImageDialog.hide();
+                        </script>
+                    </button>
+                    <button id="save-map-image" data-dojo-type="dijit/form/Button">Save
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            SaveImageMapSelection(imagegrid);
+                            MapImageDialog.hide();
+                        </script>
+                    </button>
+                    </div>
+                    </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div id="dialog-edit-file" data-dojo-type="dijit/Dialog" data-dojo-id="EditFileDialog" title="Edit File Details">
+    <div class="dijitDialogPaneContentArea">
+              <div id="edit-file-window"></div> 
+    </div>
+
+</div>
+
+<div id="dialog-preferences" data-dojo-type="dijit/Dialog" data-dojo-id="PreferencesDialog" title="Preferences">
+    <div class="dijitDialogPaneContentArea">
+              <div id="div-preferences">
+                <div class="row">
+                        <div class="large-12 columns">
+                            <label for="PrefUsername">Username</label>
+                            <input name="PrefUsername" id="PrefUsername" data-dojo-type="dijit/form/TextBox" readonly="true" disabled="disabled"/>
+                        </div>
+                </div>
+                <div class="row">
+                        <div class="large-12 columns">
+                            <label for="PrefFullname">Full Name</label>
+                            <input name="PrefFullname" id="PrefFullname" data-dojo-type="dijit/form/TextBox" />
+                        </div>
+                </div>
+
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label for="PrefDepartment">Department</label>
+                        <div id="pref-department-select"></div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                        <div class="large-12 columns">
+                            <label for="PrefDescription">Bio</label>
+                            <input name="PrefDescription" id="PrefDescription" data-dojo-type="dijit/form/Textarea" />
+                        </div>
+                </div>
+
+                <div class="row">
+                        <div class="large-12 columns">
+                            <input type="submit" label="Save" data-dojo-type="dijit/form/Button" onclick="savePreferences(); return false;" value="Save" style="float: right;"/>
+                            <button onclick="PreferencesDialog.hide();" data-dojo-type="dijit/form/Button">Cancel</button>
+                        </div>
+                </div>  
+              </div> 
+    </div>
+
+</div>
+
+<div id="dialog-box-login" data-dojo-type="dijit/Dialog" data-dojo-id="LoginDialog" title="Authenticate">
+    <div class="dijitDialogPaneContentArea">
+                <div id="login-form">
+                    <div class="panel">
+                    <div id="login-message">Enter your CTUIR username and password if you are an authorized user.</div>
+                    <form class="custom" action="/services/account/login" method="POST" id="LoginForm" >
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <label for="Username">Username</label>
+                                <input name="Username" id="Username" data-dojo-type="dijit/form/TextBox" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <label for="Password">Password</label>
+                                <input name="Password" type="password" id="Password" data-dojo-type="dijit/form/TextBox" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <input type="submit" class="button" onclick="submitLogin(); return false;" value="Login" style="float: right;"/>
+                            </div>
+                        </div>                        
+                    </form>
+                    </div>
+                </div>
+    </div>
+</div>
+
+<div id="helpDiv"><h4>Create a new project</h4>
+<p>The first step in creating a new project is to select your project's location.  All projects are linked to a geographic location, even if it is just a very general point.</p>
+<p>Indicate your project's location by clicking a point on the map.  When you click a point, the location you select is displayed next to the Create Project button.  
+</p>
+<p>If a relevant point doesn't exist, you can create a new point using the toolbar.  Click the point icon in the left sidebar panel and then use your mouse to 
+click the point you want on the map.  
+</p>
+<p>Once your location is selected, click the 'Create Project' button.</p>
+</div>
+
+<div id="legendDiv"></div>
+
+<div id="new-project-sidebar" class="sliding-sidebar">
+<div id='new-project-content'>
+<h4>Where is your project?</h4>
+<p>Select or create the feature to link as your project's location.  Click help for more info.</p>
+    <div id='new-project-selection'>Selection: none.</div>
+    <button class='tiny secondary' onclick='cancelCreateProject();'>Cancel</button> <button id='select-location' class='tiny secondary' onclick='selectNewProjectLocation();'>Create Project</button>
+    <hr /><p>Click on the map to create a new point</p>
+    <div id="templatePickerDiv"></div>
+    <div id="open-latlong" onclick="ShowSpecifyCoordinates();"><div class="closed">&nbsp;</div>Or click here to specify coordinates:</div>
+    <div id="latlong" class="hidden">
+    <div class="open">&nbsp;</div>
+    Specify latitude/longitude:
+    <input id="latitude" style="width: 145px;" data-dojo-props="placeHolder:45.8354150328846" data-dojo-type="dijit.form.TextBox"  />
+    <input id="longitude" style="width: 145px;" data-dojo-props="placeHolder:-119.3328630924220" data-dojo-type="dijit.form.TextBox" />
+    <button class="tiny secondary" onclick="createByLatLong();">New point</button>
+    </div>
+    
+    
+</div>
+</div>
+
+  <script>
+      //TODO:::  remove what we don't need...
+      document.write('<script src=' +
+      ('__proto__' in {} ? '../assets/js/vendor/foundation/js/vendor/zepto' : '../assets/js/vendor/foundation/js/vendor/jquery') +
+      '.js><\/script>')
+  </script>
+
+  <script src="../assets/js/vendor/foundation/js/foundation/foundation.js"></script>
+  <script src="../assets/js/vendor/foundation/js/foundation/foundation.dropdown.js"></script>
+  <script src="../assets/js/vendor/foundation/js/foundation/foundation.forms.js"></script>
+  <script src="../assets/js/vendor/foundation/js/foundation/foundation.section.js"></script>
+  <script src="../assets/js/vendor/foundation/js/foundation/foundation.tooltips.js"></script>
+
+  <script>
+      $(document).foundation();
+
+  </script>
+
+ 
+
+
+</body>
+</html>

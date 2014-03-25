@@ -1,0 +1,19 @@
+<p class="text-left">Choose a date expression:</p>
+<div class="row">
+	<div class="col-md-6">
+		<input type="radio" ng-model="Criteria.Value" value="all">All</input>
+	</div>
+	<div class="col-md-6">
+		&nbsp;
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6">
+		<input type="radio" ng-model="Criteria.paramActivityDateType" value="between">Between</input>
+	</div>
+	<div class="col-md-6">
+		<input  class="form-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.Value.BetweenFromActivityDate" is-open="copened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+		<input  class="form-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.Value.BetweenToActivityDate" is-open="dopened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+	</div>
+</div>

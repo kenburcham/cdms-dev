@@ -1,0 +1,75 @@
+
+<div class="query-box">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="activities-where-box">
+				<p class="text-center query-header-text">Activities where</p>
+				<p class="text-left"><b>Activity Date:</b></p>
+				<div class="row">
+					<div class="col-md-6">
+						<input type="radio" ng-model="Criteria.paramActivityDateType" value="all">All</input>
+					</div>
+					<div class="col-md-6">
+						&nbsp;
+					</div>
+				</div>
+
+				
+				<div class="row">
+					<div class="col-md-12">
+						<input type="radio" ng-model="Criteria.paramActivityDateType" value="between">Between</input>
+						<br/>
+						<input class="query-date-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.BetweenFromActivityDate" is-open="copened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+						and
+						<input class="query-date-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.BetweenToActivityDate" is-open="dopened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+					</div>
+				</div>
+
+				<div class="row top-divider">
+					<div class="col-md-4">
+						QA Status:
+					</div>
+					<div class="col-md-8">
+						<select ng-model="Criteria.ParamQAStatusId" ng-options="id as name for (id, name) in QAStatusOptions">
+						</select>
+					</div>
+				</div>
+
+				<div class="row top-divider">
+					<div class="col-md-4">
+						Location: <a href="#" title="Select locations using a map" ><img src="images/selectmap.jpg"/></a>
+					</div>
+					<div class="col-md-8">
+						<select class="query-form-control" ng-model="Criteria.LocationIds" multiple ng-multiple="true" size="4" ng-options="id as name for (id, name) in locationOptions">
+						</select>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="col-md-5 field-list-box">
+			<p class="text-center query-header-text">selected field</p>
+
+			<div class="row">
+				<div class="col-md-6">
+					<select multiple ng-multiple="false" size="12" ng-model="Criteria.ParamFieldSelect" ng-options="Value.Label for Value in dataset.Fields"/>
+				</div>
+				<div class="col-md-6">
+					{{Criteria.ParamFieldSelect[0].Field.Description}}<br/>
+				</div>
+			</div>
+
+		</div>
+		<div class="col-md-3 criteria-list-box">
+			<p class="text-center query-header-text">matches criteria</p>
+			<div class="row">
+				<div class="col-md-12" style="height: 200px;">
+					<ng-include src="'partials/query/field-' + Criteria.ParamFieldSelect[0].ControlType + '.html'"></ng-include>
+				</div>
+			</div>
+			<button class="btn right" ng-click="addCriteria()">Add criteria</button>
+
+		</div>
+	</div>
+</div>
+

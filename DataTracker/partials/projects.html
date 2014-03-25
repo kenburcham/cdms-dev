@@ -1,0 +1,17 @@
+﻿<h3>Projects List</h3>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span10">
+     
+            <ul>
+                <li ng-repeat="project in projects" class="project-listing">
+                    <a href="#/projects/{{project.Id}}">{{project.Name}}</a>
+                    <p>{{project.Description}}</p>
+                </li>
+            </ul>
+
+            <p>Total number of projects: {{projects.length}}</p>
+
+        </div>
+    </div>
+</div>

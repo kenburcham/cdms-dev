@@ -1,0 +1,11 @@
+<div ng-show="activities.success" style="margin-bottom: 50px;">
+    <div class="alert alert-success" ng-show="activities.success">
+    <h4 class="alert-heading">Success!</h4>
+    {{activities.success}}
+    </div>
+    <button class="btn right" ng-click="doneButton()">Done</button>
+</div>
+<div>    
+    <p ng-show="activities.errors.saveError" class="alert alert-danger">{{activities.errors.saveError}}</p>
+    <div ng-show="errors" class="alert alert-danger"><div ng-repeat="error in errors">{{error}}</div></div>
+</div>

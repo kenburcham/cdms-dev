@@ -1,0 +1,69 @@
+<!-- Single activity data entry -->
+<ul class="breadcrumb">
+    <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
+    <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
+    <li><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
+    <li class="active">Data entry form</li>
+</ul>
+<h4>Add new activity to: {{dataset.Name}}</h4>
+ 
+<div ng-include="'partials/dataentry/messages.html'"/>
+
+<div class="row" ng-show="!activities.success">
+
+    <div class="error-table" style="width: 400px; margin-top: 30px; float: right; margin-right: 50px;" >
+        <table class="table table-striped table-bordered table-condensed" style="width: 250px;">
+            <tbody>
+                <tr>
+                    <td>Total Records:</td><td>{{dataSheetDataset.length}}</td>
+                </tr>
+                <tr>
+                    <td>Records with errors: </td><td>{{validation_error_count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <div ng-include="'partials/grid-validation-error-box.html'"></div>
+    </div>
+
+    <div class="header-box" style="margin-top: 20px; width: 500px;">
+            <div class="header-label">Location:</div>
+            <div class="header-value">
+                <select class="form-control" ng-model="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
+                </select>
+            </div>
+            <div class="header-label">Activity Date:</div>
+            <div class="header-value">
+                <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" min="'2000-01-01'" 
+                max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+            </div>
+        <form novalidate class="row-form">
+        <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
+            <ctuir-text-field ng-switch-when="text"></ctuir-text-field>
+            <ctuir-textarea-field ng-switch-when="textarea"></ctuir-textarea-field>
+            <ctuir-number-field ng-switch-when="number"></ctuir-number-field>    
+            <ctuir-date-field ng-switch-when="date"></ctuir-date-field>
+            <ctuir-radio-field ng-switch-when="radio"></ctuir-radio-field>
+            <ctuir-checkbox-field ng-switch-when="checkbox"></ctuir-checkbox-field>
+            <ctuir-select-field ng-switch-when="select"></ctuir-select-field>
+            <ctuir-multiselect-field ng-switch-when="multiselect"></ctuir-multiselect-field>
+            <ctuir-text-field ng-switch-default></ctuir-text-field>
+        </div>
+        <div class="header-label">QA Status:</div>
+            <div class="header-value">
+                <select class="form-control" ng-model="row.ActivityQAStatus['QAStatusId']" ng-input="row.ActivityQAStatus['QAStatusId']" ng-options="id as name for (id, name) in QAStatusOptions"></select>
+            </div>  
+
+            <div class="header-label">QA Comments:</div>
+            <div class="header-value">
+                <textarea class="form-control" ng-model="row.ActivityQAStatus['Comments']" ng-input="row.ActivityQAStatus['Comments']"></textarea>
+            </div>  
+
+        </form>
+    </div>
+
+<div class="datasheet-grid" ng-grid="gridDatasheetOptions" style="margin-top: 20px;"></div>
+
+<div ng-include="'partials/dataentry/buttons.html'"/>
+
+</div>
