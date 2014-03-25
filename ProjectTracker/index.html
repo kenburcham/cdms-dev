@@ -8,22 +8,24 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Project Tracker v.1.1</title>
 
-<link rel="stylesheet" href="../assets/js/vendor/foundation/css/normalize.css" />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+
+<!-- link rel="stylesheet" href="../assets/js/vendor/foundation/css/normalize.css" / -->
 <link rel="stylesheet" href="../assets/js/vendor/foundation/css/foundation.css?v2" />
 
 <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
 <link rel="stylesheet" href="//js.arcgis.com/3.6/js/esri/css/esri.css">
 <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dijit/themes/claro/claro.css" />
 <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dojox/form/resources/CheckedMultiSelect.css" />
 <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.6/js/dojo/dojox/form/resources/UploaderFileList.css" />
 
 
-<link rel="stylesheet" type="text/css" href="ptgrid.css?v1" />
+<link rel="stylesheet" type="text/css" href="ptgrid.css?v2" />
 
 <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
 <script src="../assets/js/vendor/foundation/js/vendor/custom.modernizr.js"></script>
 <script src="ctuir/Core.js"></script>
-
 
 <!-- Load the library references for ArcGIS API for JavaScript -->
 <script>var dojoConfig = {
@@ -1572,6 +1574,50 @@
 </head>
 <body class="claro">
 
+<nav class="navbar navbar-default" role="navigation">
+                      <!-- Brand and toggle get grouped for better mobile display -->
+                      <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                          <span class="sr-only">Toggle navigation</span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">CDMS</a>
+                      </div>
+
+                      <!-- Collect the nav links, forms, and other content for toggling -->
+                      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                          <li><a href="http://data.ctuir.org/cdms-dev/ProjectTracker/index.html">ProjectTracker</a></li>
+                          <li><a href="#">My projects</a></li>
+                          <li class="active"><a href="#/projects/1222">My datasets</a></li>
+                          <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                              <li><a href="#/datasetquery/1">Query Adult Weir (All locations)</a></li>
+                              <li><a href="http://gis-sql/Reports">Reports</a></li>
+                            </ul>
+                          </li>
+                          
+                        </ul>
+                        
+                        <ul class="nav navbar-nav navbar-right">
+                          <li><a href="#">Help</a></li>
+                          <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Profile.Fullname}}<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                              <li><a href="#">Preferences</a></li>
+                              <li class="divider"></li>
+                              <li><a href="#">Logout</a></li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </div><!-- /.navbar-collapse -->
+                    </nav>
+
+
+
  <div id="init-overlay"><div id="init-heading">CTUIR Project Tracker v.1.0</div><img src="images/init.gif" />
     <div id="init-loading">Loading...<br /><br /><br /><br /><img src="images/FirstFoodsBanner.png" style="width: 100%;" /></div></div>
     
@@ -1581,32 +1627,11 @@
             
                 <div id="mapDiv"></div>
 
-                <div id="top-header">
-
-                    <div id="top-heading">CTUIR DNR Project Tracker</div>
-
-                    <div id="top-toolbar">
-
-                        <button id="projectButton" label="View" data-dojo-type="dijit.form.DropDownButton">
-                            <div data-dojo-type="dijit.Menu" id="projectMenu">
-                            </div>
-                        </button>
-
-                        <button id="dropdownButton" label="Basemaps" data-dojo-type="dijit.form.DropDownButton">
-                            <div data-dojo-type="dijit.Menu" id="basemapMenu">
-                                <!--The menu items are dynamically created using the basemap layers-->
-                            </div>
-                        </button>
-
-                        <button id="loginButton" label="LoginMenu" data-dojo-type="dijit.form.DropDownButton">
-                            <div data-dojo-type="dijit.Menu" id="loginMenu">
-                            </div>
-                        </button>
                     
-                        <div title="Open Help Documentation" id="helpMenu" class="project-tool"><a href="/cdms/docs/Welcome%20to%20the%20DNR%20Project%20Tracker.pdf"><img  class="header-tool-image" src="images/help-button.png" /></a></div>
-                        <!-- div title="Toggle Legend" id="legendMenu" class="project-tool"><a href="#" onclick="toggleLegend();"><img class="header-tool-image" src="images/tool-legend.png" /></a></!-->
-                    </div>
-                </div>
+
+
+
+
                 <div id="left-sidebar"></div>
                 <div id="right-sidebar"></div>
         </div>
@@ -1890,18 +1915,14 @@ click the point you want on the map.
 </div>
 </div>
 
-  <script>
-      //TODO:::  remove what we don't need...
-      document.write('<script src=' +
-      ('__proto__' in {} ? '../assets/js/vendor/foundation/js/vendor/zepto' : '../assets/js/vendor/foundation/js/vendor/jquery') +
-      '.js><\/script>')
-  </script>
-
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="../assets/js/vendor/foundation/js/foundation/foundation.js"></script>
   <script src="../assets/js/vendor/foundation/js/foundation/foundation.dropdown.js"></script>
   <script src="../assets/js/vendor/foundation/js/foundation/foundation.forms.js"></script>
   <script src="../assets/js/vendor/foundation/js/foundation/foundation.section.js"></script>
   <script src="../assets/js/vendor/foundation/js/foundation/foundation.tooltips.js"></script>
+
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
   <script>
       $(document).foundation();
