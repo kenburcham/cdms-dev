@@ -161,7 +161,7 @@ function savePreference(pref)
 {
     var userprefs = { UserPreference: pref };
 
-    restSend("/services/action/SaveUserPreference", userprefs, "post", function (data) {
+    restSend(SERVER_SERVICE + "/action/SaveUserPreference", userprefs, "post", function (data) {
         if (data.message == "Failure") {
             alert("There was a problem saving your preference information.");
             log.error("had an error saving preferences: " + userprefs);
@@ -232,7 +232,7 @@ function saveMetadata(current_project, metadata) {
         Metadata: metadata //and here's the new changes to save
     };
 
-    restSend("/services/action/SaveProjectDetails", saveDetailsArray, "POST", function (project) {
+    restSend(SERVER_SERVICE + "/action/SaveProjectDetails", saveDetailsArray, "POST", function (project) {
         log.debug("back from saveMetadata");
 
         //var project = json.parse(projectdata);
@@ -499,7 +499,7 @@ function formatDisplayUTCDate(the_date)
 
 function logout() {
     require(["dojo/request/xhr"], function (request) {
-        request("/services/account/logout").then(function (data) {
+        request(SERVER_SERVICE + "/account/logout").then(function (data) {
             window.location = "index.html";
         });
     });

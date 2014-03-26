@@ -13,7 +13,7 @@ define(["dojo/_base/declare"], function (declare) {
                 "dojo/request/xhr", "dojo/store/Memory",
             ],
                 function (request, Memory) {
-                    request("/services/api/MetadataProperties",
+                    request(SERVER_SERVICE + "/api/MetadataProperties",
                         {
                             handleAs: "json",
                         }).then(function (data) {

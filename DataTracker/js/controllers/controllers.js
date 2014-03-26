@@ -9,6 +9,20 @@ var mod_ds = angular.module('DatasetControllers', ['ui.bootstrap', 'angularFileU
 var projectsController = ['$scope', 'DataService',
 	function(scope, DataService){
 		scope.projects = DataService.getProjects();
+
+        var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '<a href="#/projects/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
+                               '</div>';
+
+        scope.gridOptions = {
+            data: 'projects',
+            columnDefs:
+            [
+                {field: 'Name', displayName: 'Project Name', width: '35%', cellTemplate: linkTemplate},
+                {field: 'Description', displayName: 'Description'}
+            ]
+        }
+
 	}
 ];
 
@@ -67,13 +81,64 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
             		]	
             };
 
+        var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}">' +
+                                '<img src="{{row.getProperty(\'Link\')}}"" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '{{row.getProperty("Name")}}</a>' +
+                               '</div>';
+
+        var uploadedBy = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '{{row.getProperty("UploadDate")|date}} by {{row.getProperty("User.Fullname")}}' +
+                               '</div>';                               
+
+        scope.gridFiles = {
+            data: 'project.Files',
+            columnDefs:
+            [
+                {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate},
+                {field: 'Title'},
+                {field: 'Description'},
+                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
+                {field: 'Size'},
+            ]
+        };
+
+        scope.gridGallery = {
+            data: 'project.Images',
+            columnDefs:
+            [
+                {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate},
+                {field: 'Title'},
+                {field: 'Description'},
+                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
+                {field: 'Size'},
+            ]
+        };
+
          scope.users = [];
          scope.$watch('project.Id', function(){
             if(scope.project && scope.project.Id)
             {
                 scope.editors = scope.project.Editors;
                 scope.users = DataService.getUsers();
+
+                scope.project.MetadataValue = {};
+                scope.project.Images = [];
+                angular.forEach(scope.project.Metadata, function(property, key){
+                    scope.project.MetadataValue[property.MetadataPropertyId] = property.Values;
+                });
+
+                //split out the images and other files.
+                var otherFiles = [];
+                angular.forEach(scope.project.Files, function(file, key){
+                    if(file.FileType.Name=="Image")
+                        scope.project.Images.push(file);
+                    else
+                        otherFiles.push(file);
+                });
+                scope.project.Files = otherFiles;
+
             }
+
          });
 
         scope.clearUsersWatch = scope.$watch('users', function(){

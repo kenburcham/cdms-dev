@@ -722,7 +722,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 		float: right;
 	}
 
-.closed
+.lat-closed
 {
 	background-image: url(images/arrow-right.png);
 	background-repeat: no-repeat;
@@ -734,7 +734,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	margin-top: -5px;
 }
 
-.open
+.lat-open
 {
 	background-image: url(images/arrow-down.png);
 	background-repeat: no-repeat;
@@ -756,6 +756,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	margin-right: 20px;
 }
 
+.basemap-menu {
+    margin-top: 8px;
+}
+
 .quad-report
 {
 	background-image: url(images/QR_sm.png);
@@ -766,5 +770,17 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	height: 13px;
 	z-index: 50;
 	margin-top: 1px;
+}
+
+form.custom label {
+    width: 150px;
+}
+
+form#LoginForm label {
+    width: 100px;
+}
+
+form#new-project label {
+    width: 170px;
 }
 

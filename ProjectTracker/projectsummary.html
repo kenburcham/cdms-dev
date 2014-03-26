@@ -89,6 +89,8 @@
 
 		<script>
 
+        var SERVER_SERVICE = "/servicesSTAGE";
+
 		    require([
 				"ctuir/widget/ProjectSummaryWidget",
                 "dojo/request/xhr",
@@ -115,7 +117,7 @@
                 
                     console.log("Loading project: " + projectid);
 
-		            request("/services/api/projects/" + projectid, { handleAs: "json" }).then(function (project) {
+		            request(SERVER_SERVICE + "/api/projects/" + projectid, { handleAs: "json" }).then(function (project) {
                     
 		                try{
 		                    console.log("Project loaded: ");

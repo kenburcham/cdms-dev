@@ -80,16 +80,17 @@
     var logintries = 0;
     var debugobject;
     var basemapGallery;
+    var SERVER_SERVICE = "/servicesSTAGE";
     
     //var PROJECT_DATA_URL = "ptgrid_data.json?" + currentdate.getTime();
-    var PROJECT_DATA_URL = "/services/api/projects/";
-    var USER_DATA_URL = "/services/api/users/";
-    var PROJECT_DETAILS_SAVE_URL = "/services/action/SaveProjectDetails";
-    var PROJECT_FILE_URL = "/services/api/files/";
+    var PROJECT_DATA_URL = SERVER_SERVICE + "/api/projects/";
+    var USER_DATA_URL = SERVER_SERVICE + "/api/users/";
+    var PROJECT_DETAILS_SAVE_URL = SERVER_SERVICE + "/action/SaveProjectDetails";
+    var PROJECT_FILE_URL = SERVER_SERVICE + "/api/files/";
     var PROJECT_DETAILS_URL = "projectDetails.html?" + currentdate.getTime();
     var PROJECT_EDIT_URL = "editProject.html?" + currentdate.getTime();
     var PROJECT_NEW_URL = "newProject.html?" + currentdate.getTime();
-    var WHOAMI_URL = "/services/action/WhoAmI?" + currentdate.getTime();
+    var WHOAMI_URL = SERVER_SERVICE + "/action/WhoAmI?" + currentdate.getTime();
     var CBFISH_URL = "//www.cbfish.org/Project.mvc/Display/"; //1990-005-01
     var BING_KEY = "AuaAtT6zhx1rfuP1hR_e0zh5pxy6u7Echhe9KbwfCcQRG_Y_ewSg5OcFDm-DF-8w";
     var DEFAULT_BASEMAP = "BingMapsRoad";
@@ -178,7 +179,7 @@
 
         require(["dojo/request/iframe"], function (request) {
             console.log("trying to login");
-            request("/services/account/login", {
+            request(SERVER_SERVICE + "/account/login", {
                 method: "POST",
                 form: "LoginForm",
                 handleAs: "json",
@@ -367,6 +368,7 @@
     }
 
     function createProjectDropdown() {
+        /*
         dijit.byId("projectMenu").addChild(new dijit.MenuItem({
             label: "My Favorites",
             onClick: dojo.hitch(this, function () {
@@ -402,8 +404,10 @@
 
 
     function createLoginDropdown() {
-
-        dijit.byId("loginButton").set("label", current_user.Fullname);
+console.log("---------------- >>> Current User = " + current_user.Fullname);
+        dojo.byId("loginName").innerHTML = current_user.Fullname;
+        
+        /*dijit.byId("loginButton").set("label", current_user.Fullname);
 
         var loginmenu = dijit.byId("loginMenu");
 
@@ -422,7 +426,7 @@
                     logout();
             })
         }));
-
+*/
         
     }
     
@@ -1024,9 +1028,6 @@
                             });
 
                         standby.hide();
-                        
-
-                       
                          
                      });
 
@@ -1389,7 +1390,7 @@
                 "dojo/request/xhr", "dojo/store/Memory", "dojo/dom"
         ],
                 function (request, Memory, dom) {
-                    request("/services/action/ProjectFiles?ProjectId="+id,
+                    request(SERVER_SERVICE + "/action/ProjectFiles?ProjectId="+id,
                         {
                             handleAs: "json",
                         }).then(function (files) {
@@ -1473,6 +1474,12 @@
             }
         });
 
+    }
+
+    function confirmLogout(){
+        var confirmed = confirm("Are you sure you want to logout?");
+        if (confirmed)
+            logout();
     }
 
     function createByLatLong() {
@@ -1569,57 +1576,69 @@
 
     }
 
+
 </script>
 
 </head>
 <body class="claro">
 
-<nav class="navbar navbar-default" role="navigation">
-                      <!-- Brand and toggle get grouped for better mobile display -->
-                      <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                          <span class="sr-only">Toggle navigation</span>
-                          <span class="icon-bar"></span>
-                          <span class="icon-bar"></span>
-                          <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="#">CDMS</a>
-                      </div>
-
-                      <!-- Collect the nav links, forms, and other content for toggling -->
-                      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
-                          <li><a href="http://data.ctuir.org/cdms-dev/ProjectTracker/index.html">ProjectTracker</a></li>
-                          <li><a href="#">My projects</a></li>
-                          <li class="active"><a href="#/projects/1222">My datasets</a></li>
-                          <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                              <li><a href="#/datasetquery/1">Query Adult Weir (All locations)</a></li>
-                              <li><a href="http://gis-sql/Reports">Reports</a></li>
-                            </ul>
-                          </li>
-                          
-                        </ul>
-                        
-                        <ul class="nav navbar-nav navbar-right">
-                          <li><a href="#">Help</a></li>
-                          <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{Profile.Fullname}}<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                              <li><a href="#">Preferences</a></li>
-                              <li class="divider"></li>
-                              <li><a href="#">Logout</a></li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </div><!-- /.navbar-collapse -->
-                    </nav>
 
 
 
  <div id="init-overlay"><div id="init-heading">CTUIR Project Tracker v.1.0</div><img src="images/init.gif" />
     <div id="init-loading">Loading...<br /><br /><br /><br /><img src="images/FirstFoodsBanner.png" style="width: 100%;" /></div></div>
+
+    <nav class="navbar navbar-default" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">CDMS</a>
+      </div>
+
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">View <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="#" onclick="toggleMyProjects('myprojects')">My Favorites</a></li>
+                <li><a href="#" onclick="toggleMyProjects('allprojects')">All Projects</a></li>
+                <li><a href="#" onclick="toggleMyProjects('programs')">All Programs</a></li>
+            </ul>
+        </li>
+        
+        </ul>
+        
+        <ul class="nav navbar-nav navbar-right">
+          
+        <li><a href="/cdms/docs/Welcome%20to%20the%20DNR%20Project%20Tracker.pdf">Help</a></li>
+          <li class="basemap-menu">
+                <button id="dropdownButton" label="Basemaps" data-dojo-type="dijit.form.DropDownButton">
+                    <div data-dojo-type="dijit.Menu" id="basemapMenu">
+                        <!--The menu items are dynamically created using the basemap layers-->
+                    </div>
+                </button>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="loginName">Welcome</span><b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" onclick="viewPreferences();">Preferences</a></li>
+              <li class="divider"></li>
+              <li><a href="#" onclick="confirmLogout();">Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </nav>
+
     
     <div class="row" id="header-row">
 
@@ -1683,7 +1702,7 @@
     <div class="dijitDialogPaneContentArea">
         <div style="width: 520px; height: 450px; overflow: auto;">
                     <div class="add-file">
-                        <form class="custom" action="/services/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
+                        <form class="custom" action="/servicesSTAGE/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
                         <input type="hidden" id="file-dialog-projectid" name="ProjectId" value="${current_project.Id}" />
                         <h4>Add new documents</h4>
                         <p>Click the browse button and select the file(s) you would like to add to your project.  Next, add a title and description for each file.</p>
@@ -1812,6 +1831,7 @@
 
 <div id="dialog-preferences" data-dojo-type="dijit/Dialog" data-dojo-id="PreferencesDialog" title="Preferences">
     <div class="dijitDialogPaneContentArea">
+        <form class="custom" id="preferences">
               <div id="div-preferences">
                 <div class="row">
                         <div class="large-12 columns">
@@ -1848,6 +1868,7 @@
                         </div>
                 </div>  
               </div> 
+              </form>
     </div>
 
 </div>
@@ -1857,7 +1878,7 @@
                 <div id="login-form">
                     <div class="panel">
                     <div id="login-message">Enter your CTUIR username and password if you are an authorized user.</div>
-                    <form class="custom" action="/services/account/login" method="POST" id="LoginForm" >
+                    <form class="custom" action="/servicesSTAGE/account/login" method="POST" id="LoginForm" >
                         <div class="row">
                             <div class="large-12 columns">
                                 <label for="Username">Username</label>
@@ -1902,9 +1923,9 @@ click the point you want on the map.
     <button class='tiny secondary' onclick='cancelCreateProject();'>Cancel</button> <button id='select-location' class='tiny secondary' onclick='selectNewProjectLocation();'>Create Project</button>
     <hr /><p>Click on the map to create a new point</p>
     <div id="templatePickerDiv"></div>
-    <div id="open-latlong" onclick="ShowSpecifyCoordinates();"><div class="closed">&nbsp;</div>Or click here to specify coordinates:</div>
+    <div id="open-latlong" onclick="ShowSpecifyCoordinates();"><div class="lat-closed">&nbsp;</div>Or click here to specify coordinates:</div>
     <div id="latlong" class="hidden">
-    <div class="open">&nbsp;</div>
+    <div class="lat-open">&nbsp;</div>
     Specify latitude/longitude:
     <input id="latitude" style="width: 145px;" data-dojo-props="placeHolder:45.8354150328846" data-dojo-type="dijit.form.TextBox"  />
     <input id="longitude" style="width: 145px;" data-dojo-props="placeHolder:-119.3328630924220" data-dojo-type="dijit.form.TextBox" />

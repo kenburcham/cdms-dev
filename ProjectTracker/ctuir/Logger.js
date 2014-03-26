@@ -33,7 +33,7 @@ define(["dojo/_base/declare"], function (declare) {
 
             var message = {Message: arguments[0], Type: "ERROR"};
 
-            restSend("/services/action/SystemLog", message, "POST", function (project) {
+            restSend(SERVER_SERVICE + "/action/SystemLog", message, "POST", function (project) {
                 log.debug("ERROR Message POSTED to server: " + arguments[0]);
             });
         },
@@ -41,7 +41,7 @@ define(["dojo/_base/declare"], function (declare) {
         audit: function(){
             var message = { Message: arguments[0], Type: "AUDIT" };
 
-            restSend("/services/action/SystemLog", message, "POST", function (project) {
+            restSend(SERVER_SERVICE + "/action/SystemLog", message, "POST", function (project) {
                 log.debug("AUDIT Message POSTED to server: " + arguments[0]);
             });
         },

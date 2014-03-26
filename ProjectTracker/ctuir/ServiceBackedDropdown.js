@@ -9,8 +9,8 @@ define(["dojo/_base/declare"], function (declare) {
         cache: {},
 
         services: {
-            ProjectTypes: "/services/api/ProjectTypes",
-            Departments:  "/services/api/Department"
+            ProjectTypes: SERVER_SERVICE + "/api/ProjectTypes",
+            Departments:  SERVER_SERVICE + "/api/Department"
         },
 
         getData: function (service) {

@@ -271,3 +271,46 @@ ul.dropdown-menu .btn {
 {
 	height: 38px; padding: 8px; margin-right:5px;
 }
+
+/* http://stackoverflow.com/questions/19094723/angular-ng-grid-row-height */
+.gridTable .ngCell  {
+  display : table-cell;
+  height: auto !important;
+  overflow:visible;
+  position: static;
+}
+
+.gridTable .ngRow {
+  display : table-row;
+  height: auto !important;
+  position: static;
+}
+
+.gridTable .ngCellText{
+  height: auto !important;
+  white-space: normal;
+  overflow:visible;
+}
+
+pre {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-size: 12px;
+    word-wrap: break-word !important;
+    word-break: normal !important;
+}
+
+table.metadata td
+{
+    border: solid 1px lightgray;
+    vertical-align: top;
+}
+
+.metadata-field
+{
+    font-weight: bold;
+    border: solid 1px lightgray;
+}
+
+.metadata-value{
+	border: solid 1px lightgray;	
+}

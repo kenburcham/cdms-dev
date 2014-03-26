@@ -282,7 +282,7 @@
 
                     console.log("Hey lets see if we can get some datasets for project: "+current_project.Id);
                     //pop out for this project's datasets.
-                    request("//data.ctuir.org/servicesSTAGE/action/ProjectDatasets/"+current_project.Id,
+                    request(SERVER_SERVICE + "/action/ProjectDatasets/"+current_project.Id,
                     {
                         handleAs: "json",
                         sync: true //TODO: blocking process -- so we can return when we are done... might want to return a deferred here...
