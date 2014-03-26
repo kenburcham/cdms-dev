@@ -1,6 +1,7 @@
 /* -- bootstraps angular via dojo --*/
 
-var profile = null; //{ Id: 2, Fullname: "Default User"};  //TODO: kill this. :)
+var profile = null; 
+var ALLOW_SUPERADMIN = false;
 
 require([
   'angular',

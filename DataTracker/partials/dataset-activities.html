@@ -1,7 +1,7 @@
 ﻿<ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
-    <li class="active">{{dataset.Name}} Activities</li>
+    <li class="active">{{dataset.Name}}</li>
     
 </ul>
 
@@ -15,9 +15,9 @@
                     <esri-feature-layer url="https://restdata.ctuir.org/arcgis/rest/services/CDMS/DNR_CDMS/FeatureServer/0"></esri-feature-layer>
                 </esri-map>
             
-            <h4>{{dataset.Name}} Activities</h4>
+            <h4>{{dataset.Name}}</h4>
             <div class="btn-group" project-role="editor">
-                <button class="btn border-right" ng-click="openDataEntry()">Data Entry</button>
+                <button class="btn border-right">Data Entry</button>
                 <button class="btn dropdown-toggle" data-toggle="dropdown">
                    <span class="caret"></span>
                 </button>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="gridActivities" ng-grid="gridOptions" style="margin-top: 10px;"></div>
-            Total activities: {{activities.length}} <img ng-show="loading" src="images/FishLoading.gif"/>
+            Total Activities: {{activities.length}} <img ng-show="loading" src="images/FishLoading.gif"/>
 
 
         </div>

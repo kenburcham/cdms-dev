@@ -193,8 +193,10 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
          scope.selectedUser = null;
 
          scope.addEditor = function(){
+            console.log("Add Editor.");
             for (var i = 0; i < scope.users.length; i++) {
                 var user = scope.users[i];
+
                 if(user.Id == scope.selectedUser)
                 {
                     scope.editors.push(user);
