@@ -71,17 +71,17 @@
                 </tr>
                 </table>
                 <p ng-show="!fileFields" style="text-align: center; margin-top: 30px;"><i>Load a file to select options.</i></p>
-            
+
+            <div class="top-divider"></div>
+
             </div>
-        </div>
-
-        <div class="top-divider"></div>
-
-        <div style="margin-top: 55px;">
-            <button class="btn right" ng-disabled="!enablePreview" ng-click="previewUpload()" style="margin-left: 5px;">Preview >></button>
-            <button class="btn btn-warning right" ng-click="cancel()">Cancel</button>
+                <div style="margin-top: 55px; float: right;">
+                    <button class="btn right" ng-disabled="!enablePreview" ng-click="previewUpload()" style="margin-left: 5px;">Preview >></button>
+                    <button class="btn btn-warning right" ng-click="cancel()">Cancel</button>
+                </div>
 
         </div>
+
     </div>
 
     <div class="panel" ng-show="UploadResults.showPreview" style="margin: 20px 20px 45px 20px; background-color: #F5FBEF; padding: 4px 10px 45px 10px;">

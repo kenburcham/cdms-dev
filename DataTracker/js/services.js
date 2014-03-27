@@ -1091,3 +1091,10 @@ mod.service('wish', function () {
         };
     });
 
+//convert a F to C
+function convertFtoC(fahr){
+    if(fahr)
+        return (parseFloat(fahr) - 32) * (5/9);
+
+    return fahr;
+}

@@ -8,8 +8,9 @@ var mod_di = angular.module('DataImportControllers', ['ui.bootstrap']);
 // note: we did have to hard-code these on the dataset-import.html page in ng-disabled attrbutes
 var DO_NOT_MAP = 0;
 var ACTIVITY_DATE = 1;
-var LOCATION_ID = 2;
-var QA_STATUS_ID = 3;
+var WATER_TEMP_F = 2;
+var AIR_TEMP_F = 3;
+var RELEASE_TEMP_F = 4;
 
 var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
@@ -21,7 +22,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
     		$scope.QAActivityStatuses = QAActivityStatuses;
     		$scope.dataset = DataService.getDataset($routeParams.Id);
 			$scope.mappedActivityFields = {};
-			$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
+			$scope.userId = $rootScope.Profile.Id;
 			$scope.headerFields = [];
 			$scope.detailFields = [];
 			$scope.dataSheetDataset = [];
@@ -37,12 +38,23 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				{
 					Label: "[-- Activity Date --]"
 				},
-				/* later -- also for water...
+				{
+					Label: "[-- Water Temperature (F) --]",
+					DbColumnName: "WaterTemperature",
+				},
+				{
+					Label: "[-- Air Temperature (F) --]",
+					DbColumnName: "AirTemperature",
+				},
+				{
+					Label: "[-- Release Temperature (F) --]",
+					DbColumnName: "TransportReleaseTemperature"
+				}
+				/*
 				{
 					Label: "[-- Location Id --]"
 				},
-				*/
-				/* later -- for water, etc.
+				
 				{
 					Label: "[-- QA Row Status Id --]"
 				},
@@ -206,7 +218,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 			//control disabling and re-enabling special fields
 			$scope.updateSpecialFields = function(field_name){
-				Logger.debug(">> "+field_name);
+				console.log(">> "+field_name);
 
 				//this is pretty ripe for refactoring.				
 				if($scope.mapping[field_name])
@@ -214,21 +226,25 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					if($scope.mapping[field_name].Label === $scope.mappableFields[ACTIVITY_DATE].Label)
 						$scope.mappedActivityFields[ACTIVITY_DATE] = field_name;
 					
+					/*
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[LOCATION_ID].Label)
 						$scope.mappedActivityFields[LOCATION_ID] = field_name;
 					
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[QA_STATUS_ID].Label)
 						$scope.mappedActivityFields[QA_STATUS_ID] = field_name;
-
+					*/
 					else
 					{
 						//undisable corresponding speical field if this had been one
 						if($scope.mappedActivityFields[ACTIVITY_DATE] === field_name)
 							$scope.mappedActivityFields[ACTIVITY_DATE] = false;
+					
+					/*
 						if($scope.mappedActivityFields[LOCATION_ID] === field_name)
 							$scope.mappedActivityFields[LOCATION_ID] = false;
 						if($scope.mappedActivityFields[QA_STATUS_ID] === field_name)
 							$scope.mappedActivityFields[QA_STATUS_ID] = false;
+						*/
 					}
 
 				}
@@ -247,10 +263,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				//validate mapping fields -- primarily: make sure there are selections for special fields
 				if(!$scope.ActivityFields.LocationId)
 				{
-					if($scope.mappedActivityFields[LOCATION_ID])
-						$scope.ActivityFields.LocationId = $scope.mappedActivityFields[LOCATION_ID]
-					else
-						$scope.errors.push("Please select an activity location or map a location source field.");
+					//if($scope.mappedActivityFields[LOCATION_ID])
+					//	$scope.ActivityFields.LocationId = $scope.mappedActivityFields[LOCATION_ID]
+					//else
+						$scope.errors.push("Please select an activity location.");
 				}
 
 				if(!$scope.ActivityFields.ActivityDate)
@@ -263,10 +279,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 				if(!$scope.ActivityFields.QAStatusId)
 				{
-					if($scope.mappedActivityFields[QA_STATUS_ID])
-						$scope.ActivityFields.QAStatusId = $scope.mappedActivityFields[QA_STATUS_ID]
-					else
-						$scope.errors.push("Please select a activity QA Status or map a QA Status source field.");
+					//if($scope.mappedActivityFields[QA_STATUS_ID])
+					//	$scope.ActivityFields.QAStatusId = $scope.mappedActivityFields[QA_STATUS_ID]
+					//else
+						$scope.errors.push("Please select a activity QA Status.");
 				}
 
 				if($scope.errors.length == 0)
@@ -286,7 +302,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.displayImportPreview = function()
 			{
 
-				Logger.debug("Display Import Preview!");
+				console.log("Display Import Preview!");
 
 				angular.forEach($scope.UploadResults.Data.rows, function(data_row){
 					try{
@@ -346,6 +362,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							}
 							else //just add the value to the cell
 							{
+								//console.log(field.Label + " - " + field.DbColumnName);
+								
+								//check to see if we are a mapped F->C field
+								if(field.Label == $scope.mappableFields[WATER_TEMP_F].Label ||
+								   field.Label == $scope.mappableFields[AIR_TEMP_F].Label ||
+								   field.Label == $scope.mappableFields[RELEASE_TEMP_F].Label)
+								{
+									//console.log("is a convert!");
+									data_row[col] = convertFtoC(data_row[col]);
+								}
+								
+
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
 								new_row[field.DbColumnName] = data_row[col];
 							}

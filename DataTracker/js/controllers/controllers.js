@@ -91,7 +91,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
                                '</div>';                               
 
         scope.gridFiles = {
-            data: 'project.Files',
+            data: 'project.Docs',
             columnDefs:
             [
                 {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate},
@@ -123,19 +123,20 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
 
                 scope.project.MetadataValue = {};
                 scope.project.Images = [];
+                scope.project.Docs = [];
                 angular.forEach(scope.project.Metadata, function(property, key){
                     scope.project.MetadataValue[property.MetadataPropertyId] = property.Values;
                 });
 
                 //split out the images and other files.
-                var otherFiles = [];
+                
                 angular.forEach(scope.project.Files, function(file, key){
                     if(file.FileType.Name=="Image")
                         scope.project.Images.push(file);
                     else
-                        otherFiles.push(file);
+                        scope.project.Docs.push(file);
                 });
-                scope.project.Files = otherFiles;
+                
 
             }
 
@@ -265,6 +266,26 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             			{field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '50px'}
             		],
 
+            };
+
+            $scope.ShowMap = {
+                Display: false,
+                Message: "Show Map",
+                MessageToOpen: "Show Map",
+                MessageToClose: "Hide Map",
+            };
+
+            $scope.toggleMap = function(){
+                if($scope.ShowMap.Display)
+                {
+                    $scope.ShowMap.Display = false;
+                    $scope.ShowMap.Message = $scope.ShowMap.MessageToOpen;
+                }
+                else
+                {
+                    $scope.ShowMap.Display = true;
+                    $scope.ShowMap.Message = $scope.ShowMap.MessageToClose;                    
+                }
             };
 
             $scope.$watch('dataset.Fields', function() { 
