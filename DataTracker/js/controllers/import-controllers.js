@@ -39,15 +39,15 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					Label: "[-- Activity Date --]"
 				},
 				{
-					Label: "[-- Water Temperature (F) --]",
+					Label: "Water Temperature (F)",
 					DbColumnName: "WaterTemperature",
 				},
 				{
-					Label: "[-- Air Temperature (F) --]",
+					Label: "Air Temperature (F)",
 					DbColumnName: "AirTemperature",
 				},
 				{
-					Label: "[-- Release Temperature (F) --]",
+					Label: "Release Temperature (F)",
 					DbColumnName: "TransportReleaseTemperature"
 				}
 				/*

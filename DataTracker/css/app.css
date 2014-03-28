@@ -314,3 +314,8 @@ table.metadata td
 .metadata-value{
 	border: solid 1px lightgray;	
 }
+
+.nav-buttons{
+	width: 28px;
+	cursor: pointer;
+}

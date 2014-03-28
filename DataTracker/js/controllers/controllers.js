@@ -296,7 +296,15 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.$watch('activities.length', function(){ 
                 if($scope.activities.length > 0)
+                {
                     $scope.loading = false;
+                    
+                    $scope.gridOptions.ngGrid.data.$promise.then(function(){
+                        $rootScope.GridActivities = $scope.gridOptions.ngGrid.data;
+                    });
+                    
+                }
+                
             });
 
             $scope.openQueryWindow = function(p) {

@@ -13,6 +13,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		$scope.datasheetColDefs = [];
     		
     		$scope.query = { loading: true };
+    		$scope.activities = $rootScope.GridActivities; //pull this in from the previous page, if they were set.  Used for navigating between activities.
 
 			$scope.gridDatasheetOptions = { 
     			data: 'grid.Details', 
@@ -95,5 +96,17 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 					//resolve: { files: function() { return $scope.files; } }
 				});
 			};
+
+
+			//defined in services
+			$scope.previousActivity = function(){
+				previousActivity($scope.activities, $routeParams.Id, $location);
+			}
+
+			$scope.nextActivity = function(){
+				nextActivity($scope.activities, $routeParams.Id, $location);
+			}
+
+
     }]);
 

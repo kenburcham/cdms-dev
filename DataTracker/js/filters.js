@@ -10,7 +10,7 @@ angular.module('DatasetFilters', [])
     })
     .filter('units', function () {
         return function (input) {
-            return (input == null) ? '' : '(in ' + input + ' units.)';
+            return (input == null) ? '' : ' ('+input+')';
         };
     })
     .filter('locationNameFilter', function($rootScope){

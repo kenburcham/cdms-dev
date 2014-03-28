@@ -1098,3 +1098,53 @@ function convertFtoC(fahr){
 
     return fahr;
 }
+
+
+function previousActivity(activities, routeId, $location){
+    var previousId;
+    
+    //spin through the activities - when we get to the one we're on, send the one before
+    //  (unless we are on the first one, then do nothing)
+
+    for (var i = 0; i < activities.length; i++) {
+        var activity = activities[i];
+
+        if(activity.Id == routeId)
+        {
+            if(previousId)
+                break; // meaning the previousId is set already; we are good to go.
+            else
+            {
+                previousId = activity.Id; //meaning we are on the first one.
+                break;
+            }
+        }
+        previousId = activity.Id;
+    };
+
+    $location.path("/dataview/"+previousId);
+};
+
+function nextActivity(activities, routeId, $location){
+    var nextId;
+    var found = false;
+    
+    for (var i = 0; i < activities.length; i++) {
+        var activity = activities[i];
+
+        if(found)
+        {
+            nextId = activity.Id;
+            break;
+        }
+
+        if(activity.Id == routeId)
+        {
+            found = true;
+            nextId = activity.Id; // in case we don't get another one.
+        }
+
+    };
+
+    $location.path("/dataview/"+nextId);
+}

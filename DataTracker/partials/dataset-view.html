@@ -1,3 +1,8 @@
+<div class="right" ng-show="activities">
+    <img ng-click="previousActivity()" title="Previous Activity" class="nav-buttons" src="images/icon-prev.png"/>
+    <span>&nbsp;</span>
+    <img ng-click="nextActivity()" title="Next Activity" class="nav-buttons" src="images/icon-next.png"/>
+</div>
 <ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
@@ -8,7 +13,7 @@
 
 <div class="container-fluid">
     <div class="row-fluid">
-        <div class="span6">
+        <div class="span6" style="min-height: 300px;">
 
             <div class="right small-graph-box" ng-include="'partials/graphs/BarGraph-View.html'"></div>
 
@@ -21,19 +26,22 @@
 
                 <div ng-repeat="field in headerFields">
                 <div class="header-column">
-                    <div class="header-label">{{field.Label}}:</div>
+                    <div class="header-label">{{field.Label}}{{field.Field.Units | units}}:</div>
                     <div class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
                 </div>
                 </div>
 
                 <div class="header-label">QA Status:</div>
-                <div class="header-value"></div>            
+                <div class="header-value">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}}</div>            
+
+                <div class="header-label">QA Comment:</div>
+                <div class="header-value">{{grid.Header.Activity.ActivityQAStatus.Comments}}</div>            
 
             
             </div>
             
             <hr/>
-            <div class="gridStyle" ng-grid="gridDatasheetOptions">
+            <div class="gridStyle" ng-grid="gridDatasheetOptions" ng-show="!query.loading">
             </div>
             Total Records: {{grid.Details.length}} <img ng-show="query.loading" src="images/FishLoading.gif"/></div>           
             <button project-role="editor" class="btn" ng-click="openEdit()">Edit</button>
@@ -41,3 +49,4 @@
         </div>
     </div>
 </div>
+
