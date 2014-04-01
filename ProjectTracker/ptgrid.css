@@ -76,19 +76,23 @@
     padding: 0px;
 }
 
-#header-row, .map-div, #mapDiv
+#mapDiv, .map-div {
+
+
+
+    height: 300px;
+
+}
+
+#header-row
 {
-    height: 80% !important;
-    margin-bottom: -240px;
-    min-height: 550px;
-    height: 550px;
 }
 
 #grid
 {
 		position: absolute;
         width: 98%;
-        height: 250px;
+        height: 300px;
 		
 }
 

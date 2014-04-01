@@ -8,9 +8,6 @@ var mod_di = angular.module('DataImportControllers', ['ui.bootstrap']);
 // note: we did have to hard-code these on the dataset-import.html page in ng-disabled attrbutes
 var DO_NOT_MAP = 0;
 var ACTIVITY_DATE = 1;
-var WATER_TEMP_F = 2;
-var AIR_TEMP_F = 3;
-var RELEASE_TEMP_F = 4;
 
 var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
@@ -38,18 +35,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				{
 					Label: "[-- Activity Date --]"
 				},
-				{
-					Label: "Water Temperature (F)",
-					DbColumnName: "WaterTemperature",
-				},
-				{
-					Label: "Air Temperature (F)",
-					DbColumnName: "AirTemperature",
-				},
-				{
-					Label: "Release Temperature (F)",
-					DbColumnName: "TransportReleaseTemperature"
-				}
+				
 				/*
 				{
 					Label: "[-- Location Id --]"
@@ -362,17 +348,21 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							}
 							else //just add the value to the cell
 							{
-								//console.log(field.Label + " - " + field.DbColumnName);
-								
-								//check to see if we are a mapped F->C field
-								if(field.Label == $scope.mappableFields[WATER_TEMP_F].Label ||
-								   field.Label == $scope.mappableFields[AIR_TEMP_F].Label ||
-								   field.Label == $scope.mappableFields[RELEASE_TEMP_F].Label)
-								{
-									//console.log("is a convert!");
-									data_row[col] = convertFtoC(data_row[col]);
-								}
-								
+								//this is ugly but it has to be done.
+								if(field.DbColumnName == 'WaterTemperature')
+									new_row['WaterTemperatureF'] = convertCtoF(data_row[col]);
+								if(field.DbColumnName == 'WaterTemperatureF')
+									new_row['WaterTemperature'] = convertFtoC(data_row[col]);
+
+								if(field.DbColumnName == 'AirTemperature')
+									new_row['AirTemperatureF'] = convertCtoF(data_row[col]);
+								if(field.DbColumnName == 'AirTemperatureF')
+									new_row['AirTemperature'] = convertFtoC(data_row[col]);
+
+								if(field.DbColumnName == 'TransportReleaseTemperature')
+									new_row['TransportReleaseTemperatureF'] = convertCtoF(data_row[col]);
+								if(field.DbColumnName == 'TransportReleaseTemperatureF')
+									new_row['TransportReleaseTemperature'] = convertFtoC(data_row[col]);
 
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
 								new_row[field.DbColumnName] = data_row[col];

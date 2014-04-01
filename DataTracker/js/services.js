@@ -1,5 +1,7 @@
 'use strict';
 
+var NUM_FLOAT_DIGITS = 3;
+
 var mod = angular.module('DatasetServices', ['ngResource']);
 
 var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
@@ -517,6 +519,22 @@ mod.service('DataSheet',[ 'Logger',
                 else
                 {
                     delete scope.headerFieldErrors[field_name];
+
+                    //check if temp field -- if so, fill in the partner -- TODO: refactor?
+                    if(field_name == 'WaterTemperature')
+                        if(!scope.row['WaterTemperatureF']) scope.row['WaterTemperatureF'] = convertCtoF(value);
+                    if(field_name == 'WaterTemperatureF')
+                        if(!scope.row['WaterTemperature']) scope.row['WaterTemperature'] = convertFtoC(value);
+
+                    if(field_name == 'AirTemperature')
+                        if(!scope.row['AirTemperatureF']) scope.row['AirTemperatureF'] = convertCtoF(value);
+                    if(field_name == 'AirTemperatureF')
+                        if(!scope.row['AirTemperature']) scope.row['AirTemperature'] = convertFtoC(value);
+
+                    if(field_name == 'TransportReleaseTemperature')
+                        if(!scope.row['TransportReleaseTemperatureF']) scope.row['TransportReleaseTemperatureF'] = convertCtoF(value);
+                    if(field_name == 'TransportReleaseTemperatureF')
+                        if(!scope.row['TransportReleaseTemperature']) scope.row['TransportReleaseTemperature'] = convertFtoC(value);
                 }
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
@@ -526,6 +544,7 @@ mod.service('DataSheet',[ 'Logger',
             undoAutoUpdate: function(scope){
                 for (var i = 0; i < scope.autoUpdate.updated.length; i++) {
 
+                    //TODO -- eww don't do it this way! don't need rendered rows
                     var entityFieldValue = scope.gridDatasheetOptions.$gridScope.renderedRows[i].entity[scope.autoUpdate.field];
 
                     //Logger.debug("Unsetting "+scope.autoUpdate.field+": " + entityFieldValue + " back to " + scope.autoUpdate.from);
@@ -1093,10 +1112,17 @@ mod.service('wish', function () {
 
 //convert a F to C
 function convertFtoC(fahr){
-    if(fahr)
-        return (parseFloat(fahr) - 32) * (5/9);
+    if(fahr != null)
+        return (parseFloat(fahr) - 32) * (5/9).toFixed(NUM_FLOAT_DIGITS);
 
     return fahr;
+}
+
+function convertCtoF(cels){
+    if(cels != null)
+        return (parseFloat(cels)*9/5 +32).toFixed(NUM_FLOAT_DIGITS);
+
+    return cels;
 }
 
 
@@ -1147,4 +1173,27 @@ function nextActivity(activities, routeId, $location){
     };
 
     $location.path("/dataview/"+nextId);
+}
+
+//anything we might need to do in initializing edit/entry pages.
+function initEdit(){
+    // Prevent the backspace key from navigating back.
+    //http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back/1495435#1495435
+    $(document).unbind('keydown').bind('keydown', function (event) {
+        var doPrevent = false;
+        if (event.keyCode === 8) {
+            var d = event.srcElement || event.target;
+            if ((d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
+                 || d.tagName.toUpperCase() === 'TEXTAREA') {
+                doPrevent = d.readOnly || d.disabled;
+            }
+            else {
+                doPrevent = true;
+            }
+        }
+
+        if (doPrevent) {
+            event.preventDefault();
+        }
+    });
 }

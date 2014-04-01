@@ -9,6 +9,8 @@ var mod_edit = angular.module('DataEditControllers', ['ui.bootstrap']);
 mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet',
 	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet){
 
+		initEdit(); // stop backspace from ditching in the wrong place.
+
 		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
 		$scope.headerFields = [];
 		$scope.detailFields = [];

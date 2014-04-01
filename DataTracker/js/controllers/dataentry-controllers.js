@@ -7,6 +7,8 @@ var mod_de = angular.module('DataEntryControllers', ['ui.bootstrap']);
 mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$route',
 	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $route){
 
+		initEdit(); // stop backspace from ditching in the wrong place.
+
 		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
 		$scope.headerFields = [];
 		$scope.detailFields = [];
@@ -130,6 +132,8 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 //Fieldsheet / form version of the dataentry page
 mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$route',
 	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $route){
+
+		initEdit(); // stop backspace from ditching in the wrong place.
 
 		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
 		$scope.headerFields = [];
