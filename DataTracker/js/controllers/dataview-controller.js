@@ -4,6 +4,30 @@
 'use strict';
 var mod_dv = angular.module('DataViewControllers', ['ui.bootstrap']);
 
+mod_dv.controller('ModalQaUpdateCtrl', ['$scope','DataService', '$modalInstance',
+	function($scope, DataService, $modalInstance){
+		$scope.save = function(){
+			
+			DataService.updateQaStatus(
+				$scope.grid.Header.ActivityId,
+				$scope.row.ActivityQAStatus.QAStatusId, 
+				$scope.row.ActivityQAStatus.Comments, 
+				$scope.QaSaveResults);
+		
+			$modalInstance.dismiss();
+
+		};
+
+		$scope.cancel = function(){
+			$modalInstance.dismiss();
+		};
+
+	}
+]);
+
+
+
+
 mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$modal','$location','DataSheet','$route','$rootScope',
     	function($scope, $routeParams, DataService, $modal, $location, DataSheet, $route, $rootScope) {
     		$scope.grid = DataService.getActivityData($routeParams.Id); //activity data for a particular activityId
@@ -11,7 +35,16 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		$scope.headerFields = [];
     		$scope.detailFields = [];
     		$scope.datasheetColDefs = [];
-    		
+
+    		$scope.fieldsloaded = false;
+
+			$scope.$watch('QaSaveResults', function(){
+				if($scope.QaSaveResults && $scope.QaSaveResults.success)
+				{
+					$scope.grid = DataService.getActivityData($routeParams.Id); //activity data for a particular activityId
+				}				
+			},true);
+
     		$scope.query = { loading: true };
     		$scope.activities = $rootScope.GridActivities; //pull this in from the previous page, if they were set.  Used for navigating between activities.
 
@@ -48,29 +81,50 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		$scope.$watch('dataset.ProjectId', function()
     		{
     			if($scope.dataset && $scope.dataset.ProjectId)
-    			$scope.project = DataService.getProject($scope.dataset.ProjectId);
+    			{
+    				$scope.project = DataService.getProject($scope.dataset.ProjectId);
+	    			$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+	    		}
+
     		});
 
     		//setup a listener to populate column headers on the grid
 			$scope.$watch('grid.Dataset', function() { 
 				if(!$scope.grid.Dataset) return; //not done cooking yet.
 				$scope.dataset = DataService.getDataset($scope.grid.Dataset.Id);
-				angular.forEach($scope.grid.Dataset.Fields, function(field){
-					if(field.FieldRoleId == 1)
-					{
-						$scope.headerFields.push(field);
-					}
-					else
-					{
-						$scope.detailFields.push(field);
-						$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
-					}
-	    		});
 
-	    		$scope.chartData = getAdultWeirChartData($scope.grid.Details);
-	    		$scope.query.loading = false;
+				if(!$scope.fieldsloaded)
+				{
+					angular.forEach($scope.grid.Dataset.Fields, function(field){
+						if(field.FieldRoleId == 1)
+						{
+							$scope.headerFields.push(field);
+						}
+						else
+						{
+							$scope.detailFields.push(field);
+							$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
+						}
+		    		});
+
+		    		$scope.chartData = getAdultWeirChartData($scope.grid.Details);
+		    		$scope.fieldsloaded = true;
+				}
+				$scope.query.loading = false;
 
 	    	});
+
+	        $scope.changeQa = function(){
+	        	$scope.QaSaveResults = {};
+				$scope.row = {ActivityQAStatus: {}}; //modal selections
+
+	        	var modalInstance = $modal.open({
+						templateUrl: 'partials/changeqa-modal.html',
+						controller: 'ModalQaUpdateCtrl',
+						scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
+						//resolve: { files: function() { return $scope.files; } }
+					});
+	        };
 
 	    	$scope.openEdit = function()
 	    	{

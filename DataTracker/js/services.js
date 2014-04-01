@@ -73,11 +73,15 @@ mod.factory('DeleteActivitiesAction', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/DeleteDatasetActivities');
 }]);
 
+mod.factory('SetQaStatusAction', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/SetQaStatus');
+}]);
 
 
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction){
+
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction){
     var service = {
         
         project: null,
@@ -234,6 +238,25 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
 
         },
 
+        updateQaStatus: function(ActivityId, QAStatusId, Comments, saveResults){
+            saveResults.saving = true;
+            var payload = {
+                QAStatusId: QAStatusId,
+                ActivityId: ActivityId,
+                Comments: Comments,
+            };
+
+            console.dir(payload);
+
+            SetQaStatusAction.save(payload, function(data){
+                saveResults.saving = false;
+                saveResults.success = true;
+            },
+            function(data){
+                saveResults.saving = false;
+                saveResults.failure = true;
+            });
+        },
 
 
 

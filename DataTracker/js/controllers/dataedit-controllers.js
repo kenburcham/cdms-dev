@@ -109,7 +109,6 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 		});
         
-
 		 $scope.cancel = function(){
 		 	if($scope.dataChanged)
 		 	{	
