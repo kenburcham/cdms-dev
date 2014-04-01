@@ -266,11 +266,13 @@ mod.service('ActivityParser',[ 'Logger',
             parseSingleActivity: function(heading, data, headerFields, detailFields){
                 var activities = {activities: {}, errors: false};
 
+                var tmpdata = data.slice(0); // create a copy.
+
                 var key = service.makeKey(heading);
 
                 if(key)
                 {
-                    angular.forEach(data, function(data_row, index){
+                    angular.forEach(tmpdata, function(data_row, index){
                         //note we mash the heading fields into our row -- addActivity splits them out appropriately.
                         service.addActivity(activities, key, angular.extend(data_row, heading), headerFields, detailFields);
                     });
@@ -289,7 +291,9 @@ mod.service('ActivityParser',[ 'Logger',
             parseActivitySheet: function(data, headerFields, detailFields){
                 var activities = {activities: {}, errors: false};
 
-                angular.forEach(data, function(row, index){
+                var tmpdata = data.slice(0); //create a copy
+
+                angular.forEach(tmpdata, function(row, index){
                     var key = service.makeKey(row);
 
                     if(key)
@@ -481,7 +485,7 @@ mod.service('DataSheet',[ 'Logger',
                             return;
 
                         
-                        validateField(field, row[key], scope, row_errors);
+                        validateField(field, row, key, scope, row_errors);
                         //row_num++;
                         //console.log("  >>incrementing!");
                         
@@ -510,7 +514,7 @@ mod.service('DataSheet',[ 'Logger',
                 var field = scope.FieldLookup[field_name];
                 var errors = [];
              
-                validateField(field, value, scope, errors);
+                validateField(field, scope.row, field_name, scope, errors);
              
                 if(errors.length > 0)
                 {
@@ -900,8 +904,10 @@ function array_count(the_array)
     return count;
 }
 
-function validateField(field, value, scope, row_errors)
+function validateField(field, row, key, scope, row_errors)
 {
+
+    var value = row[key];
 
     //console.log("Validating: ("+value+") on field: " + field.DbColumnName);
     //console.dir(field);
@@ -918,6 +924,7 @@ function validateField(field, value, scope, row_errors)
         case 'multiselect':
             //is each value in our list of options?
             var values = angular.fromJson(value);
+            row[key] = values;
             //console.log("doing a comparison: " + values + " for value: "+ value);
             for(var a = 0; a < values.length; a++ )
             {

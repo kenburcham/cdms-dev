@@ -52,7 +52,7 @@
         </form>
 
             <div class="header-label">QA Status:</div>
-            <div class="header-value">
+            <div class="header-value" title="by {{dataset_activities.Header.Activity.ActivityQAStatus.User.Fullname}}">
                 <select class="form-control" ng-model="row.ActivityQAStatus['QAStatusId']" ng-input="row.ActivityQAStatus['QAStatusId']" ng-options="id as name for (id, name) in QAStatusOptions"></select>
             </div>  
 
@@ -70,3 +70,4 @@
 <div ng-include="'partials/dataentry/buttons.html'">&nbsp;</div>
 
 </div>
+{{dataSheetDataset}}
