@@ -77,11 +77,15 @@ mod.factory('SetQaStatusAction', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/SetQaStatus');
 }]);
 
+mod.factory('GetMyDatasetsAction', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetMyDatasets', {}, {
+            query: {method: 'GET', params: {}, isArray: true}
+        });
+}]);
 
 
-
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction){
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction){
     var service = {
         
         project: null,
@@ -94,6 +98,10 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
             }
 
             return this.project; 
+        },
+
+        getMyDatasets: function() {
+            return GetMyDatasetsAction.query();
         },
 
         getDataset: function(datasetId) {
@@ -1227,3 +1235,15 @@ function initEdit(){
         }
     });
 }
+
+function getByName(list, search_name)
+{
+    for (var i = 0; i < list.length; i++) {
+        var pref = list[i];
+        if(pref.Name == search_name)
+            return pref;
+    };
+
+    return null;
+}
+

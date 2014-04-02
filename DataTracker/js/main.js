@@ -14,6 +14,7 @@ define([
 	  'DataQueryControllers',
 	  'DataEntryControllers',
 	  'DataImportControllers',
+	  'MyDatasetsControllers',
 	  'DatasetServices',
 	  'angularFileUpload',
 	  'DatasetDirectives',
@@ -24,6 +25,7 @@ define([
 	        $routeProvider.when('/projects/:Id', {templateUrl: 'partials/project-datasets.html', controller: 'ProjectDatasetsCtrl'});
 
 	        //this one is a little special -- loads up the arcgis mapping stuff.
+	        $routeProvider.when('/mydata', {templateUrl: 'partials/mydatasets.html', controller: 'MyDatasetsCtrl'});
 	        $routeProvider.when('/activities/:Id', {templateUrl: 'partials/dataset-activities.html', controller: 'DatasetActivitiesCtrl', permission: 'Edit'});
 	        $routeProvider.when('/dataview/:Id', {templateUrl: 'partials/dataset-view.html', controller: 'DatasetViewCtrl'});
 	        $routeProvider.when('/dataentry/:Id',{templateUrl: 'partials/dataset-entry.html', controller: 'DataEntryDatasheetCtrl', permission: 'Edit'});

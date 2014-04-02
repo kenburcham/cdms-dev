@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="header-label">QA Status:</div>
-                <div class="header-value" ng-show="grid.Header.Activity.ActivityQAStatus">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}} ({{grid.Header.Activity.ActivityQAStatus.User.Fullname}}) <button class="btn btn-xs" ng-click="changeQa()">Change</button>
+                <div class="header-value" ng-show="grid.Header.Activity.ActivityQAStatus">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}} ({{grid.Header.Activity.ActivityQAStatus.User.Fullname}}) <button project-role="editor" class="btn btn-xs" ng-click="changeQa()">Change</button>
                 <div class="alert alert-danger" ng-show="QaSaveResults.failure">Failed to update.</div>
                 </div>            
 
