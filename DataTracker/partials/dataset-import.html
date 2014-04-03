@@ -99,6 +99,9 @@
                     </tbody>
                 </table>
             </div>
+            <span ng-hide="ignoreDuplicates && DuplicateRecordsBucket.length==0">
+                <input type="checkbox" ng-change="toggleDuplicates()" ng-model="ignoreDuplicates"> Ignore Duplicates?</input> <span ng-show="DuplicateRecordsBucket.length>0"><i>Ignoring {{DuplicateRecordsBucket.length}} Records</i> (<a href="" ng-click="openDuplicatesModal()">view</a>)</span>
+            </span>
 
         <div style="height: 100px; width: 400px; float: right; margin-top: -150px;" ng-include="'partials/grid-validation-error-box.html'"></div>
 
@@ -121,4 +124,3 @@
     </div>
 
 </div>
-

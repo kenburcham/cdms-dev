@@ -14,8 +14,8 @@ var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 var USE_FAKE_DATA = false;
 var USE_FAKE_COLS = false;
 
-mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location', 'ActivityQAStatusesConstant','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route',
-    	function($scope, $routeParams, DataService, $location, QAActivityStatuses, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route) {
+mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location', 'ActivityQAStatusesConstant','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal',
+    	function($scope, $routeParams, DataService, $location, QAActivityStatuses, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal) {
     		$scope.QAActivityStatuses = QAActivityStatuses;
     		$scope.dataset = DataService.getDataset($routeParams.Id);
 			$scope.mappedActivityFields = {};
@@ -24,9 +24,15 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.detailFields = [];
 			$scope.dataSheetDataset = [];
 			
+			$scope.existingActivitiesLoad = DataService.getActivities($routeParams.Id);
+			$scope.existingActivities = [];
+
 			$scope.ActivityFields = {};
 			$scope.UploadResults = {};
 			$scope.UploadResults.errors = [];
+
+			$scope.ignoreDuplicates = true;
+			$scope.DuplicateRecordsBucket = [];
 
 			$scope.mappableFields = [
 				{
@@ -67,9 +73,55 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					
 	        });
 
+			//setup our existingActivities array so we can manage duplicates
+	        var ealoadwatcher = $scope.$watch('existingActivitiesLoad.length', function(){
+	        	if($scope.existingActivitiesLoad.length > 0)
+	        	{
+	        		$scope.existingActivitiesLoad.$promise.then(function(){
+	        			angular.forEach($scope.existingActivitiesLoad, function(activity, key){
+	        				$scope.existingActivities.push(activity.LocationId+"_"+activity.ActivityDate.substr(0,10));
+	        			});
+	        			$scope.existingActivitiesLoad = []; // cleanup
+	        			console.dir($scope.existingActivities);
+	        			ealoadwatcher();
+	        		});
+	        	}
+	        	
+	        });
+
 			//to be able to show only the invalid records.
 			$scope.ValidRecordsBucket = [];
 			$scope.TempRecordsBucket = [];
+
+			$scope.toggleDuplicates = function(){
+
+				if($scope.ignoreDuplicates)
+				{
+					$scope.TempRecordsBucket = [];
+					$scope.DuplicateRecordsBucket = [];
+					angular.forEach($scope.dataSheetDataset, function(item, key){
+						if($scope.existingActivities.indexOf(item.locationId + "_"+item.activityDate.substr(0,10)) != -1) //found a duplicate
+							$scope.DuplicateRecordsBucket.push(item);
+						else
+							$scope.TempRecordsBucket.push(item);
+					});
+
+					$scope.dataSheetDataset = $scope.TempRecordsBucket;
+					$scope.TempRecordsBucket = [];
+					//our duplicates are in $scope.DuplicateRecordsBucket
+				}
+				else
+				{
+					angular.forEach($scope.DuplicateRecordsBucket, function(item, key){
+						$scope.dataSheetDataset.push(item);
+					});
+					$scope.DuplicateRecordsBucket = [];
+				}
+
+				$scope.validateGrid($scope);
+	        	$scope.floatErrorsToTop();
+				
+			};
 
 			$scope.floatErrorsToTop = function(){
 				//iterate and split errors from valid records.
@@ -390,13 +442,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 				$scope.UploadResults.showPreview = true;
 				
-		
-            	$scope.validateGrid($scope);
-        
+				$scope.toggleDuplicates();
 
+            	$scope.validateGrid($scope);
         		$scope.floatErrorsToTop();
-				//now do our parsing in the background...
-				//$scope.UploadResults.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+        
+				
 
 			};
 
@@ -482,8 +533,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 			};
 
-    	}
+	    	$scope.openDuplicatesModal = function(){
+				var modalInstance = $modal.open({
+					templateUrl: 'partials/viewduplicates-modal.html',
+					controller: 'ModalDuplicatesViewCtrl',
+					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
+					//resolve: { files: function() { return $scope.files; } }
+				});
+	    	};
+
+	    }
 ]);
+
 
 function getResults()
 {	
@@ -494,4 +555,29 @@ function getData()
 {
 	return [{"locationId":"75","activityDate":"2013-03-27T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":170,"GeneticSampleId":3,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-03-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":167,"GeneticSampleId":4,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-01T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":166,"GeneticSampleId":7,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-01T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":167,"GeneticSampleId":null,"Origin":"Wild","FishComments":"Lost Genetic sample"},{"locationId":"75","activityDate":"2013-04-03T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":167,"GeneticSampleId":10,"Origin":"Wild","FishComments":"Bad Reye"},{"locationId":"75","activityDate":"2013-04-03T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":169,"GeneticSampleId":12,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-15T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":18,"GeneticSampleId":13,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-22T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":170,"GeneticSampleId":14,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":157,"GeneticSampleId":21,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":159,"GeneticSampleId":20,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":162,"GeneticSampleId":22,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":165,"GeneticSampleId":23,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":166,"GeneticSampleId":15,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":167,"GeneticSampleId":18,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":168,"GeneticSampleId":16,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":171,"GeneticSampleId":24,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-05-03T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"F","ForkLength":154,"GeneticSampleId":27,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-03-13T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":168,"GeneticSampleId":1,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-03-15T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":157,"GeneticSampleId":2,"Origin":"Wild","FishComments":"No PIT"},{"locationId":"75","activityDate":"2013-03-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":152,"GeneticSampleId":5,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-01T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":169,"GeneticSampleId":9,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-01T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":173,"GeneticSampleId":6,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-03T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":173,"GeneticSampleId":11,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":156,"GeneticSampleId":25,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":171,"GeneticSampleId":17,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-04-29T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":172,"GeneticSampleId":19,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-05-03T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":168,"GeneticSampleId":26,"Origin":"Wild","FishComments":null},{"locationId":"75","activityDate":"2013-05-06T00:00:00","QAStatusId":"Ready for QA","undefined":null,"Sex":"M","ForkLength":162,"GeneticSampleId":28,"Origin":"Wild","FishComments":"Headburn, no PIT tag"}];
 }
+
+
+mod_di.controller('ModalDuplicatesViewCtrl', ['$scope','$modalInstance',
+	function($scope, $modalInstance){
+
+		$scope.gridDuplicates = { 
+			data: 'DuplicateRecordsBucket',
+			columnDefs: [{
+				   field: 'locationId', 
+                    displayName: 'Location', 
+                    cellFilter: 'locationNameFilter'
+                },
+                {
+                    field: 'activityDate', 
+                    displayName: 'Activity Date',
+                    cellFilter: 'date: \'MM/dd/yyyy\'',
+                }],
+		};
+
+		$scope.ok = function(){
+			$modalInstance.dismiss();
+		};
+
+	}
+]);
 
