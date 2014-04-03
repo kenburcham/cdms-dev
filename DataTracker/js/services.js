@@ -83,9 +83,13 @@ mod.factory('GetMyDatasetsAction', ['$resource', function($resource){
         });
 }]);
 
+mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/action/SaveUserPreference');
+}]);
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction){
+
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction){
     var service = {
         
         project: null,
@@ -197,6 +201,20 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
             }, function(data){
                 saveResults.saving = false;
                 saveResults.failure = true;
+            });
+
+        },
+
+        saveUserPreference: function(name, value, results)
+        {
+            var payload = {UserPreference: {Name: name, Value: value}};
+
+            SaveUserPreferenceAction.save(payload, function(data){
+                results.done = true;
+                results.success = true;
+            }, function(data){
+                results.done = true;
+                results.failure = true;
             });
 
         },
@@ -1236,6 +1254,7 @@ function initEdit(){
     });
 }
 
+//in any array with a "Name" attribute, get the matching item
 function getByName(list, search_name)
 {
     for (var i = 0; i < list.length; i++) {
@@ -1246,4 +1265,5 @@ function getByName(list, search_name)
 
     return null;
 }
+
 

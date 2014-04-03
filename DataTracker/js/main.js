@@ -57,6 +57,13 @@ define([
 //configure profile permission functions
 function configureProfile(profile)
 {
+	//setup our favoritedatasets array for checking later.
+	var favoriteDatasets = getByName(profile.UserPreferences, "Datasets"); 
+	if(favoriteDatasets)
+		profile.favoriteDatasets = favoriteDatasets.Value.split(",");
+	else
+		profile.favoriteDatasets = [];
+
 	//is the profile owner of the given project?
 	profile.isProjectOwner = function(project){
 		//console.dir(project);
@@ -89,6 +96,29 @@ function configureProfile(profile)
 
         return isEditor;    
 	};
+
+	profile.isDatasetFavorite = function(datasetId){
+		/*
+		console.log("checking: " + datasetId);
+		console.log(profile.favoriteDatasets.join());
+		if (profile.favoriteDatasets.indexOf(datasetId+"") != -1)
+			console.log("YES!");
+		else
+			console.log("NO");
+		*/
+		return (profile.favoriteDatasets.indexOf(datasetId+"") != -1);
+	};
+
+	profile.toggleDatasetFavorite = function(dataset)
+	{
+		var dsid = dataset.Id+"";
+		var index = profile.favoriteDatasets.indexOf(dsid);
+		if(index == -1) //doesn't exist
+			profile.favoriteDatasets.push(dsid);
+		else
+			profile.favoriteDatasets.splice(index,1);
+	};
+
 
 	return profile;
 }

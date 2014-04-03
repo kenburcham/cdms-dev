@@ -320,3 +320,5 @@ table.metadata td
 	width: 28px;
 	cursor: pointer;
 }
+
+.fav-dataset { float: right; }

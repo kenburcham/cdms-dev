@@ -235,6 +235,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.loading = true;
             $scope.project = null;
             $scope.saveResults = null;
+            $scope.isFavorite = $rootScope.Profile.isDatasetFavorite($routeParams.Id);
 
             //console.log("Profile = ");
             //console.dir($rootScope.Profile);
@@ -249,8 +250,6 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
           	var editButtonTemplate = '<div project-role="editor" class="ngCellText" ng-class="col.colIndex()">' + 
             				   '<a href="#/edit/{{row.getProperty(\'Id\')}}">Edit</a>' +
             				   '</div>';
-
-            $scope.QAStatusList = { 5: "Approved", 6: "Ready for QA" }; //TODO
 
             $scope.gridOptions = {
             	data: 'activities',
@@ -288,10 +287,36 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 }
             };
 
+            $scope.toggleFavorite = function(){
+                $scope.isFavorite = !$scope.isFavorite; //make the visible change instantly.
+                
+                $scope.results = {};
+
+                $rootScope.Profile.toggleDatasetFavorite($scope.dataset);
+                
+                DataService.saveUserPreference("Datasets", $rootScope.Profile.favoriteDatasets.join(), $scope.results);
+
+                var watcher = $scope.$watch('results', function(){
+                    if($scope.results.done)
+                    {
+                        //if something goes wrong, roll it back.
+                        if($scope.results.failure)
+                        {
+                            $scope.isFavorite = !$scope.isFavorite; 
+                            $rootScope.Profile.toggleDatasetFavorite($scope.dataset);
+                        }
+                        watcher();
+                    }
+                },true);
+                
+
+            }
+
             $scope.$watch('dataset.Fields', function() { 
                 if(!$scope.dataset.Fields ) return;
                 //load our project based on the projectid we get back from the dataset
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
+                $scope.QAStatusList = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
             });
 
             $scope.$watch('activities.length', function(){ 

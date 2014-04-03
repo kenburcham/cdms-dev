@@ -1,4 +1,10 @@
-﻿<ul class="breadcrumb">
+﻿<div title="Toggle 'Favorite' status" class="fav-dataset">
+    <a href='' ng-click="toggleFavorite()">
+        <img id="favorite-active" ng-show="isFavorite" class="on" src='images/favorite-on.png'/>
+        <img id="favorite-inactive" ng-show="!isFavorite" class="off" src='images/favorite-off.png'/>
+    </a></div>
+
+<ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
     <li class="active">{{dataset.Name}}</li>
@@ -47,4 +53,3 @@
         </div>
     </div>
 </div>
-
