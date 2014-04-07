@@ -84,6 +84,12 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     			{
     				$scope.project = DataService.getProject($scope.dataset.ProjectId);
 	    			$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+
+	    			if($scope.dataset.Datastore.TablePrefix == "AdultWeir") /// TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		    			$scope.chartData = getAdultWeirChartData($scope.grid.Details);
+		    		else
+		    			delete $scope.chartData; 
+
 	    		}
 
     		});
@@ -107,7 +113,6 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 						}
 		    		});
 
-		    		$scope.chartData = getAdultWeirChartData($scope.grid.Details);
 		    		$scope.fieldsloaded = true;
 				}
 				$scope.query.loading = false;

@@ -1,7 +1,7 @@
 /* -- bootstraps angular via dojo --*/
 
 var profile = null; 
-var ALLOW_SUPERADMIN = false;
+var ALLOW_SUPERADMIN = true;
 
 require([
   'angular',

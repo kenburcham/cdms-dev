@@ -459,7 +459,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			        method: "POST",
 			        // headers: {'headerKey': 'headerValue'},
 			        // withCredential: true,
-			        data: {ProjectId: 9999},
+			        data: {ProjectId: $scope.project.Id},
 			        file: $scope.file,
 			        // file: $files, //upload multiple files, this feature only works in HTML5 FromData browsers
 			        /* set file formData name for 'Content-Desposition' header. Default: 'file' */
