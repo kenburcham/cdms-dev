@@ -4,8 +4,8 @@
 
 var mod_mydata = angular.module('MyDatasetsControllers', ['ui.bootstrap']);
 
-mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','DataService',
-	function($scope, $rootScope,$location, DataService){
+mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','DataService','$window',
+	function($scope, $rootScope,$location, DataService, $window){
 
 		//var mydatasets = getByName($rootScope.Profile.UserPreferences, 'Datasets');
 		$scope.mydatasets = DataService.getMyDatasets();
@@ -50,6 +50,10 @@ mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','Data
 		  $location.path( path );
 		};
 		
+
+		$scope.openReportWindow = function( target ){
+			$window.open('http://gis-sql/Reports/Pages/Folder.aspx?ItemPath=%2f' + target,'_blank');
+		};
 
 }]);
 

@@ -374,6 +374,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 							//$scope.Logger.debug(field);
 
+							//just ditch if it is an empty value
+							if(data_row[col] == null || data_row[col].trim() == "")
+								return;
+
 							if(field.ControlType == "multiselect")
 							{
 								//$scope.Logger.debug("is a multiselect");
@@ -382,7 +386,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							        new_row[field.DbColumnName] = [];
 
 							    //split on commas -- if any
-							    var row_items = data_row[col].split(",");
+							    var row_items = data_row[col].trim().split(",");
 
 							    for(var a = 0; a < row_items.length; a++)
 							    {        
@@ -417,7 +421,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									new_row['TransportReleaseTemperature'] = convertFtoC(data_row[col]);
 
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
-								new_row[field.DbColumnName] = data_row[col];
+								new_row[field.DbColumnName] = data_row[col].trim();
 							}
 							
 							//TODO: validate = $scope.UploadResults.Errors.push({message: "There was a problem."});

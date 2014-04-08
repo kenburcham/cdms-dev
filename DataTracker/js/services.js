@@ -65,6 +65,12 @@ mod.factory('QueryActivitiesAction',  ['$resource', function($resource){
         });
 }]);
 
+mod.factory('ExportActivitiesAction',  ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/DownloadDatasetActivities', {}, {
+           save: {method: 'POST', isArray: false} 
+        });
+}]);
+
 mod.factory('SetProjectEditors', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/SetProjectEditors');
 }]);
@@ -88,8 +94,9 @@ mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
 }]);
 
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction){
+
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction){
     var service = {
         
         project: null,
@@ -165,6 +172,21 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
                 query.loading = false;
             });
    
+        },
+
+        exportActivities: function(query)
+        {
+            ExportActivitiesAction.save(query.criteria, function(data){
+                console.log("success!");
+                query.loading = false;
+                query.exportedFile = data;
+                console.dir(data);
+                //console.dir(angular.fromJson(data));
+            }, function(data){
+                console.log("Failure!");
+                query.failed = true;
+                query.loading = false;
+            });
         },
 
         updateActivities: function(userId, datasetId, activities)

@@ -3,6 +3,26 @@
 
 var mod_dq = angular.module('DataQueryControllers', ['ui.bootstrap']);
 
+mod_dq.controller('ModalExportController',['$scope','DataService','$modalInstance','$window',
+	function($scope, DataService,$modalInstance, $window) {
+
+		//$scope.alerts 
+		$scope.Export = { Filename: "Export.csv" };
+
+		$scope.ok = function(){
+			$scope.downloadQuery = $scope.buildQuery(); 
+			$scope.downloadQuery.criteria.Filename = $scope.Export.Filename;
+			DataService.exportActivities($scope.downloadQuery);
+
+			//$modalInstance.dismiss();
+		};
+
+		$scope.cancel = function(){
+			$modalInstance.dismiss();
+		};
+	}
+]);
+
 mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$location', '$modal','DataSheet', '$rootScope',
     	function($scope, $routeParams, DataService, $location, $modal, DataSheet, $rootScope) {
 
@@ -27,7 +47,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     			showFilter: false,
     			showColumnMenu: true,
     			multiSelect: false,
-//    			 plugins: [new ngGridCsvExportPlugin()],
+    			//plugins: [new ngGridCsvExportPlugin()],
     			//showFooter: true,
     			//footerTemplate: '<div class="grid-footer-totals"><div class="colt0 sumField"></div><div class="colt1 sumField"></div><div class="colt2 sumField"></div><div class="colt3 sumField"></div><div class="colt4 sumField"></div><div class="colt5 sumField">s: 1433<br/>a: 477.67</div><div class="colt6 sumField"></div></div>',
 
@@ -163,10 +183,8 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					$scope.executeQuery();
     		};
 
-    		$scope.executeQuery = function(){
-    			
-
-    			$scope.query = 
+    		$scope.buildQuery = function(){
+				var query = 
     			{
 					criteria: {
 						DatasetId: 	  $scope.dataset.Id,
@@ -180,6 +198,13 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					},
 					loading: true,
     			};
+
+    			return query;
+    		};
+
+    		$scope.executeQuery = function(){
+    			
+    			$scope.query = $scope.buildQuery();
 
     			DataService.queryActivities($scope.query);
     			//service will run query and then update:
@@ -216,7 +241,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     		$scope.openExportView = function() {
 				var modalInstance = $modal.open({
 					templateUrl: 'partials/exportfile-modal.html',
-					controller: 'ModalDataEntryCtrl',
+					controller: 'ModalExportController',
 					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 					//resolve: { files: function() { return $scope.files; } }
 				});

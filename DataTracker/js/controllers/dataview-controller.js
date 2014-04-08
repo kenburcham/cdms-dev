@@ -102,6 +102,9 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 				if(!$scope.fieldsloaded)
 				{
 					angular.forEach($scope.grid.Dataset.Fields, function(field){
+
+						parseField(field, $scope);
+
 						if(field.FieldRoleId == 1)
 						{
 							$scope.headerFields.push(field);
