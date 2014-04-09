@@ -14,6 +14,7 @@ define([
 	  'DataQueryControllers',
 	  'DataEntryControllers',
 	  'DataImportControllers',
+	  'DatasetDetailsControllers',
 	  'MyDatasetsControllers',
 	  'DatasetServices',
 	  'angularFileUpload',
@@ -32,8 +33,9 @@ define([
 	        $routeProvider.when('/dataentryform/:Id',{templateUrl: 'partials/dataset-entry-form.html', controller: 'DataEntryFormCtrl', permission: 'Edit'});
 	        $routeProvider.when('/edit/:Id',{templateUrl: 'partials/dataset-edit-form.html', controller: 'DataEditCtrl', permission: 'Edit'});
 	        $routeProvider.when('/datasetquery/:Id',{templateUrl: 'partials/dataset-query.html', controller: 'DataQueryCtrl'});
-	        $routeProvider.when('/dataset-details',{templateUrl: 'partials/dataset-details.html', controller: 'DatasetDetailsCtrl'});
+	        $routeProvider.when('/dataset-details/:Id',{templateUrl: 'partials/dataset-details.html', controller: 'DatasetDetailsCtrl'});
 	        $routeProvider.when('/datasetimport/:Id',{templateUrl: 'partials/dataset-import.html', controller: 'DatasetImportCtrl', permission: 'Edit'});
+	        $routeProvider.when('/dataset-edit/:Id',{templateUrl: 'partials/edit-dataset.html', controller: 'DatasetDetailsCtrl', permission: 'Edit'});
 
 	        $routeProvider.otherwise({redirectTo: '/projects'});
 	    }]);

@@ -26,36 +26,6 @@ var projectsController = ['$scope', 'DataService',
 	}
 ];
 
-var DatasetDetailsCtrl = ['$scope',
-	function(scope){
-		scope.metadataList = [
-		{
-			field: 'Name',
-			value: 'CC/UGR'
-		},
-		{
-			field: 'Summary',
-			value: 'Catherine Creek /GR Adult Weir Summary'
-		},
-		{
-			field: 'Description',
-			value: 'Catherine Creek /GR Adult Weir Description'
-		},
-		{
-			field: 'Owner',
-			value: 'CTUIR Department of Natural Resources'
-		},
-		{
-			field: 'Data Use Agreement Required',
-			value: 'No'
-		},
-		{
-			field: 'CreateDate',
-			value: '1/9/2014'
-		},
-		];
-	}
-];
 
 var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
 	function(scope, routeParams, DataService){
@@ -337,7 +307,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             };
 
             $scope.openDetailsWindow = function(p) {
-            	$location.path("/dataset-details/");
+            	$location.path("/dataset-details/"+$scope.dataset.Id);
             };
 
             $scope.openImportWindow = function() {

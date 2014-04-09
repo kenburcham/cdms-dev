@@ -93,22 +93,28 @@ mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/action/SaveUserPreference');
 }]);
 
+mod.factory('GetMetadataProperties', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/api/MetadataProperties');
+}]);
 
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction){
+
+
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties){
     var service = {
         
+        //our "singleton cache" kinda thing
         project: null,
         dataset: null,
+        metadataProperties: null,
 
         getProject: function(id) { 
-            if(id && (!this.project || this.project.Id != id))
-            {
-                this.project = Project.query({id: id});
-            }
+            if(service.project && service.project.Id == id)
+                return service.project;
 
-            return this.project; 
+            service.project = Project.query({id: id});
+            return service.project;
         },
 
         getMyDatasets: function() {
@@ -116,8 +122,11 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
         },
 
         getDataset: function(datasetId) {
-            this.dataset = Datasets.query({id: datasetId});
-            return this.dataset;
+            if(service.dataset && service.dataset.Id == datasetId)
+                return service.dataset;
+            
+            service.dataset = Datasets.query({id: datasetId});
+            return service.dataset;
         },
 
         getActivityData: function(id) {
@@ -139,6 +148,40 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
         getProjectDatasets: function(projectId){
             this.getProject(projectId); //set our local project to the one selected
             return ProjectDatasets.query({id: projectId});
+        },
+
+        getMetadataProperty: function(propertyId){
+            if(!service.metadataProperties)
+            {
+                //console.log("Looking up properties.");
+                service.metadataPropertiesPromise = GetMetadataProperties.query(function(data){
+                    service.metadataProperties = {};
+                    angular.forEach(data, function(value, key){
+                        service.metadataProperties["ID_"+value.Id] = value;
+                    });    
+                  //  console.log("done and now returing");
+                  //  console.dir(service.metadataProperties);
+                  //  console.log("returning: " + service.metadataProperties["ID_"+propertyId].Name);
+                   return service.metadataProperties["ID_"+propertyId];
+
+                });
+            }else{
+                //console.log("not looking up just returning");
+                return service.metadataProperties["ID_"+propertyId];                
+            }
+        },
+
+        getMetadataProperties: function(scope, propertyTypeId) {
+            if(!service.metadataPropertiesPromise.$resolved)
+            {
+                service.metadataPropertiesPromise.$promise.then(function(){
+                    scope.metadataProperties = getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId');
+                });
+            }
+            else
+            {
+                scope.metadataProperties = getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId');
+            }
         },
 
         //this should give you the possible QA Statuses for this dataset's rows
@@ -309,6 +352,8 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
 
 
     };
+
+    service.getMetadataProperty(1); //cause our metadata properties to be loaded early.
 
     return service;
 
@@ -1279,6 +1324,9 @@ function initEdit(){
 //in any array with a "Name" attribute, get the matching item
 function getByName(list, search_name)
 {
+    return getByField(list, search_name, 'Name');
+
+    /*
     for (var i = 0; i < list.length; i++) {
         var pref = list[i];
         if(pref.Name == search_name)
@@ -1286,6 +1334,33 @@ function getByName(list, search_name)
     };
 
     return null;
+    */
 }
 
+//returns single match in any fieldname
+function getByField(list, search, field)
+{
+    for (var i = 0; i < list.length; i++) {
+        var pref = list[i];
+        if(pref[field] == search)
+            return pref;
+    };
 
+    return null;   
+}
+
+function getMatchingByField(data, search, field)
+{
+    var newlist = [];
+    
+    for(var key in data)
+    {
+        if(data[key][field] == search)
+            newlist.push(data[key]);
+    }
+
+    //console.log("did a search on " + search + " for " + field);
+    //console.dir(newlist);
+
+    return newlist;  
+}
