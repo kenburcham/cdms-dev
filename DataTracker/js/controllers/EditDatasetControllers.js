@@ -11,6 +11,9 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
 
         //common fields we show for all datasets
         scope.metadataList = {};
+
+        //select lists
+        scope.CellOptions = {};
         
         //if we only want to show in edit mode, use some if statement here...
         DataService.getMetadataProperties(scope, METADATA_ENTITY_DATASETTYPEID); //sets scope.metadataProperties
@@ -24,11 +27,13 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
                 scope.metadataList = angular.extend(scope.metadataList, {
                     Name: {
                             field: 'Name',
-                            value: scope.dataset.Name
+                            value: scope.dataset.Name,
+                            controlType: 'text',
                    	},
                     Description: {
                             field: 'Description',
-                            value: scope.dataset.Description
+                            value: scope.dataset.Description,
+                            controlType: 'text',
                     },
                     Dataset: {
                             field: 'Dataset',
@@ -47,15 +52,23 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
                     }
 	            });
 
+				//add in the metadata that came with this dataset
                 angular.forEach(scope.dataset.Metadata, function(value, key){
                     try{
-                    		var name = DataService.getMetadataProperty(value.MetadataPropertyId).Name;
-                        	scope.metadataList[name] =
+                    		var property = DataService.getMetadataProperty(value.MetadataPropertyId);
+
+							scope.populateMetadataDropdowns(property); //setup any dropdown
+
+                        	scope.metadataList[property.Name] =
                         	{
-	                            field: name,
-	                            propertyId: value.MetadataPropertyId,
-	                            value: value.Values
+	                            field: property.Name,
+	                            propertyId: property.Id,
+	                            controlType: property.ControlType,
+	                            value: value.Values,
+	                            options: scope.CellOptions[property.Id+"_Options"]
                         	};
+
+                        	
 
 
                     }catch(e)
@@ -67,24 +80,38 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
             }
         });
 
-		//these are all the properties configured for datasets
+		//these are all the metadata properties configured for all datasets
+		// -- add in the ones that aren't already being used in this particular dataset.
 		scope.$watch('metadataProperties', function(){
 			console.log("Hey we have some properties now!");
-			    angular.forEach(scope.metadataProperties, function(value, key){
+			    angular.forEach(scope.metadataProperties, function(property, key){
 			    	//if it isn't already there, add it as an available option
-			   		if(!(value.Name in scope.metadataList))
+			   		if(!(property.Name in scope.metadataList))
 			   		{
-						scope.metadataList[value.Name] =
+			   			scope.populateMetadataDropdowns(property); //setup the dropdown
+
+						scope.metadataList[property.Name] =
                     	{
-                            field: value.Name,
-                            propertyId: value.Id,
-                            value: ""
+                            field: property.Name,
+                            propertyId: property.Id,
+                            controlType: property.ControlType,
+                            value: "",
+                            options: scope.CellOptions[property.Id+"_Options"]
                     	};
+                    	
 			   		}
 			    });
 
 
 		});
+
+		scope.populateMetadataDropdowns = function(property)
+		{
+			if(property.ControlType == "select" || property.ControlType == "multiselect")
+        	{
+				scope.CellOptions[property.Id+'_Options'] = makeObjectsFromValues(property.Id+"_Options", property.PossibleValues);
+        	}
+		};
 
         scope.close = function(){
             $location.path("/activities/"+scope.dataset.Id);   
