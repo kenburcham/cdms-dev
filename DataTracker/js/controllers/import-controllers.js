@@ -371,12 +371,24 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						try{
 						if(field.Label != $scope.mappableFields[DO_NOT_MAP])
 						{
-
-							//$scope.Logger.debug(field);
-
 							//just ditch if it is an empty value
-							if(data_row[col] == null || data_row[col].trim() == "")
+							if(data_row[col] == null || data_row[col] == "")
 								return;
+
+							//check for numeric or ignore as blank if it isn't.
+							if(field.ControlType == "number")
+							{
+								if(field.DbColumnName == 'WaterTemperatureF')
+									console.log("Number and watertemp = " + new_row[field.DbColumnName] );
+
+								if(!isNumber(data_row[col]))
+								{
+									console.log("ignoring: " + field.DbColumnName + " is a number field but value is not a number: " + data_row[col]);
+									return; //don't set this as a value
+								}
+								else
+									console.log("is numeric and value is too." + field.DbColumnName);
+							}
 
 							if(field.ControlType == "multiselect")
 							{
@@ -404,6 +416,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							}
 							else //just add the value to the cell
 							{
+								new_row[field.DbColumnName] = data_row[col]; //but don't uppercase anything that isn't a multiselect or select.
+
 								//this is ugly but it has to be done.
 								if(field.DbColumnName == 'WaterTemperature')
 									new_row['WaterTemperatureF'] = convertCtoF(data_row[col]);
@@ -421,13 +435,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									new_row['TransportReleaseTemperature'] = convertFtoC(data_row[col]);
 
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
-								new_row[field.DbColumnName] = data_row[col].trim();
+								if(field.ControlType == "select" && data_row[col])
+									new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....
+								
 							}
+
+							if(field.DbColumnName == 'WaterTemperatureF')
+								console.log("Final watertempf = " + new_row[field.DbColumnName] );
 							
 							//TODO: validate = $scope.UploadResults.Errors.push({message: "There was a problem."});
-						}
+						}//if
 						}catch(e){
-							$scope.Logger.debug(e);
+							console.dir(e);
 						}
 					});
 

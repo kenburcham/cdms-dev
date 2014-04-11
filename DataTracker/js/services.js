@@ -97,17 +97,25 @@ mod.factory('GetMetadataProperties', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/api/MetadataProperties');
 }]);
 
+mod.factory('SaveDatasetMetadata', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
+}]);
 
 
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties){
+mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata',
+    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata){
     var service = {
         
         //our "singleton cache" kinda thing
         project: null,
         dataset: null,
         metadataProperties: null,
+
+        clearDataset: function()
+        {
+            service.dataset = null;
+        },
 
         getProject: function(id) { 
             if(service.project && service.project.Id == id)
@@ -182,6 +190,24 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
             {
                 scope.metadataProperties = getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId');
             }
+        },
+
+        saveDatasetMetadata: function(datasetId, metadata, saveResults)
+        {
+            saveResults.saving = true;
+            var payload = {
+                DatasetId: datasetId,
+                Metadata: metadata
+            };
+
+            SaveDatasetMetadata.save(payload, function(data){
+                saveResults.saving = false;
+                saveResults.success = true;
+            }, function(data){
+                saveResults.saving = false;
+                saveResults.failure = true;
+            });
+
         },
 
         //this should give you the possible QA Statuses for this dataset's rows
@@ -1363,4 +1389,8 @@ function getMatchingByField(data, search, field)
     //console.dir(newlist);
 
     return newlist;  
+}
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }

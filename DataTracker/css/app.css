@@ -33,6 +33,10 @@ html {
 
 body { background-color: transparent !important; }
 
+.header-box {
+	min-height: 200px;
+}
+
 .nav, .pagination, .carousel a { cursor: pointer; } 
 
 .gridWrapper {

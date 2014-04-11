@@ -113,6 +113,32 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
         	}
 		};
 
+        scope.saveResults = {};
+
+        scope.save = function(){
+            var metadata = [];
+            angular.forEach(scope.metadataList, function(item, key){
+                metadata.push({ MetadataPropertyId: item.propertyId, Values: item.value});
+            });
+
+            DataService.saveDatasetMetadata(scope.dataset.Id, metadata, scope.saveResults);
+
+            var watcher = scope.$watch('saveResults',function(){
+                if(!scope.saveResults.saving && scope.saveResults.success)
+                {
+                    console.log("watcher");
+                    DataService.clearDataset();
+                    $location.path("/dataset-details/"+scope.dataset.Id);
+                    watcher();
+                }
+            },true);
+            
+        };
+
+        scope.cancel = function(){
+            $location.path("/dataset-details/"+scope.dataset.Id);
+        };
+
         scope.close = function(){
             $location.path("/activities/"+scope.dataset.Id);   
         };
