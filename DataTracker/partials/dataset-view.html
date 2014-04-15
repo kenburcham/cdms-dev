@@ -15,7 +15,7 @@
     <div class="row-fluid">
         <div class="span6" style="min-height: 300px;">
 
-            <div ng-show="chartData"  class="right small-graph-box" ng-include="'partials/graphs/BarGraph-View.html'"></div>
+            <ng-include src="'partials/graphs/view-inset-' + dataset.Datastore.TablePrefix + '.html'"></ng-include>
 
             <div class="header-box">
                 <div class="header-label">Location:</div>

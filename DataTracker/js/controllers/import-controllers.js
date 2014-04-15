@@ -95,31 +95,38 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 			$scope.toggleDuplicates = function(){
 
-				if($scope.ignoreDuplicates)
-				{
-					$scope.TempRecordsBucket = [];
-					$scope.DuplicateRecordsBucket = [];
-					angular.forEach($scope.dataSheetDataset, function(item, key){
-						if($scope.existingActivities.indexOf(item.locationId + "_"+item.activityDate.substr(0,10)) != -1) //found a duplicate
-							$scope.DuplicateRecordsBucket.push(item);
-						else
-							$scope.TempRecordsBucket.push(item);
-					});
+				try{
+					if($scope.ignoreDuplicates)
+					{
+						$scope.TempRecordsBucket = [];
+						$scope.DuplicateRecordsBucket = [];
+						angular.forEach($scope.dataSheetDataset, function(item, key){
+							console.dir(item);
+							if($scope.existingActivities.indexOf(item.locationId + "_"+item.activityDate.substr(0,10)) != -1) //found a duplicate
+								$scope.DuplicateRecordsBucket.push(item);
+							else
+								$scope.TempRecordsBucket.push(item);
+						});
 
-					$scope.dataSheetDataset = $scope.TempRecordsBucket;
-					$scope.TempRecordsBucket = [];
-					//our duplicates are in $scope.DuplicateRecordsBucket
-				}
-				else
-				{
-					angular.forEach($scope.DuplicateRecordsBucket, function(item, key){
-						$scope.dataSheetDataset.push(item);
-					});
-					$scope.DuplicateRecordsBucket = [];
-				}
+						$scope.dataSheetDataset = $scope.TempRecordsBucket;
+						$scope.TempRecordsBucket = [];
+						//our duplicates are in $scope.DuplicateRecordsBucket
+					}
+					else
+					{
+						angular.forEach($scope.DuplicateRecordsBucket, function(item, key){
+							$scope.dataSheetDataset.push(item);
+						});
+						$scope.DuplicateRecordsBucket = [];
+					}
 
-				$scope.validateGrid($scope);
-	        	$scope.floatErrorsToTop();
+					$scope.validateGrid($scope);
+		        	$scope.floatErrorsToTop();
+		        }
+		        catch(e)
+		        {
+		        	console.dir(e);
+		        }
 				
 			};
 
@@ -378,16 +385,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							//check for numeric or ignore as blank if it isn't.
 							if(field.ControlType == "number")
 							{
-								if(field.DbColumnName == 'WaterTemperatureF')
-									console.log("Number and watertemp = " + new_row[field.DbColumnName] );
-
 								if(!isNumber(data_row[col]))
 								{
 									console.log("ignoring: " + field.DbColumnName + " is a number field but value is not a number: " + data_row[col]);
 									return; //don't set this as a value
 								}
-								else
-									console.log("is numeric and value is too." + field.DbColumnName);
+								//else
+								//	console.log("is numeric and value is too." + field.DbColumnName);
 							}
 
 							if(field.ControlType == "multiselect")
@@ -416,23 +420,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							}
 							else //just add the value to the cell
 							{
+								//set the value
 								new_row[field.DbColumnName] = data_row[col]; //but don't uppercase anything that isn't a multiselect or select.
-
-								//this is ugly but it has to be done.
-								if(field.DbColumnName == 'WaterTemperature')
-									new_row['WaterTemperatureF'] = convertCtoF(data_row[col]);
-								if(field.DbColumnName == 'WaterTemperatureF')
-									new_row['WaterTemperature'] = convertFtoC(data_row[col]);
-
-								if(field.DbColumnName == 'AirTemperature')
-									new_row['AirTemperatureF'] = convertCtoF(data_row[col]);
-								if(field.DbColumnName == 'AirTemperatureF')
-									new_row['AirTemperature'] = convertFtoC(data_row[col]);
-
-								if(field.DbColumnName == 'TransportReleaseTemperature')
-									new_row['TransportReleaseTemperatureF'] = convertCtoF(data_row[col]);
-								if(field.DbColumnName == 'TransportReleaseTemperatureF')
-									new_row['TransportReleaseTemperature'] = convertFtoC(data_row[col]);
 
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
 								if(field.ControlType == "select" && data_row[col])
@@ -440,10 +429,26 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 								
 							}
 
-							if(field.DbColumnName == 'WaterTemperatureF')
-								console.log("Final watertempf = " + new_row[field.DbColumnName] );
-							
-							//TODO: validate = $scope.UploadResults.Errors.push({message: "There was a problem."});
+							//set our rule context up
+							var value = data_row[col];
+							var row = new_row;
+
+							//Fire update rules (the validation ones already run)
+							 try{
+		                        //fire Field rule if it exists -- OnChange
+		                        if(field.Field && field.Field.Rule && field.Field.Rule.OnChange){
+		                            eval(field.Field.Rule.OnChange);
+		                        }
+
+		                        //fire Datafield rule if it exists -- OnChange
+		                        if(field.Rule && field.Rule.OnChange){
+		                            eval(field.Rule.OnChange);
+		                        }
+		                    }catch(e){
+		                        //so we don't die if the rule fails....
+		                        console.dir(e);
+		                    }
+
 						}//if
 						}catch(e){
 							console.dir(e);

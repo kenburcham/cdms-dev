@@ -655,6 +655,7 @@ mod.service('DataSheet',[ 'Logger',
                 var value = scope.row[field_name];
                 var field = scope.FieldLookup[field_name];
                 var errors = [];
+                var row = scope.row;
              
                 validateField(field, scope.row, field_name, scope, errors);
              
@@ -665,23 +666,27 @@ mod.service('DataSheet',[ 'Logger',
                 else
                 {
                     delete scope.headerFieldErrors[field_name];
-
-                    //check if temp field -- if so, fill in the partner -- TODO: refactor?
-                    if(field_name == 'WaterTemperature')
-                        if(!scope.row['WaterTemperatureF']) scope.row['WaterTemperatureF'] = convertCtoF(value);
-                    if(field_name == 'WaterTemperatureF')
-                        if(!scope.row['WaterTemperature']) scope.row['WaterTemperature'] = convertFtoC(value);
-
-                    if(field_name == 'AirTemperature')
-                        if(!scope.row['AirTemperatureF']) scope.row['AirTemperatureF'] = convertCtoF(value);
-                    if(field_name == 'AirTemperatureF')
-                        if(!scope.row['AirTemperature']) scope.row['AirTemperature'] = convertFtoC(value);
-
-                    if(field_name == 'TransportReleaseTemperature')
-                        if(!scope.row['TransportReleaseTemperatureF']) scope.row['TransportReleaseTemperatureF'] = convertCtoF(value);
-                    if(field_name == 'TransportReleaseTemperatureF')
-                        if(!scope.row['TransportReleaseTemperature']) scope.row['TransportReleaseTemperature'] = convertFtoC(value);
                 }
+
+
+                //fire rules - OnChange
+                
+                try{
+                    //fire Field rule if it exists -- OnChange
+                    if(field.Field.Rule && field.Field.Rule.OnChange){
+                        eval(field.Field.Rule.OnChange);
+                    }
+
+                    //fire Datafield rule if it exists -- OnChange
+                    if(field.Rule && field.Rule.OnChange){
+                        eval(field.Rule.OnChange);
+                    }
+                }catch(e){
+                    //so we don't die if the rule fails....
+                    console.dir(e);
+                }
+            
+
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
 
@@ -709,14 +714,16 @@ mod.service('DataSheet',[ 'Logger',
             },
 
             //fired whenever a cell value changes.
-            updateCell: function(row, field, scope)
+            updateCell: function(row, field_name, scope)
             {
+                //console.log("Field changed: " + field_name);
+
                 scope.dataChanged = true;
 
                 if(scope.onRow.entity)
                 {
-                    var fromValue = scope.onRow.entity[field];
-                    var toValue = row.entity[field];
+                    var fromValue = scope.onRow.entity[field_name];
+                    var toValue = row.entity[field_name];
 
                     //Logger.debug("Changed "+field+" from: " + fromValue + " to: "+ toValue);
                 }
@@ -780,6 +787,54 @@ mod.service('DataSheet',[ 'Logger',
                 });
                 */
             
+                var value = row.entity[field_name];
+                var field = scope.FieldLookup[field_name];
+
+                //console.dir(scope.FieldLookup);
+                //console.log("field name = " + field_name);
+
+                row = row.entity; //get the right reference for our rules
+
+                //fire OnChange rule
+
+// -------------------------------------------
+//I like to write my test rules here and move into rule and delete when i'm done  ---------------------------
+//eg:
+/*
+
+                if(field_name == "Disposition")
+                {
+                    console.log("Disposition value: " + value);
+                    var testRule = 
+                    {
+                        "OnChange":
+                        ""
+                    };
+
+                    field.Field.Rule = angular.fromJson(testRule);
+
+                }
+*/
+// ------------------------------------------
+                if(value)
+                {
+                    try{
+                        //fire Field rule if it exists -- OnChange
+                        if(field.Field.Rule && field.Field.Rule.OnChange){
+                            eval(field.Field.Rule.OnChange);
+                        }
+
+                        //fire Datafield rule if it exists -- OnChange
+                        if(field.Rule && field.Rule.OnChange){
+                            eval(field.Rule.OnChange);
+                        }
+                    }catch(e){
+                        //so we don't die if the rule fails....
+                        console.dir(e);
+                    }
+                }
+
+                //this is expensive in that it runs every time a value is changed in the grid.
                 scope.validateGrid(scope); //so that number of errors gets calculated properly.
 
 
@@ -909,6 +964,9 @@ function makeFieldColDef(field, scope) {
 */
 function parseField(field, scope)
 {
+    //do this no matter what.
+    scope.FieldLookup[field.DbColumnName] = field; //setup our little convenience lookup associative array - used for validation
+
     //are we already parsed?
     if(field.parsed === true)
         return; 
@@ -935,8 +993,17 @@ function parseField(field, scope)
         }
     }
 
+    try{
+        field.Rule = (field.Rule) ? angular.fromJson(field.Rule) : {};
+        field.Field.Rule = (field.Field.Rule) ? angular.fromJson(field.Field.Rule) : {};
+    }
+    catch(e)
+    {
+        console.log("*** there is a rule parsing error for " + field.Field.Name + " *** ");
+        console.dir(e);
+    }
+
     field.parsed = true;
-    scope.FieldLookup[field.DbColumnName] = field; //setup our little convenience lookup associative array - used for validation
 
 }
 
@@ -1100,6 +1167,51 @@ function validateField(field, row, key, scope, row_errors)
         case 'checkbox':
             //anything here?
             break;
+
+    }
+
+
+// You can test validation rules here
+//------------------------------------
+/*
+if(field.DbColumnName == "Disposition")
+{
+    console.log("Disposition value: " + value);
+    var testRule = 
+    {
+        "OnValidate":
+        "if((value == 'O' || value == 'T') && (scope.FieldLookup['ReleaseSite'] && !row['ReleaseSite'])) row_errors.push('[ReleaseSite] Disposition choice requires ReleaseSite');"
+    };
+
+    field.Field.Rule = angular.fromJson(testRule);
+}
+*/
+/*
+console.log(field.DbColumnName);
+if(field.DbColumnName == "FinClip")
+{
+    console.log("Origin value: " + value);
+    var testRule = 
+    {
+        "OnValidate":
+        "row['Origin'] = 'NAT';if(!(!row['FinClip'] || (row['FinClip'] == 'NONE' || row['FinClip'] == 'NA')) || ( row['Tag'] == 'WIRE')) row['Origin'] = 'HAT';"
+    };
+
+    field.Field.Rule = angular.fromJson(testRule);
+}
+*/
+
+
+    try{
+        //fire Field rule if it exists -- OnValidate
+        if(field.Field && field.Field.Rule && field.Field.Rule.OnValidate)
+            eval(field.Field.Rule.OnValidate);
+
+        //fire Datafield rule if it exists -- OnValidate
+        if(field.Rule && field.Rule.OnValidate)
+            eval(field.Rule.OnValidate);
+    }catch(e){
+        console.dir(e);
     }
 
 }

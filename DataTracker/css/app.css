@@ -72,6 +72,7 @@ body { background-color: transparent !important; }
     height: 400px;
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     font-size: 12px;
+    margin-right: 80px;
 }
 
 .gridActivities {

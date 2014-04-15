@@ -18,6 +18,18 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
         //if we only want to show in edit mode, use some if statement here...
         DataService.getMetadataProperties(scope, METADATA_ENTITY_DATASETTYPEID); //sets scope.metadataProperties
 
+        scope.$watch('project.OwnerId', function() {
+            if(scope.project && scope.project.OwnerId)
+            {
+                scope.metadataList.Owner = {
+                            field: 'Owner',
+                            value: scope.project.Owner.Organization.Name + " / "+ scope.project.Owner.Department.Name + " / " +  scope.project.Owner.Fullname ,
+                            locked: true
+                    };
+
+            }
+        });
+
         scope.$watch('dataset.ProjectId', function(){
             if(scope.dataset && scope.dataset.ProjectId)
             {
@@ -38,11 +50,6 @@ mod_edc.controller('DatasetDetailsCtrl', ['$scope','$routeParams', 'DataService'
                     Dataset: {
                             field: 'Dataset',
                             value: scope.dataset.Datastore.Name,
-                            locked: true
-                    },
-                    Owner: {
-                            field: 'Owner',
-                            value: 'CTUIR Department of Natural Resources',
                             locked: true
                     },
                     Created: {
