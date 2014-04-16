@@ -43,7 +43,7 @@
             </div>
             
             <hr/>
-            <div class="gridStyle" ng-grid="gridDatasheetOptions" ng-show="!query.loading">
+            <div class="gridStyle" ng-grid="gridDatasheetOptions" ng-style="gridWidth" ng-show="!query.loading">
             </div>
             Total Records: {{grid.Details.length}} <img ng-show="query.loading" src="images/FishLoading.gif"/></div>           
             <button project-role="editor" class="btn" ng-click="openEdit()">Edit</button>

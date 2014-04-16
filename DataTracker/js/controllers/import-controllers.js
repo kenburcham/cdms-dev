@@ -101,7 +101,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						$scope.TempRecordsBucket = [];
 						$scope.DuplicateRecordsBucket = [];
 						angular.forEach($scope.dataSheetDataset, function(item, key){
-							console.dir(item);
+							//console.dir(item);
 							if($scope.existingActivities.indexOf(item.locationId + "_"+item.activityDate.substr(0,10)) != -1) //found a duplicate
 								$scope.DuplicateRecordsBucket.push(item);
 							else

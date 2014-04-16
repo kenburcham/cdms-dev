@@ -102,6 +102,12 @@ var ngMoveSelectionHandler = function($scope, elm, evt, grid) {
                 newColumnIndex += 1;
             }
         }
+
+        //console.log(visibleCols[newColumnIndex]);
+        //kb 4/16 - to get selected cell
+        //$scope.selectionProvider.lastSelectedCell = visibleCols[newColumnIndex];//$scope.renderedColumns.indexOf(visibleCols[newColumnIndex]);
+
+
     }
     var items;
     if ($scope.configGroups.length > 0) {
@@ -139,6 +145,7 @@ var ngMoveSelectionHandler = function($scope, elm, evt, grid) {
         }, 3);
     }
 
+    
     return false;
 };
 

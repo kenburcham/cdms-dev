@@ -1581,14 +1581,11 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
 
 </head>
 <body class="claro">
-
-
-
-
  <div id="init-overlay"><div id="init-heading">CTUIR Project Tracker v.1.0</div><img src="images/init.gif" />
-    <div id="init-loading">Loading...<br /><br /><br /><br /><img src="images/FirstFoodsBanner.png" style="width: 100%;" /></div></div>
+    <div id="init-loading">Loading...<br /><br /><br /><br /><img src="images/FirstFoodsBanner.png" style="width: 100%;" /></div>
+ </div>
 
-    <nav class="navbar navbar-default" role="navigation">
+    <nav class="navbar navbar-default" role="navigation" id="nav-bar">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -1641,23 +1638,15 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
 
     
     <div class="row" id="header-row">
-
-        <div class="large-12 columns pt-panel map-div">
-            
+        <div class="large-12 columns map-div">            
                 <div id="mapDiv"></div>
-
-                    
-
-
-
-
                 <div id="left-sidebar"></div>
                 <div id="right-sidebar"></div>
         </div>
-
-      </div>
+    </div>
       
-      <div class="row pt-panel-grid" id="grid-window">
+
+    <div class="row pt-panel-grid" id="grid-window">
         <div class="large-12 columns pt-panel pt-panel-grid">
 
             <div id="grid-toolbar" class="row">

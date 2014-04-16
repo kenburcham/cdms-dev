@@ -86,7 +86,7 @@
         <hr/>
         <div >Rows: {{query.results.length}}<img ng-show="query.loading" src="images/FishLoading.gif"/></div>
         <div class="gridWrapper">
-            <div class="gridStyle" ng-grid="gridDatasheetOptions"></div>
+            <div class="gridStyle" ng-style="gridWidth" ng-grid="gridDatasheetOptions"></div>
         </div>
 
         <button class="btn" ng-click="openExportView()">Export data</button>

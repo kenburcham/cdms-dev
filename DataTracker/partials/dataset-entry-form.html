@@ -62,8 +62,11 @@
         </form>
     </div>
 
-<div class="datasheet-grid" ng-grid="gridDatasheetOptions" style="margin-top: 20px;"></div>
+<div class="datasheet-grid" ng-grid="gridDatasheetOptions" ng-style="gridWidth" style="margin-top: 20px;"></div>
+
+<div ng-include="'partials/dataentry/bottom-bar.html'"/>
 
 <div ng-include="'partials/dataentry/buttons.html'"/>
 
 </div>
+

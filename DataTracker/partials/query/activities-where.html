@@ -51,10 +51,10 @@
 			<p class="text-center query-header-text">selected field</p>
 
 			<div class="row">
-				<div class="col-md-6">
+				<div class="col-md-7">
 					<select multiple ng-multiple="false" size="12" ng-model="Criteria.ParamFieldSelect" ng-options="Value.Label for Value in dataset.Fields"/>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-5 selected-field-description">
 					{{Criteria.ParamFieldSelect[0].Field.Description}}<br/>
 				</div>
 			</div>

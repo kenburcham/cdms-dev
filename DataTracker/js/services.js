@@ -530,8 +530,8 @@ mod.service('ActivityParser',[ 'Logger',
 
 
 //gridDatasheetOptions needs to be set to your datasheet grid
-mod.service('DataSheet',[ 'Logger',
-    function(Logger){
+mod.service('DataSheet',[ 'Logger', '$window',
+    function(Logger,$window){
         //var LocationCellTemplate = '<input ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />';
 
         var LocationCellEditTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'locationId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in locationOptions"/>';
@@ -547,12 +547,14 @@ mod.service('DataSheet',[ 'Logger',
                 scope.CellOptions = {}; //dropdown list options
                 scope.FieldLookup = {}; //conveience lookup dbcolname->fieldobj (populated by dataentry-controller.makecoldef)
                 scope.onRow = undefined;
+                scope.onField = undefined;
                 scope.autoUpdateUndone = [];
                 scope.deletedRows = []; 
                 scope.updatedRows = [];
                 scope.autoUpdateFeatureDisabled = true; 
                 scope.headerFieldErrors= {};
                 scope.dataChanged = false; //any changes to the grid yet?
+                scope.gridWidth = { width: '2000' }; //will set below based on number of fields 
 
                 //scope wrapper functions
                 scope.undoAutoUpdate = function() { service.undoAutoUpdate(scope)};
@@ -563,23 +565,41 @@ mod.service('DataSheet',[ 'Logger',
                 scope.removeRow = function() { service.removeOnRow(scope)};
                 scope.undoRemoveRow = function() {service.undoRemoveOnRow(scope)};
                 
+                scope.selectCell = function(field) {
+                    console.log("select cell!");
+                    scope.onField = scope.FieldLookup[field];
+                };
+                
+                //dynamically set the width of the grids.
+                var grid_width_watcher = scope.$watch('FieldLookup', function(){
+                    var length = array_count(scope.FieldLookup);
+                    var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 100 : 980;
+                    //console.log(minwidth + " <----");
+                    var width = 100 * length; //multiply number of columns by 100px
+                    if(width < minwidth) width=minwidth; //min-width
+                    scope.gridWidth = { width: width };
+                    //refresh the grid
+                    setTimeout(function() {
+                        scope.gridDatasheetOptions.$gridServices.DomUtilityService.RebuildGrid(scope.gridDatasheetOptions.$gridScope, scope.gridDatasheetOptions.ngGrid); //refresh
+                      //  console.log("Width now: " + width);
+                        grid_width_watcher(); //remove watcher.
+                    }, 200);
+                },true);
+
                 //only do this for pages that have editing enabled
                 if(scope.gridDatasheetOptions.enableCellEdit)
                 {
                     //setup editing rowtemplate
-                    scope.gridDatasheetOptions.rowTemplate = '<div ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="{\'has-validation-error\': !row.getProperty(\'isValid\')}" class="{{col.colIndex()}} ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
+                    scope.gridDatasheetOptions.rowTemplate = '<div ng-click="selectCell(col.field)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="{\'has-validation-error\': !row.getProperty(\'isValid\')}" class="{{col.colIndex()}} ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
                 }
 
                 //this is pure awesomeness: setup a watcher so that when we navigate the grid we update our current row and validate it.
                 scope.$watch('gridDatasheetOptions.$gridScope.selectionProvider.lastClickedRow', function(){
                     //Logger.debug(scope.gridDatasheetOptions.$gridScope);
                     scope.onRow = scope.gridDatasheetOptions.$gridScope.selectionProvider.lastClickedRow;
-                    if(scope.gridDatasheetOptions.enableCellEdit)
-                    {
-                   //     service.validate(scope.onRow,scope);
-                    }
+                    console.dir(scope.gridDatasheetOptions.$gridScope.selectionProvider);
                 });
-                
+
             },
 
             getColDefs: function(){
@@ -1506,3 +1526,4 @@ function getMatchingByField(data, search, field)
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
+

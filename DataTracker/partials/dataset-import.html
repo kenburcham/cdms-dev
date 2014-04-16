@@ -104,10 +104,10 @@
                 <span ng-show="DuplicateRecordsBucket.length>0"><i>Ignoring {{DuplicateRecordsBucket.length}} Duplicate Records</i> (<a href="" ng-click="openDuplicatesModal()">view</a>)</span>
             </span>
 
-        <div style="height: 100px; width: 400px; float: right; margin-top: -150px;" ng-include="'partials/grid-validation-error-box.html'"></div>
+        <div style="height: 100px; width: 400px; float: right; margin-top: -120px;" ng-include="'partials/grid-validation-error-box.html'"></div>
 
-        <div class="datasheet-grid" ng-grid="gridDatasheetOptions" style="margin-top: 20px;"></div>
-
+        <div class="datasheet-grid" ng-grid="gridDatasheetOptions" ng-style="gridWidth" style="margin-top: 20px;"></div>
+        <div ng-include="'partials/dataentry/bottom-bar.html'"/>
         <div style="margin-top: 15px; padding-bottom: 30px;">
             <button class="btn" ng-disabled="!onRow" ng-click="removeRow()">Remove Row</button>
             <button ng-show="deletedRows.length" class="btn" ng-click="undoRemoveRow()">Undo</button>
