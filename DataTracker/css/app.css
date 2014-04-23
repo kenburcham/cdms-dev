@@ -41,7 +41,7 @@ body { background-color: transparent !important; }
 
 .gridWrapper {
 	margin-right: 50px;
-	width: 2030px;
+	background-color: black;
 }
 
 .gridStyle {
@@ -343,11 +343,17 @@ table.metadata td
 
 .fav-dataset { float: right; }
 
-.grid-bar { 
+.grid-bar-info { 
 	background-color: lightgray;
 	font-size: small;
-	margin-bottom: 10px;
 	border-bottom: solid 1px gray;
+}
+
+.grid-bar-stats { 
+	background-color: lightgray;
+	font-size: small;
+	border-bottom: solid 1px gray;
+	margin-bottom: 10px;
 }
 
 .grid-bar-item {

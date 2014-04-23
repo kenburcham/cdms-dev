@@ -32,21 +32,23 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     		$scope.detailFields = [];
     		$scope.datasheetColDefs = [];
     		$scope.query = {results: []};
+    		$scope.dataSheetDataset = [];
 
     		var footerTemplate = '';
 
 
     		$scope.gridDatasheetOptions = { 
-    			data: 'query.results', 
+    			data: 'dataSheetDataset', 
 		        columnDefs: 'datasheetColDefs',
     			enableColumnResize: true, 
 	        	enableRowSelection: true,
 	        	enableCellEdit: false,
 	        	enableSorting: true, 
-    			enableCellSelection: false,
+    			enableCellSelection: true,
     			showFilter: false,
     			showColumnMenu: true,
     			multiSelect: false,
+    			//aggregateTemplate: '<div ng-click="row.toggleExpand()" ng-style="{'left': row.offsetleft}" class="ngAggregate"><span class="ngAggregateText">{{row.label CUSTOM_FILTERS}} (1 {{AggItemsLabel}})</span><div class="{{row.aggClass()}}"></div></div>',
     			//plugins: [new ngGridCsvExportPlugin()],
     			//showFooter: true,
     			//footerTemplate: '<div class="grid-footer-totals"><div class="colt0 sumField"></div><div class="colt1 sumField"></div><div class="colt2 sumField"></div><div class="colt3 sumField"></div><div class="colt4 sumField"></div><div class="colt5 sumField">s: 1433<br/>a: 477.67</div><div class="colt6 sumField"></div></div>',
@@ -86,7 +88,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
     		$scope.$watch('project.Name', function(){
     			if($scope.project){
-    				$scope.locationOptions = $rootScope.locationOptions = makeObjects($scope.project.Locations, 'Id','Label') ;
+    				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
     				$scope.locationOptions["all"] = "- All -";
     				$scope.Criteria.LocationIds = ["all"]; //set the default
 				}
@@ -215,6 +217,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 	    	$scope.$watch('query.loading', function(){
 	    		console.log("-- gathering graph data");
 	    		$scope.chartData = getAdultWeirChartData($scope.query.results);	
+	    		$scope.dataSheetDataset = $scope.query.results;
 	    	});
 	    	
 

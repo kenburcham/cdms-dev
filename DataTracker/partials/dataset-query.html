@@ -85,9 +85,9 @@
         
         <hr/>
         <div >Rows: {{query.results.length}}<img ng-show="query.loading" src="images/FishLoading.gif"/></div>
-        <div class="gridWrapper">
-            <div class="gridStyle" ng-style="gridWidth" ng-grid="gridDatasheetOptions"></div>
-        </div>
+        <div class="gridStyle" ng-style="gridWidth" ng-grid="gridDatasheetOptions"></div>
+        
+        <div ng-include="'partials/dataentry/bottom-bar.html'"/> 
 
         <button class="btn" ng-click="openExportView()">Export data</button>
         <button class="btn right" ng-disabled="!onRow" ng-click="openActivity()">View Activity</button>

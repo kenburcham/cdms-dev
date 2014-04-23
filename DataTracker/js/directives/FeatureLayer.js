@@ -21,10 +21,15 @@ define([
 
         // now is a good time to declare our FeautreLayer
         var layer = new FeatureLayer($attrs.url);
+        var filter = $attrs.filter;
 
         // lets expose a function to get the layer
         this.getLayer = function(){
           return layer;
+        };
+
+        this.getFilter = function(){
+          return filter;
         };
       },
 
@@ -36,7 +41,7 @@ define([
 
         // now we can use the 'addLayer' method exposed on the controller
         // of the esriMap directive to add the layer to the map
-        mapController.addLayer(layerController.getLayer());
+        mapController.addLayer(layerController.getLayer(), layerController.getFilter());
       }
     };
   });

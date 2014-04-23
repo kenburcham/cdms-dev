@@ -49,8 +49,46 @@ define([
 
         // start exposing an API by setting properties on "this" which is our controller
         // lets expose the "addLayer" method so child directives can add themselves to the map
-        this.addLayer = function(layer){
-          return map.addLayer(layer);
+        this.addLayer = function(layer, filter){
+          map.locationLayer = map.addLayer(layer);
+          console.log("Added layer to map");
+          console.dir(map.locationLayer);
+
+          if(filter)
+          {
+            if(filter == "location")
+            {
+
+              if(typeof $scope.locationObjectIds == "undefined")
+              {
+                $scope.$watch('locationObjectIds', function(){
+
+                  if($scope.locationObjectIds == "")
+                    return;
+
+                  layer.clearSelection();
+                  var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
+                  console.log(" from watched: " + definitionExpression);
+                  layer.setDefinitionExpression(definitionExpression);
+                  layer.show();                  
+
+                });
+              }
+              else
+              {
+                if($scope.locationObjectIds == "")
+                    return;
+
+                  layer.clearSelection();
+                  var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
+                  console.log(" from direct: " + definitionExpression);
+                  layer.setDefinitionExpression(definitionExpression);
+                  layer.show();                  
+              }
+            }
+          }
+
+          return map.locationLayer;
         };
 
         // lets expose a version of centerAt that takes an array of [lng,lat]
@@ -72,10 +110,14 @@ define([
           $scope.$emit("map.click", e);
 
           // use the scopes click fuction to handle the event
-          $scope.$apply(function() {
+          $scope.$apply(function($scope) {
             $scope.click.call($scope, e);
           });
         });
+
+        $scope.map = map;
+        console.log("Map is complete and in scope.");
+
       }
     };
   });

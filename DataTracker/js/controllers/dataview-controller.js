@@ -35,6 +35,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		$scope.headerFields = [];
     		$scope.detailFields = [];
     		$scope.datasheetColDefs = [];
+    		$scope.dataSheetDataset = [];
 
     		$scope.fieldsloaded = false;
 
@@ -49,11 +50,11 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		$scope.activities = $rootScope.GridActivities; //pull this in from the previous page, if they were set.  Used for navigating between activities.
 
 			$scope.gridDatasheetOptions = { 
-    			data: 'grid.Details', 
+    			data: 'dataSheetDataset', 
 		        columnDefs: 'datasheetColDefs',
     			enableColumnResize: true, 
     			enableSorting: true, 
-    			//enableCellSelection: false,
+    			enableCellSelection: true,
     			showFilter: true,
     			showColumnMenu: true,
     			enableRowSelection: true,
@@ -78,6 +79,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
     		DataSheet.initScope($scope);
 
+    		
     		$scope.$watch('dataset.ProjectId', function()
     		{
     			if($scope.dataset && $scope.dataset.ProjectId)
@@ -117,8 +119,11 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 		    		});
 
 		    		$scope.fieldsloaded = true;
+
+		    		$scope.dataSheetDataset = $scope.grid.Details;
 				}
 				$scope.query.loading = false;
+				$scope.datasheetDat
 
 	    	});
 

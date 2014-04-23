@@ -72,7 +72,7 @@ function configureProfile(profile)
 		if(project && project.OwnerId == profile.Id)
 			return true;
 		
-		if(ALLOW_SUPERADMIN && (profile.Id == 1 || profile.Id == 2))
+		if(ALLOW_SUPERADMIN && (profile.Id == 1 || profile.Id == 2 || profile.Id == 1028))
 			return true;
 
 		//console.log(profile.Id + " is not owner: " + project.OwnerId);

@@ -564,9 +564,18 @@ mod.service('DataSheet',[ 'Logger', '$window',
                 scope.validate = function(row) { service.validate(row, scope)};
                 scope.removeRow = function() { service.removeOnRow(scope)};
                 scope.undoRemoveRow = function() {service.undoRemoveOnRow(scope)};
+                scope.getFieldStats = function() {return service.getFieldStats(scope)};
+                
+                scope.onNumberField = function() { 
+                    if(!scope.onField)
+                        return false;
+
+                    return(scope.onField.ControlType == "number");
+                }
+
                 
                 scope.selectCell = function(field) {
-                    console.log("select cell!");
+                    //console.log("select cell!");
                     scope.onField = scope.FieldLookup[field];
                 };
                 
@@ -592,12 +601,18 @@ mod.service('DataSheet',[ 'Logger', '$window',
                     //setup editing rowtemplate
                     scope.gridDatasheetOptions.rowTemplate = '<div ng-click="selectCell(col.field)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="{\'has-validation-error\': !row.getProperty(\'isValid\')}" class="{{col.colIndex()}} ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
                 }
+                else
+                {
+                    //for viewing
+                    scope.gridDatasheetOptions.rowTemplate = '<div ng-click="selectCell(col.field)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" class="{{col.colIndex()}} ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
+
+                }
 
                 //this is pure awesomeness: setup a watcher so that when we navigate the grid we update our current row and validate it.
                 scope.$watch('gridDatasheetOptions.$gridScope.selectionProvider.lastClickedRow', function(){
                     //Logger.debug(scope.gridDatasheetOptions.$gridScope);
                     scope.onRow = scope.gridDatasheetOptions.$gridScope.selectionProvider.lastClickedRow;
-                    console.dir(scope.gridDatasheetOptions.$gridScope.selectionProvider);
+                    //console.dir(scope.gridDatasheetOptions.$gridScope.selectionProvider);
                 });
 
             },
@@ -897,6 +912,72 @@ mod.service('DataSheet',[ 'Logger', '$window',
 
             },
 
+            getFieldStats: function(scope){
+
+                if(!scope.onField || scope.onField.ControlType != "number")
+                    return "";
+
+                //first get the mean (average)
+                var total = 0;
+                var num_recs = 0;
+                var max = undefined;
+                var min = undefined;
+                
+                //calculate total (for mean), max, min
+                angular.forEach(scope.dataSheetDataset, function(item, key){
+
+                    try{
+                        var num = new Number(item[scope.onField.DbColumnName]); 
+                        
+                        if(!isNaN(num)) //just skip if it is not a number (NaN)
+                        {
+                            total += num;
+
+                            if(typeof min == "undefined")
+                                min = num;
+
+                            if(typeof max == "undefined")
+                                max = num;
+
+                            if(num > max)
+                                max = num;
+
+                            if(num < min)
+                                min = num;
+
+                            num_recs ++;
+                        }
+                    }
+                    catch(e)
+                    {
+                        //ran across something that wasn't a number (usurally a blank...)
+                        console.log("couldn't convert this to a number: " + item[scope.onField.DbColumnName] + " on " + scope.onField.DbColumnName);
+                    }
+
+                });
+
+                var mean = total / num_recs;
+                
+                var std_total = 0;
+
+                //now do standard deviation
+                angular.forEach(scope.dataSheetDataset, function(item, key){
+                    if(!isNaN(item[scope.onField.DbColumnName]))
+                        std_total += Math.pow( (item[scope.onField.DbColumnName] - mean), 2); //difference of each item, squared
+                });
+
+                var std_dev = Math.sqrt(std_total/ (num_recs - 1) );//square root of sum of squared differences
+
+                var stats = "Mean: " + mean.toFixed(2);
+                stats += " / Max: " + max;
+                stats += " / Min: " + min;
+                stats += " / Std Dev: " + std_dev.toFixed(2);
+                stats += " / Total: " + total;
+              
+              return stats;  
+            },
+
+
 
         } //end service
     
@@ -932,7 +1013,7 @@ function makeFieldColDef(field, scope) {
         switch(field.ControlType)
         {
             case 'select':
-                coldef.editableCellTemplate = '<select ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"/>';
+                coldef.editableCellTemplate = '<select ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"><option value="" selected="selected"></option></select>';
                 scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(field.DbColumnName, field.Field.PossibleValues);
                 break;
             case 'multiselect':
@@ -1507,6 +1588,7 @@ function getByField(list, search, field)
     return null;   
 }
 
+//returns array with matching field value
 function getMatchingByField(data, search, field)
 {
     var newlist = [];

@@ -206,6 +206,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.project = null;
             $scope.saveResults = null;
             $scope.isFavorite = $rootScope.Profile.isDatasetFavorite($routeParams.Id);
+            $scope.allActivities = null;
 
             //console.log("Profile = ");
             //console.dir($rootScope.Profile);
@@ -243,6 +244,37 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 MessageToOpen: "Show Map",
                 MessageToClose: "Hide Map",
             };
+
+
+//MAP stuff
+         // expose a method for handling clicks - this is linked to from the Map.js directive
+            $scope.click = function(e){
+              //console.log("SHOW: ",e.graphic.attributes.OBJECTID);
+
+              if(!$scope.allActivities)
+                $scope.allActivities = $scope.activities;
+
+              var filterActivities = [];
+              var location = getByField($scope.locationsArray,e.graphic.attributes.OBJECTID,"SdeObjectId");
+
+              angular.forEach($scope.allActivities, function(item, key){
+                if(item.LocationId == location.Id)
+                    filterActivities.push(item);
+              });
+
+              $scope.activities = filterActivities;
+
+              //$scope.center = [e.mapPoint.x,e.mapPoint.y];
+            };
+
+            // listen for click broadcasts
+           /* $scope.$on("map.click", function(event, e){
+              console.log("broadcast", event, e);
+              console.log("Map -- ");
+              console.dir($scope.map.locationLayer);
+            });
+*/
+//
 
             $scope.toggleMap = function(){
                 if($scope.ShowMap.Display)
@@ -282,11 +314,25 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             }
 
+            $scope.$watch('project.Name', function(){
+                if($scope.project){
+                    $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
+                    $scope.locationObjectIds = [];
+                    
+                    angular.forEach($scope.locationsArray, function(item, key){
+                        $scope.locationObjectIds.push(item.SdeObjectId);
+                    });
+
+                    $scope.locationObjectIds = $scope.locationObjectIds.join();
+                }
+            });            
+
             $scope.$watch('dataset.Fields', function() { 
                 if(!$scope.dataset.Fields ) return;
                 //load our project based on the projectid we get back from the dataset
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
                 $scope.QAStatusList = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+
             });
 
             $scope.$watch('activities.length', function(){ 
