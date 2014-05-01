@@ -65,7 +65,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				}
 
 	        	//setup locationOptions dropdown
-				$scope.locationOptions = $rootScope.locationOptions = makeObjects($scope.project.Locations, 'Id','Label') ;
+				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
 
 				//setup location field to participate in validation 
 				$scope.FieldLookup['locationId'] = { DbColumnName: 'locationId', ControlType: "select" };

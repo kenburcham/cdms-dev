@@ -507,20 +507,25 @@ mod.service('ActivityParser',[ 'Logger',
 
                 }
 
+                var rowHasValue = false; //we don't save blank detail records.
+
                 //handle field level validation or processing
                 angular.forEach(detailFields, function(field){
-
-                    //flatten multiselect values into an json array string
-                    if(field.ControlType == "multiselect" && row[field.DbColumnName])
+                    if(row[field.DbColumnName])
                     {
-                        row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
-                    }
+                        //flatten multiselect values into an json array string
+                        if(field.ControlType == "multiselect")
+                        {
+                            row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
+                        }
 
-                    //what else? //TODO:
-                    //activities.errors.push({message: "What went wrong"});
+                        rowHasValue = true; //ok, we have a value in this row.
+                    }
                 });
                 
-                activities.activities[key].Details.push(row);
+                //only save the detail row if we have a value in at least one of the fields.
+                if(rowHasValue)
+                    activities.activities[key].Details.push(row);
             },
 
         };        
@@ -620,24 +625,31 @@ mod.service('DataSheet',[ 'Logger', '$window',
             getColDefs: function(){
                 var coldefs = [{
                                         field: 'locationId', 
+                                        Label: 'Location',
                                         displayName: 'Location', 
                                         editableCellTemplate: LocationCellEditTemplate,
-                                        cellFilter: 'locationNameFilter'
+                                        cellFilter: 'locationNameFilter',
+                                        Field: { Description: "What location is this record related to?"}
                                     },
                                     {
                                         field: 'activityDate', 
+                                        Label: 'Activity Date',
                                         displayName: 'Activity Date',
                                         cellFilter: 'date: \'MM/dd/yyyy\'',
                                         editableCellTemplate: '<input ng-blur="updateCell(row,\'activityDate\')" type="text" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />',
+                                        Field: { Description: "Date of activity in format: '10/22/2014'"}
                                     },
                                     {
                                         field: 'QAStatusId',
+                                        Label: 'QA Status',
                                         displayName: 'QA Status',
                                         editableCellTemplate: QACellEditTemplate,
-                                        cellFilter: 'QAStatusFilter'
+                                        cellFilter: 'QAStatusFilter',
+                                        Field: { Description: "Quality Assurance workflow status"}
 
                                     }
                               ];
+
                 return coldefs;
             },
 
@@ -880,6 +892,7 @@ mod.service('DataSheet',[ 'Logger', '$window',
             {
                 var entity = scope.deletedRows.pop();
                 scope.dataSheetDataset.push(entity);
+                scope.validateGrid(scope);
             },
 
 
@@ -889,6 +902,7 @@ mod.service('DataSheet',[ 'Logger', '$window',
                 var index = scope.dataSheetDataset.indexOf(scope.onRow.entity);
                 scope.dataSheetDataset.splice(index,1);
                 scope.onRow = undefined;
+                scope.validateGrid(scope);
             },
 
 
@@ -1114,7 +1128,7 @@ function makeNewRow(coldefs)
     var obj = {};
 
     angular.forEach(coldefs, function(col){
-        obj[col.field] = ''
+        obj[col.field] = null
     });
 
     obj.isValid=true;

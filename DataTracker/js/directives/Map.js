@@ -51,8 +51,8 @@ define([
         // lets expose the "addLayer" method so child directives can add themselves to the map
         this.addLayer = function(layer, filter){
           map.locationLayer = map.addLayer(layer);
-          console.log("Added layer to map");
-          console.dir(map.locationLayer);
+          //console.log("Added layer to map");
+          //console.dir(map.locationLayer);
 
           if(filter)
           {
@@ -68,7 +68,7 @@ define([
 
                   layer.clearSelection();
                   var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
-                  console.log(" from watched: " + definitionExpression);
+//                  console.log(" from watched: " + definitionExpression);
                   layer.setDefinitionExpression(definitionExpression);
                   layer.show();                  
 
@@ -81,7 +81,7 @@ define([
 
                   layer.clearSelection();
                   var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
-                  console.log(" from direct: " + definitionExpression);
+  //                console.log(" from direct: " + definitionExpression);
                   layer.setDefinitionExpression(definitionExpression);
                   layer.show();                  
               }
@@ -116,7 +116,7 @@ define([
         });
 
         $scope.map = map;
-        console.log("Map is complete and in scope.");
+        //console.log("Map is complete and in scope.");
 
       }
     };

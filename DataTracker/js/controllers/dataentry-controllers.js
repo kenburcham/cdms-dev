@@ -9,7 +9,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
-		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
+		$scope.userId = $rootScope.Profile.Id;
 		$scope.headerFields = [];
 		$scope.detailFields = [];
 		$scope.colDefs = [];
@@ -39,7 +39,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects($scope.project.Locations, 'Id','Label') ;
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
 			
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
@@ -102,7 +102,6 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		 	$location.path("/activities/"+$scope.dataset.Id);
 		 };
 
-
 		//adds row to datasheet grid
 		$scope.addNewRow = function()
 		{
@@ -135,7 +134,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
-		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
+		$scope.userId = $rootScope.Profile.Id;
 		$scope.headerFields = [];
 		$scope.detailFields = [];
 		$scope.datasheetColDefs = [];
@@ -165,7 +164,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects($scope.project.Locations, 'Id','Label') ;
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
 
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
@@ -230,6 +229,12 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			$scope.dataSheetDataset.push(row);
 			$scope.onRow = row;
 		};
+
+   	    //overriding the one in our service because we don't want to allow removing of a blank row.
+        $scope.removeRow = function(){
+        	if($scope.dataSheetDataset.length > 1)
+        		DataSheet.removeOnRow($scope);
+        };
 
 
 		$scope.doneButton = function()

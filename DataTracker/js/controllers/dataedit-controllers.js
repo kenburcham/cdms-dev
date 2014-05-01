@@ -11,7 +11,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
-		$scope.userId = 1; /////////////////////////////////////////TODOOOOOOOOOOOOOOOOOOOOOOOO
+		$scope.userId = $rootScope.Profile.Id;
 		$scope.headerFields = [];
 		$scope.detailFields = [];
 
@@ -61,7 +61,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 				$location.path("/unauthorized");
 			}
 
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects($scope.project.Locations, 'Id','Label') ;
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
 
         });
 
