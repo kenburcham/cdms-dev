@@ -37,6 +37,8 @@ define([
 	        $routeProvider.when('/datasetimport/:Id',{templateUrl: 'partials/dataset-import.html', controller: 'DatasetImportCtrl', permission: 'Edit'});
 	        $routeProvider.when('/dataset-edit/:Id',{templateUrl: 'partials/edit-dataset.html', controller: 'DatasetDetailsCtrl', permission: 'Edit'});
 
+	        $routeProvider.when('/query/:Id', {templateUrl: 'partials/dataset-query.html', controller: 'DatastoreQueryCtrl'});
+
 	        $routeProvider.otherwise({redirectTo: '/projects'});
 	    }]);
 

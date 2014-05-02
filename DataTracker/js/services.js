@@ -97,11 +97,51 @@ mod.factory('GetMetadataProperties', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/api/MetadataProperties');
 }]);
 
+mod.factory('GetAllPossibleDatastoreLocations', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllPossibleDatastoreLocations');
+}]);
+
+mod.factory('GetAllDatastoreFields', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllDatastoreFields');
+}]);
+
+mod.factory('GetDatastore', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
+}]);
+
+
+
 mod.factory('SaveDatasetMetadata', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
 }]);
 
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore){
+        var service = {
 
+            datastoreId: null,
+
+            getLocations: function(id)
+            {
+                service.datastoreId = id;
+                return GetAllPossibleDatastoreLocations.query({id: id});
+            },
+
+            getFields: function(id)
+            {
+                return GetAllDatastoreFields.query({id: id});
+            },
+
+            getDatastore: function(id)
+            {
+                return GetDatastore.query({id: id});
+            },
+
+        };
+
+        return service;
+    }
+]);
 
 mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata',
     function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata){
@@ -1086,15 +1126,28 @@ function parseField(field, scope)
     if(field.parsed === true)
         return; 
 
-    var displayName = field.Label;
+    var displayName = "";
 
-    //include units in the label
-    if(field.Field.Units)
+    //if we are a DatasetField
+    if(field.Label)
+        displayName = field.Label;
+
+    //if we are a Field
+    if(field.Name)
+        displayName = field.Name;
+
+    //include units in the label if we are a DatasetField
+    if(field.Field && field.Field.Units)
         displayName += " (" + field.Field.Units+")";
+
+    //or if we are a Field
+    if(field.Units)
+        displayName += " (" + field.Units+")";
 
     field.Label = displayName;
 
-    if(field.Field.Validation)
+    //configure field validation for DatasetFields (will be skipped for global Fields (in the case of glboal query))
+    if(field.Field && field.Field.Validation)
     {
         try{
             console.log("configuring validation for " + field.DbColumnName);
@@ -1110,7 +1163,9 @@ function parseField(field, scope)
 
     try{
         field.Rule = (field.Rule) ? angular.fromJson(field.Rule) : {};
-        field.Field.Rule = (field.Field.Rule) ? angular.fromJson(field.Field.Rule) : {};
+
+        if(field.Field)
+            field.Field.Rule = (field.Field.Rule) ? angular.fromJson(field.Field.Rule) : {};
     }
     catch(e)
     {

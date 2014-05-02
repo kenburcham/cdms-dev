@@ -1,7 +1,8 @@
 <ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
-    <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
-    <li><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
+    <li ng-show="project.Name"><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
+    <li ng-show="datastore.Name">{{datastore.Name}} (All) <span class="divider"></span></li>
+    <li ng-show="dataset.Name"><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
     
     <li class="active">Query</li>
 </ul>
@@ -10,11 +11,13 @@
     <div class="row-fluid">
         <div class="span6">
 
-        <h4>Dataset Query Tool for {{dataset.Name}}</h4>
+        <h4 ng-show="dataset.Name">Dataset Query Tool for {{dataset.Name}}</h4>
+        <h4 ng-show="datastore.Name">Dataset Query Tool for {{datastore.Name}} (All)</h4>
+        
 
 
 <tabset justified="true">
-    <tab heading="New query">
+    <tab class="hidden" heading="New query">
         <div class="header-box" style="border: 1px;">
         
             <div class="panel" style="margin: 20px;background-color: #f2f2f2;padding: 4px 10px 35px 10px;">
@@ -48,14 +51,14 @@
                 <div class="top-divider"></div>
                 <br/><div class="right" style="margin-top: 5px; margin-bottom: 10px;">Auto execute query? <input type="checkbox" ng-model="AutoExecuteQuery"></input></div><br/><br/>
                 <button class="btn right" ng-click="executeQuery()" style="margin-top: 5px; margin-left: 5px;">Execute query</button>
-                <button class="btn right" ng-click="saveQuery()" style="margin-top: 5px;">Save query</button>
+                <button class="btn right hidden" ng-click="saveQuery()" style="margin-top: 5px;">Save query</button>
 
             </div>
 
 
         </div>
     </tab>
-    <tab heading="Saved queries">
+    <tab heading="Saved queries" class="hidden">
         <div class="header-box" style="border: 1px; ">
             <div class="panel" style="margin: 20px;background-color: #F5FBEF;padding: 0px;">
 
