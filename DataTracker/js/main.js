@@ -2,6 +2,7 @@ define([
   'angular'
 ], function(angular){
 
+ 
   // define our app as an angular module - with our dependencies and our routes
   var app = angular.module("app", 
 	 [
@@ -19,6 +20,7 @@ define([
 	  'DatasetServices',
 	  'angularFileUpload',
 	  'DatasetDirectives',
+	  'AdminController',
 	  'angularCharts'
 	  ])
 	    .config(['$routeProvider', function($routeProvider) {
@@ -38,10 +40,15 @@ define([
 	        $routeProvider.when('/dataset-edit/:Id',{templateUrl: 'partials/edit-dataset.html', controller: 'DatasetDetailsCtrl', permission: 'Edit'});
 
 	        $routeProvider.when('/query/:Id', {templateUrl: 'partials/dataset-query.html', controller: 'DatastoreQueryCtrl'});
+	        $routeProvider.when('/admin', {templateUrl: 'partials/admin.html', controller: 'AdminCtrl'});
+	        $routeProvider.when('/admin-dataset/:Id', {templateUrl: 'partials/admin/admin-dataset.html', controller: 'AdminEditDatasetCtrl'});
+
+	        $routeProvider.when('/admin-master/:Id', {templateUrl: 'partials/admin/admin-master.html', controller: 'AdminEditMasterCtrl'});
 
 	        $routeProvider.otherwise({redirectTo: '/projects'});
 	    }]);
 
+	//any functions in here are available to EVERY scope.  use sparingly!
 	app.run(function($rootScope,$location) {
 	  $rootScope.config = {
 	      version: "1.0",
@@ -50,6 +57,10 @@ define([
 	  $rootScope.Cache = {};
 	  $rootScope.Profile = configureProfile(profile); // profile defined in init.js
 
+	  $rootScope.go = function ( path ) {
+		  $location.path( path );
+	  };
+
 	  angular.rootScope = $rootScope; //just so we can get to it later. :)
 
 	});
@@ -57,6 +68,7 @@ define([
 	return app;
 
 });
+
 
 //configure profile permission functions
 function configureProfile(profile)
@@ -68,13 +80,19 @@ function configureProfile(profile)
 	else
 		profile.favoriteDatasets = [];
 
+	
+	profile.isAdmin = function()
+	{
+		return (ALLOW_SUPERADMIN && (profile.Id == 1 || profile.Id == 2 || profile.Id == 1028));
+	};
+
 	//is the profile owner of the given project?
 	profile.isProjectOwner = function(project){
 		//console.dir(project);
 		if(project && project.OwnerId == profile.Id)
 			return true;
 		
-		if(ALLOW_SUPERADMIN && (profile.Id == 1 || profile.Id == 2 || profile.Id == 1028))
+		if(profile.isAdmin)
 			return true;
 
 		//console.log(profile.Id + " is not owner: " + project.OwnerId);

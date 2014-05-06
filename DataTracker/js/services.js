@@ -109,14 +109,44 @@ mod.factory('GetDatastore', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
 }]);
 
+mod.factory('GetDatastoreProjects', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastoreProjects');
+}]);
+
+mod.factory('GetAllDatastores', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllDatastores');
+}]);
+
+mod.factory('GetDatastoreDatasets', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastoreDatasets');
+}]);
 
 
 mod.factory('SaveDatasetMetadata', ['$resource', function($resource){
         return $resource('http://data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
 }]);
 
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore){
+mod.factory('GetSources', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetSources');
+}]);
+
+mod.factory('GetInstruments', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetInstruments');
+}]);
+
+mod.factory('SaveDatasetField', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/SaveDatasetField');
+}]);
+
+mod.factory('SaveMasterField', ['$resource', function($resource){
+        return $resource('http://data.ctuir.org/servicesSTAGE/data/SaveMasterField');
+}]);
+
+
+
+
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField){
         var service = {
 
             datastoreId: null,
@@ -136,6 +166,56 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             {
                 return GetDatastore.query({id: id});
             },
+
+            getProjects: function(id)
+            {
+                return GetDatastoreProjects.query({id: id});
+            },
+
+            getDatastores: function()
+            {
+                return GetAllDatastores.query();
+            },
+            
+            getDatasets: function(id)
+            {
+                return GetDatastoreDatasets.query({id: id});
+            },
+            getSources: function()
+            {
+                return GetSources.query();
+            },
+            getInstruments: function()
+            {
+                return GetInstruments.query();
+            },
+            saveDatasetField: function(field, saveResults)
+            {
+                saveResults.saving = true;
+                
+                SaveDatasetField.save(field, function(data){
+                    saveResults.saving = false;
+                    saveResults.success = true;
+                }, function(data){
+                    saveResults.saving = false;
+                    saveResults.failure = true;
+                });
+                    
+            },
+            saveMasterField: function(field, saveResults)
+            {
+                saveResults.saving = true;
+                
+                SaveMasterField.save(field, function(data){
+                    saveResults.saving = false;
+                    saveResults.success = true;
+                }, function(data){
+                    saveResults.saving = false;
+                    saveResults.failure = true;
+                });
+                    
+            },
+
 
         };
 
