@@ -483,7 +483,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			{
 				$scope.loading=true;
 			      $scope.upload = $upload.upload({
-			        url: '/servicesSTAGE/data/UploadImportFile', //upload.php script, node.js route, or servlet url
+			        url: '/services/data/UploadImportFile', //upload.php script, node.js route, or servlet url
 			        method: "POST",
 			        // headers: {'headerKey': 'headerValue'},
 			        // withCredential: true,

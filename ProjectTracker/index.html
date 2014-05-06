@@ -56,8 +56,8 @@
 <script>
 
     //require https
-    //if (!isSecure())
-    //    window.location = "https:" + window.location.href.substr(5);
+   // if (!isSecure())
+     //   window.location = "https:" + window.location.href.substr(5);
 
     var current_user;
     var currentdate = new Date();
@@ -1357,7 +1357,10 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
                     dojo.byId("file-save-results").innerHTML = "Success!";
 
                     var uploader = registry.byId("uploader");
-                    refreshProjectFiles(current_project.Id);
+
+                    setTimeout(function () {
+                        refreshProjectFiles(current_project.Id);
+                    },400);
                     
                     AddFileDialog.hide();
                     dojo.byId("file-save-results").innerHTML = "";
@@ -1390,6 +1393,9 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
                 "dojo/request/xhr", "dojo/store/Memory", "dojo/dom"
         ],
                 function (request, Memory, dom) {
+                    if(!id)
+                        id = current_project.Id;
+
                     request(SERVER_SERVICE + "/action/ProjectFiles?ProjectId="+id,
                         {
                             handleAs: "json",
@@ -1621,7 +1627,7 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
         
         <ul class="nav navbar-nav navbar-right">
           
-        <li><a href="/cdms/docs/Welcome%20to%20the%20DNR%20Project%20Tracker.pdf">Help</a></li>
+        <li><a href="http://intranet.ctuir.org/adminstration/oit/gis/wiki/Pages/Project%20Tracker%20Documentation.aspx" target="_blank">Help</a></li>
           <li class="basemap-menu">
                 <button id="dropdownButton" label="Basemaps" data-dojo-type="dijit.form.DropDownButton">
                     <div data-dojo-type="dijit.Menu" id="basemapMenu">
@@ -1697,7 +1703,7 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
     <div class="dijitDialogPaneContentArea">
         <div style="width: 520px; height: 450px; overflow: auto;">
                     <div class="add-file">
-                        <form class="custom" action="/servicesSTAGE/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
+                        <form class="custom" action="/services/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
                         <input type="hidden" id="file-dialog-projectid" name="ProjectId" value="${current_project.Id}" />
                         <h4>Add new documents</h4>
                         <p>Click the browse button and select the file(s) you would like to add to your project.  Next, add a title and description for each file.</p>
@@ -1873,7 +1879,7 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
                 <div id="login-form">
                     <div class="panel">
                     <div id="login-message">Enter your CTUIR username and password if you are an authorized user.</div>
-                    <form class="custom" action="/servicesSTAGE/account/login" method="POST" id="LoginForm" >
+                    <form class="custom" action="/services/account/login" method="POST" id="LoginForm" >
                         <div class="row">
                             <div class="large-12 columns">
                                 <label for="Username">Username</label>

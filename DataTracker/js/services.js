@@ -10,136 +10,136 @@ var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
 //Note: typically you won't want to use these factories directly in your
 // controllers, but rather use the DataService below.
 mod.factory('Projects',['$resource', function(resource){
-        return resource('http://data.ctuir.org/servicesSTAGE/api/projects',{}, {
+        return resource('//data.ctuir.org/servicesSTAGE/api/projects',{}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('Users',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/api/users', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/api/users', {}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('Project',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/api/projects', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/api/projects', {}, {
             query: {method: 'GET', params: {id:'id'}, isArray: false}
         });
 }]);
 
 mod.factory('ProjectDatasets',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/action/ProjectDatasets', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/action/ProjectDatasets', {}, {
             query: {method: 'GET', params: {id:'projectId'}, isArray: true}
         });
 }]);
 
 mod.factory('Activities',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/action/DatasetActivities', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/action/DatasetActivities', {}, {
             query: {method: 'GET', params: {id:'datasetId'}, isArray: true}
         });
 }]);
 
 mod.factory('Datasets',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/api/datasets', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/api/datasets', {}, {
             query: {method: 'GET', params: {id:'datasetId'}, isArray: false}
         });
 }]);
 
 mod.factory('Data',['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/action/DatasetData', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/action/DatasetData', {}, {
             query: {method: 'GET', params: {id:'activityId'}, isArray: false}
         });
 }]);
 
 mod.factory('SaveActivitiesAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SaveDatasetActivities');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveDatasetActivities');
 }]);
 
 mod.factory('UpdateActivitiesAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/UpdateDatasetActivities');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/UpdateDatasetActivities');
 }]);
 
 mod.factory('QueryActivitiesAction',  ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/QueryDatasetActivities', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/data/QueryDatasetActivities', {}, {
            save: {method: 'POST', isArray: true} 
         });
 }]);
 
 mod.factory('ExportActivitiesAction',  ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/DownloadDatasetActivities', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/data/DownloadDatasetActivities', {}, {
            save: {method: 'POST', isArray: false} 
         });
 }]);
 
 mod.factory('SetProjectEditors', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SetProjectEditors');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SetProjectEditors');
 }]);
 
 mod.factory('DeleteActivitiesAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/DeleteDatasetActivities');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/DeleteDatasetActivities');
 }]);
 
 mod.factory('SetQaStatusAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SetQaStatus');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SetQaStatus');
 }]);
 
 mod.factory('GetMyDatasetsAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetMyDatasets', {}, {
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetMyDatasets', {}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/action/SaveUserPreference');
+        return $resource('//data.ctuir.org/servicesSTAGE/action/SaveUserPreference');
 }]);
 
 mod.factory('GetMetadataProperties', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/api/MetadataProperties');
+        return $resource('//data.ctuir.org/servicesSTAGE/api/MetadataProperties');
 }]);
 
 mod.factory('GetAllPossibleDatastoreLocations', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllPossibleDatastoreLocations');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllPossibleDatastoreLocations');
 }]);
 
 mod.factory('GetAllDatastoreFields', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllDatastoreFields');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllDatastoreFields');
 }]);
 
 mod.factory('GetDatastore', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
 }]);
 
 mod.factory('GetDatastoreProjects', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastoreProjects');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastoreProjects');
 }]);
 
 mod.factory('GetAllDatastores', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetAllDatastores');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllDatastores');
 }]);
 
 mod.factory('GetDatastoreDatasets', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetDatastoreDatasets');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastoreDatasets');
 }]);
 
 
 mod.factory('SaveDatasetMetadata', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
 }]);
 
 mod.factory('GetSources', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetSources');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetSources');
 }]);
 
 mod.factory('GetInstruments', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/GetInstruments');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/GetInstruments');
 }]);
 
 mod.factory('SaveDatasetField', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SaveDatasetField');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveDatasetField');
 }]);
 
 mod.factory('SaveMasterField', ['$resource', function($resource){
-        return $resource('http://data.ctuir.org/servicesSTAGE/data/SaveMasterField');
+        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveMasterField');
 }]);
 
 
