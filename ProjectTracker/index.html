@@ -1703,7 +1703,7 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
     <div class="dijitDialogPaneContentArea">
         <div style="width: 520px; height: 450px; overflow: auto;">
                     <div class="add-file">
-                        <form class="custom" action="/services/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
+                        <form class="custom" action="/servicesSTAGE/action/postFiles" method="POST" id="add-file" enctype="multipart/form-data">
                         <input type="hidden" id="file-dialog-projectid" name="ProjectId" value="${current_project.Id}" />
                         <h4>Add new documents</h4>
                         <p>Click the browse button and select the file(s) you would like to add to your project.  Next, add a title and description for each file.</p>
@@ -1879,7 +1879,7 @@ console.log("---------------- >>> Current User = " + current_user.Fullname);
                 <div id="login-form">
                     <div class="panel">
                     <div id="login-message">Enter your CTUIR username and password if you are an authorized user.</div>
-                    <form class="custom" action="/services/account/login" method="POST" id="LoginForm" >
+                    <form class="custom" action="/servicesSTAGE/account/login" method="POST" id="LoginForm" >
                         <div class="row">
                             <div class="large-12 columns">
                                 <label for="Username">Username</label>

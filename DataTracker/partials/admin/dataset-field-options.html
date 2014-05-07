@@ -33,6 +33,7 @@
 <tr><td class="prop-name">Label:</td><td><input class="form-control" type="text" ng-model="SelectedField.Label" name="Label"></input></td></tr>
 <tr><td class="prop-name">Source:</td><td><select ng-model="SelectedField.SourceId" ng-options="id as name for (id, name) in SourcesLookup"></select></td></tr>
 <tr><td class="prop-name">Instrument:</td><td><select ng-model="SelectedField.InstrumentId" ng-options="id as name for (id, name) in InstrumentsLookup"></select></td></tr>
+<tr><td class="prop-name">FieldRole:</td><td><select ng-model="SelectedField.FieldRoleId"><option value="1">Header</option><option value="2">Details</option></select></td></tr>
 <tr><td class="prop-name">ControlType:</td><td><select ng-model="SelectedField.ControlType"><option>date</option><option>multiselect</option><option>number</option><option>select</option><option>text</option><option>textarea</option></select></td></tr>
 <tr><td class="prop-name">Validation:</td><td><input class="form-control" type="text" ng-model="SelectedField.Validation" name="Validation"></td></tr>
 <tr><td class="prop-name">Rule:</td><td><textarea style="margin-left: 2px;"class="form-control" type="text" ng-model="SelectedField.Rule" name="Rule"></textarea></td></tr>
@@ -40,7 +41,9 @@
 
 </table>
 
+<button style="margin-top: 30px;" class="btn btn-warning" ng-click="removeField()">Remove</button>
 <button style="margin-top: 30px;" class="right btn" ng-click="saveField()">Save Changes</button>
+
 <div ng-show="saveResults.saving" style="float: right;margin-right: 20px;" class="alert alert-success">Saving...</div>
 
 

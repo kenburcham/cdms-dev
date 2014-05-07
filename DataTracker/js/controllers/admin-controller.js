@@ -8,7 +8,8 @@ mod_dv.controller('ModalAddProjectDatasetCtrl', ['$scope','$modalInstance', 'Dat
 
 		$scope.row = {};
 
-		$scope.Projects = DataService.getProjects();
+		$scope.projects = DataService.getProjects(); //.sort(orderByAlpha);
+		
 
 		$scope.save = function(){
 			
@@ -78,7 +79,7 @@ mod_ac.controller('AdminEditDatasetCtrl', ['$scope','DatastoreService','$modal',
 
 		$scope.dataset = DataService.getDataset($routeParams.Id);
 		$scope.FieldLookup = {};
-
+		
 		$scope.Sources = DatastoreService.getSources();
 
 		$scope.$watch('Sources',function(){
@@ -96,9 +97,13 @@ mod_ac.controller('AdminEditDatasetCtrl', ['$scope','DatastoreService','$modal',
 		$scope.SelectedField = null;
 
 		$scope.$watch('dataset.Id', function(){
+			
 			if(!$scope.dataset.Id)
 				return;
-			
+		
+			if(!$scope.MasterFields)
+				$scope.MasterFields = DatastoreService.getMasterFields($scope.dataset.Datastore.Id);
+
 			angular.forEach($scope.dataset.Fields.sort(orderByAlpha), function(field){
 				//parseField(field, $scope);
 				if(field.Field.PossibleValues)
@@ -112,11 +117,37 @@ mod_ac.controller('AdminEditDatasetCtrl', ['$scope','DatastoreService','$modal',
 
 		});
 
+		$scope.removeField = function()
+		{
+			if(!confirm("Are you sure you want to remove '" + $scope.SelectedField.Label + "' from this dataset?"))
+                return;
+
+			$scope.saveResults = {};
+            DatastoreService.removeField($scope.dataset.Id, $scope.SelectedField.FieldId, $scope.saveResults)
+            setTimeout(function(){
+            	DataService.clearDataset();
+            	$scope.dataset = DataService.getDataset($routeParams.Id); //reload
+            	$scope.SelectedField = null;
+            },400);
+
+
+		}
+
+		$scope.addMasterField = function()
+		{
+			$scope.saveResults = {};
+			DatastoreService.addMasterFieldToDataset($scope.dataset.Id, $scope.newField, $scope.saveResults);
+			setTimeout(function(){
+				DataService.clearDataset();
+            	$scope.dataset = DataService.getDataset($routeParams.Id); //reload
+            },400);
+		};
+
 		$scope.saveField = function()
 		{
 			$scope.saveResults = {};
 			DatastoreService.saveDatasetField($scope.SelectedField, $scope.saveResults);
-		}
+		};
 
 		$scope.selectField = function(field){
 			$scope.SelectedField = field;
