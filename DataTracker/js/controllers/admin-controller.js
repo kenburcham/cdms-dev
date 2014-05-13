@@ -102,7 +102,7 @@ mod_ac.controller('AdminEditDatasetCtrl', ['$scope','DatastoreService','$modal',
 				return;
 		
 			if(!$scope.MasterFields)
-				$scope.MasterFields = DatastoreService.getMasterFields($scope.dataset.Datastore.Id);
+				$scope.MasterFields = DatastoreService.getMasterFields($scope.dataset.Datastore.FieldCategoryId);
 
 			angular.forEach($scope.dataset.Fields.sort(orderByAlpha), function(field){
 				//parseField(field, $scope);
@@ -162,9 +162,12 @@ mod_ac.controller('AdminEditMasterCtrl', ['$scope','DatastoreService','$modal', 
 
 		$scope.datastore = DatastoreService.getDatastore($routeParams.Id);
 		
-		$scope.datastoreFields = DatastoreService.getFields($routeParams.Id);
-
 		$scope.SelectedField = null;
+
+		$scope.$watch('datastore.Id', function(){
+			if($scope.datastore.Id > 0)
+				$scope.datastoreFields = DatastoreService.getMasterFields($scope.datastore.FieldCategoryId); //DatastoreService.getFields($routeParams.Id);
+		});
 
 		$scope.$watch('datastoreFields', function(){
 			if(!$scope.datastoreFields)

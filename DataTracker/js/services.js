@@ -6,159 +6,168 @@ var mod = angular.module('DatasetServices', ['ngResource']);
 
 var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
 
+var serviceUrl = '//data.ctuir.org/servicesSTAGE';
 
 //Note: typically you won't want to use these factories directly in your
 // controllers, but rather use the DataService below.
 mod.factory('Projects',['$resource', function(resource){
-        return resource('//data.ctuir.org/servicesSTAGE/api/projects',{}, {
+        return resource(serviceUrl+'/api/projects',{}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('Users',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/api/users', {}, {
+        return $resource(serviceUrl+'/api/users', {}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('Project',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/api/projects', {}, {
+        return $resource(serviceUrl+'/api/projects', {}, {
             query: {method: 'GET', params: {id:'id'}, isArray: false}
         });
 }]);
 
 mod.factory('ProjectDatasets',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/action/ProjectDatasets', {}, {
+        return $resource(serviceUrl+'/action/ProjectDatasets', {}, {
             query: {method: 'GET', params: {id:'projectId'}, isArray: true}
         });
 }]);
 
 mod.factory('Activities',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/action/DatasetActivities', {}, {
+        return $resource(serviceUrl+'/action/DatasetActivities', {}, {
             query: {method: 'GET', params: {id:'datasetId'}, isArray: true}
         });
 }]);
 
 mod.factory('Datasets',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/api/datasets', {}, {
+        return $resource(serviceUrl+'/api/datasets', {}, {
             query: {method: 'GET', params: {id:'datasetId'}, isArray: false}
         });
 }]);
 
 mod.factory('Data',['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/action/DatasetData', {}, {
+        return $resource(serviceUrl+'/action/DatasetData', {}, {
             query: {method: 'GET', params: {id:'activityId'}, isArray: false}
         });
 }]);
 
 mod.factory('SaveActivitiesAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveDatasetActivities');
+        return $resource(serviceUrl+'/data/SaveDatasetActivities');
 }]);
 
 mod.factory('UpdateActivitiesAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/UpdateDatasetActivities');
+        return $resource(serviceUrl+'/data/UpdateDatasetActivities');
 }]);
 
 mod.factory('QueryActivitiesAction',  ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/QueryDatasetActivities', {}, {
+        return $resource(serviceUrl+'/data/QueryDatasetActivities', {}, {
            save: {method: 'POST', isArray: true} 
         });
 }]);
 
 mod.factory('ExportActivitiesAction',  ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/DownloadDatasetActivities', {}, {
+        return $resource(serviceUrl+'/data/DownloadDatasetActivities', {}, {
            save: {method: 'POST', isArray: false} 
         });
 }]);
 
 mod.factory('SetProjectEditors', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SetProjectEditors');
+        return $resource(serviceUrl+'/data/SetProjectEditors');
 }]);
 
 mod.factory('DeleteActivitiesAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/DeleteDatasetActivities');
+        return $resource(serviceUrl+'/data/DeleteDatasetActivities');
 }]);
 
 mod.factory('SetQaStatusAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SetQaStatus');
+        return $resource(serviceUrl+'/data/SetQaStatus');
 }]);
 
 mod.factory('GetMyDatasetsAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetMyDatasets', {}, {
+        return $resource(serviceUrl+'/data/GetMyDatasets', {}, {
             query: {method: 'GET', params: {}, isArray: true}
         });
 }]);
 
 mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/action/SaveUserPreference');
+        return $resource(serviceUrl+'/action/SaveUserPreference');
 }]);
 
 mod.factory('GetMetadataProperties', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/api/MetadataProperties');
+        return $resource(serviceUrl+'/api/MetadataProperties');
 }]);
 
 mod.factory('GetAllPossibleDatastoreLocations', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllPossibleDatastoreLocations');
+        return $resource(serviceUrl+'/data/GetAllPossibleDatastoreLocations');
 }]);
 
 mod.factory('GetAllDatastoreFields', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllDatastoreFields');
+        return $resource(serviceUrl+'/data/GetAllDatastoreFields');
 }]);
 
 mod.factory('GetDatastore', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
+        return $resource(serviceUrl+'/data/GetDatastore', {}, { query: {method: 'GET', params: {}, isArray: false}});
 }]);
 
 mod.factory('GetDatastoreProjects', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastoreProjects');
+        return $resource(serviceUrl+'/data/GetDatastoreProjects');
 }]);
 
 mod.factory('GetAllDatastores', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllDatastores');
+        return $resource(serviceUrl+'/data/GetAllDatastores');
 }]);
 
 mod.factory('GetDatastoreDatasets', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetDatastoreDatasets');
+        return $resource(serviceUrl+'/data/GetDatastoreDatasets');
 }]);
 
 
 mod.factory('SaveDatasetMetadata', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SetDatasetMetadata');
+        return $resource(serviceUrl+'/data/SetDatasetMetadata');
 }]);
 
 mod.factory('GetSources', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetSources');
+        return $resource(serviceUrl+'/data/GetSources');
 }]);
 
 mod.factory('GetInstruments', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetInstruments');
+        return $resource(serviceUrl+'/data/GetInstruments');
 }]);
 
 mod.factory('SaveDatasetField', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveDatasetField');
+        return $resource(serviceUrl+'/data/SaveDatasetField');
 }]);
 
 mod.factory('SaveMasterField', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/SaveMasterField');
+        return $resource(serviceUrl+'/data/SaveMasterField');
 }]);
 
 mod.factory('DeleteDatasetField', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/DeleteDatasetField');
+        return $resource(serviceUrl+'/data/DeleteDatasetField');
 }]);
 
 mod.factory('GetAllFields', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/GetAllFields');
+        return $resource(serviceUrl+'/data/GetAllFields');
+}]);
+
+mod.factory('GetLocationTypes', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetLocationTypes');
 }]);
 
 mod.factory('AddMasterFieldToDataset', ['$resource', function($resource){
-        return $resource('//data.ctuir.org/servicesSTAGE/data/AddMasterFieldToDataset');
+        return $resource(serviceUrl+'/data/AddMasterFieldToDataset');
+}]);
+
+mod.factory('SaveProjectLocation', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/SaveProjectLocation');
 }]);
 
 
 
 
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset){
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation){
         var service = {
 
             datastoreId: null,
@@ -203,6 +212,10 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             {
                 return GetInstruments.query();
             },
+            getLocationTypes: function()
+            {
+                return GetLocationTypes.query();
+            },
             saveDatasetField: function(field, saveResults)
             {
                 saveResults.saving = true;
@@ -228,6 +241,10 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
                     saveResults.failure = true;
                 });
                     
+            },
+            saveNewProjectLocation: function(projectId, location)
+            {
+                return SaveProjectLocation.save({ProjectId: projectId, Location: location});
             },
             addMasterFieldToDataset: function(datasetId, fieldId)
             {

@@ -1,8 +1,10 @@
 define([
   'app',
   'esri/map',
-  'esri/geometry/Point'
-], function (app, Map, Point) {
+  'esri/geometry/Point',
+  'esri/dijit/InfoWindow',
+  'esri/InfoTemplate'
+], function (app, Map, Point, InfoWindow, InfoTemplate) {
 
   // register a new directive called esriMap with our app
   app.directive('esriMap', function(){
@@ -37,57 +39,50 @@ define([
       // this is great for when you need to expose an API for manipulaiting your directive
       // this is also the best place to setup our map
       controller: function($scope, $element, $attrs){
+
+        //console.dir($attrs);
+
         // setup our map options based on the attributes and scope
         var mapOptions = {
           center: ($attrs.center) ? $attrs.center.split(",") : $scope.center,
           zoom: ($attrs.zoom) ? $attrs.zoom : $scope.zoom,
-          basemap: ($attrs.basemap) ? $attrs.basemap : $scope.basemap
+          basemap: ($attrs.basemap) ? $attrs.basemap : $scope.basemap,
+        
         };
 
         // declare our map
         var map = new Map($attrs.id, mapOptions);
 
+        
         // start exposing an API by setting properties on "this" which is our controller
         // lets expose the "addLayer" method so child directives can add themselves to the map
         this.addLayer = function(layer, filter){
           map.locationLayer = map.addLayer(layer);
-          //console.log("Added layer to map");
-          //console.dir(map.locationLayer);
 
-          if(filter)
+          console.log("Added layer to map");
+          console.log("layer_"+layer.id);
+
+          if(filter && filter == "location")
           {
-            if(filter == "location")
-            {
-
               if(typeof $scope.locationObjectIds == "undefined")
               {
                 $scope.$watch('locationObjectIds', function(){
 
-                  if($scope.locationObjectIds == "")
+                  //skip the first run
+                  if(typeof $scope.locationObjectIds == "undefined")
                     return;
 
                   layer.clearSelection();
                   var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
-//                  console.log(" from watched: " + definitionExpression);
+                  console.log("Definition expression: " + definitionExpression);
                   layer.setDefinitionExpression(definitionExpression);
+
                   layer.show();                  
 
                 });
               }
-              else
-              {
-                if($scope.locationObjectIds == "")
-                    return;
-
-                  layer.clearSelection();
-                  var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
-  //                console.log(" from direct: " + definitionExpression);
-                  layer.setDefinitionExpression(definitionExpression);
-                  layer.show();                  
-              }
-            }
           }
-
+          
           return map.locationLayer;
         };
 
@@ -116,6 +111,8 @@ define([
         });
 
         $scope.map = map;
+        //map.resize();
+        
         //console.log("Map is complete and in scope.");
 
       }
