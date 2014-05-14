@@ -72,10 +72,16 @@ define([
                   if(typeof $scope.locationObjectIds == "undefined")
                     return;
 
-                  layer.clearSelection();
-                  var definitionExpression = "OBJECTID IN (" + $scope.locationObjectIds + ")";
-                  console.log("Definition expression: " + definitionExpression);
-                  layer.setDefinitionExpression(definitionExpression);
+                  //setup our layer locationid function so we can all it again sometime
+                  layer.showLocationsById = function(locationObjectIds){
+                      this.clearSelection();
+                      var definitionExpression = "OBJECTID IN (" + locationObjectIds + ")";
+                      console.log("Definition expression: " + definitionExpression);
+                      this.setDefinitionExpression(definitionExpression);
+                      this.refresh();
+                  };
+                  
+                  layer.showLocationsById($scope.locationObjectIds); // now call it
 
                   layer.show();                  
 

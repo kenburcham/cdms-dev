@@ -276,6 +276,11 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
             service.dataset = null;
         },
 
+        clearProject: function()
+        {
+            service.project = null;
+        },
+
         getProject: function(id) { 
             if(service.project && service.project.Id == id)
                 return service.project;

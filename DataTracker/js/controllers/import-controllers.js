@@ -17,7 +17,7 @@ var USE_FAKE_COLS = false;
 mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location', 'ActivityQAStatusesConstant','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal',
     	function($scope, $routeParams, DataService, $location, QAActivityStatuses, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal) {
     		$scope.QAActivityStatuses = QAActivityStatuses;
-    		$scope.dataset = DataService.getDataset($routeParams.Id);
+    		$scope.dataset = DataService.getDataset($routeParams.Id);    			
 			$scope.mappedActivityFields = {};
 			$scope.userId = $rootScope.Profile.Id;
 			$scope.headerFields = [];
@@ -28,6 +28,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.existingActivities = [];
 
 			$scope.ActivityFields = {};
+
+			//set locationid if it is incoming as a query param (?LocationId=142)
+    		if($routeParams.LocationId)
+    			$scope.ActivityFields.LocationId = $routeParams.LocationId;
+
 			$scope.UploadResults = {};
 			$scope.UploadResults.errors = [];
 

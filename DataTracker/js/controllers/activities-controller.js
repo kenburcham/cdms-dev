@@ -3,46 +3,70 @@
 
 var mod_dac = angular.module('ActivitiesController', ['ui.bootstrap']);
 
+//modal that handles both saving and editing locations
 mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
     function($scope,  $modalInstance, DataService, DatastoreService){
 
-        $scope.row = {};
+        //if $scope.selectedLocation is set then we are EDITING, otherwise CREATING
+        if($scope.selectedLocation)
+        {
+            $scope.headingMessage = "Editing existing location";
+            $scope.row = $scope.selectedLocation;
+        }
+        else
+        {
+            $scope.headingMessage = "Create new location for a project"; //default mode = 
+            $scope.row = {
+                Projection: "NAD83",
+                UTMZone: "11",
+            };
+        }
+
 
         $scope.project = DataService.getProject($scope.dataset.ProjectId); 
         $scope.locationTypes = DatastoreService.getLocationTypes();
 
         $scope.save = function(){
-            //add the graphic to the map and get SDE_ObjectId
-            $scope.map.locationLayer.applyEdits([$scope.newGraphic],null,null).then(function(results){
-                if(results[0].success)
-                {
-                    $scope.row.SdeObjectId = results[0].objectId;
-
-                    var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
-                    console.dir(promise);
-                    promise.$promise.then(function(){
-                        console.log("done and success!");
-                        $modalInstance.dismiss(); 
-                    });
-
-
-                    //$modalInstance.dismiss(); 
-                }
-                else
-                {
-                    $scope.errorMessage = "There was a problem saving that location.";
-                }
-
-                $scope.map.infoWindow.hide();
-                if($scope.newGraphic)
-                    $scope.map.graphics.remove($scope.newGraphic);
-
-            });
-
-
-            //save the location information 
-            //associate location with project
             
+            //OK -- if we are saving a NEW location then start off by adding the point to the featurelayer
+            if(!$scope.row.Id)
+            {
+                //add the graphic to the map and get SDE_ObjectId
+                $scope.map.locationLayer.applyEdits([$scope.newGraphic],null,null).then(function(results){
+                    if(results[0].success)
+                    {
+                        $scope.row.SdeObjectId = results[0].objectId;
+                        console.log("Created a new point! "+ $scope.row.SdeObjectId);
+
+                        var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
+                        promise.$promise.then(function(){
+                            //console.log("done and success!");
+                            //reload the project -- this will cause the locations and locationlayer to be reloaded!  wow!  go AngularJS!  :)
+                            $scope.refreshProjectLocations();
+                            $modalInstance.dismiss(); 
+                        });
+                        
+                    }
+                    else
+                    {
+                        $scope.errorMessage = "There was a problem saving that location.";
+                    }
+
+                });
+            }
+            else //updating an existing...
+            {
+                var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
+                promise.$promise.then(function(){
+                    //done updating.
+                    $modalInstance.dismiss();                 
+                });
+            }
+
+            $scope.map.infoWindow.hide();
+            if($scope.newGraphic)
+                $scope.map.graphics.remove($scope.newGraphic);
+
             
         };
 
@@ -118,7 +142,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 $scope.map.infoWindow.hide();
 
                 if($scope.newGraphic)
+                {
                     $scope.map.graphics.remove($scope.newGraphic);
+                    $scope.newGraphic = null;
+                }
   
             };
 
@@ -127,18 +154,18 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     alert("Not implemented.");
             };
 
-//MAP stuff
-            
+            $scope.editLocation = function(){
+                $scope.row = $scope.selectedLocation;
+                var modalInstance = $modal.open({
+                    templateUrl: 'partials/modal-addlocation.html',
+                    controller: 'ModalAddLocationCtrl',
+                    scope: $scope, //very important to pass the scope along... 
+                });
+            };
+           
             $scope.selectedLocation = null;
             $scope.newPoint = null;
             $scope.newGraphic = null;
-
-            $scope.getInfoContent = function(graphic)
-            {
-                var location = getByField($scope.locationsArray,graphic.attributes.OBJECTID,"SdeObjectId");
-                $scope.map.infoWindow.setTitle(location.Label);
-                return location.Description + '<br/>...';
-            };
 
             $scope.getFormContent = function()
             {
@@ -146,7 +173,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             };
 
             
-            // expose a method for handling clicks - this is linked to from the Map.js directive
+            // expose a method for handling clicks ON THE MAP - this is linked to from the Map.js directive
             $scope.click = function(e){
 
             try{
@@ -158,7 +185,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 }
 
   
-                $scope.map.infoWindow.resize(250, 200);
+                $scope.map.infoWindow.resize(250, 300);
                 
                 //show the infowindow
                 if(e.graphic)
@@ -192,11 +219,20 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
                       $scope.activities = filterActivities;
                       
+                      $scope.selectedLocation = location;
+                      if($scope.newGraphic)
+                      {
+                           $scope.map.graphics.remove($scope.newGraphic);
+                           $scope.newGraphic = null; // just to clear the buttons on the UI.
+                      }
+                       
+
                       //$scope.center = [e.mapPoint.x,e.mapPoint.y];
                 }
                 else // no -- maybe they are making a new point?
                 {
-
+                    $scope.selectedLocation = null; //since we didn't select an existing one.
+        
                     $scope.map.reposition(); //this is important or else we end up with our map points off somehow.
 
                       $scope.newPoint = e.mapPoint;
@@ -276,17 +312,36 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             }
 
             $scope.$watch('project.Name', function(){
-                if($scope.project){
-                    $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
-                    $scope.locationObjectIds = [];
-                    
-                    angular.forEach($scope.locationsArray, function(item, key){
-                        $scope.locationObjectIds.push(item.SdeObjectId);
-                    });
-
-                    $scope.locationObjectIds = $scope.locationObjectIds.join();
+                if($scope.project && $scope.project.$resolved){
+                    $scope.reloadProjectLocations();
                 }
-            });            
+            });      
+
+            $scope.refreshProjectLocations = function(){
+                DataService.clearProject();
+                $scope.project = null;
+                $scope.project = DataService.getProject($scope.dataset.ProjectId);
+            };
+
+            $scope.reloadProjectLocations = function(){
+
+                console.log("reloading project locations");
+                $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
+                $scope.locationObjectIdArray = [];
+                
+                angular.forEach($scope.locationsArray, function(item, key){
+                    $scope.locationObjectIdArray.push(item.SdeObjectId);
+                });
+
+                $scope.locationObjectIds = $scope.locationObjectIdArray.join();
+                console.log("found project locations: " + $scope.locationObjectIds);
+
+                if($scope.map && $scope.map.locationLayer && $scope.map.locationLayer.hasOwnProperty('showLocationsById'))
+                    $scope.map.locationLayer.showLocationsById($scope.locationObjectIds); //bump and reload the locations.
+
+                console.log("Project locations loaded!");
+
+            };      
 
             $scope.$watch('dataset.Fields', function() { 
                 if(!$scope.dataset.Fields ) return;
@@ -296,16 +351,23 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             });
 
-            $scope.$watch('activities.length', function(){ 
-                if($scope.activities.length > 0)
+            $scope.$watch('activities.$resolved', function(){ 
+                $scope.loading = true;
+                if($scope.activities && $scope.activities.$resolved)
                 {
                     $scope.loading = false;
                     
-                    $scope.gridOptions.ngGrid.data.$promise.then(function(){
-                        $rootScope.GridActivities = $scope.gridOptions.ngGrid.data;
-                    });
-                    
+                    if($scope.activities.length > 0)
+                    {
+                        $scope.gridOptions.ngGrid.data.$promise.then(function(){
+                            $rootScope.GridActivities = $scope.gridOptions.ngGrid.data;
+                        });
+                    }
                 }
+
+                //turn off the wheel of fishies
+                if(typeof $scope.activities.$resolved == "undefined")
+                    $scope.loading = false;
                 
             });
 
@@ -345,7 +407,52 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             };
 
 			$scope.openDataEntry = function (p) { $location.path("/dataentry/"+$scope.dataset.Id);	};
+
+            //Ok -- this is pretty ugly and non-angular-ish.  This is because in the context of a dijit I'm not sure
+            //  how to get angular to process any content here... so we'll have to compose the content " by hand "
+            $scope.getInfoContent = function(graphic)
+            {
+                var location = getByField($scope.locationsArray,graphic.attributes.OBJECTID,"SdeObjectId");
+                $scope.map.infoWindow.setTitle(location.Label);
+
+                var html = "";
+                
+                if(location.Description)
+                    html += "<i>" + location.Description + "</i><br/><br/>";
+
+                html += "<b>Type: </b>" + location.LocationType.Name;
+                
+                if(location.Elevation)
+                    html += "<br/><b>Elevation: </b>" + location.Elevation;
+                if(location.GPSEasting)
+                    html += "<br/><b>Easting: </b>" + location.GPSEasting;
+                if(location.GPSNorthing)
+                    html += "<br/><b>Northing: </b>" + location.GPSNorthing;
+                if(location.Latitude)
+                    html += "<br/><b>Latitude: </b>" + location.Latitude;
+                if(location.Longitude)
+                    html += "<br/><b>Longitude: </b>" + location.Longitude;
+                if(location.OtherAgencyId)
+                    html += "<br/><b>Other Agency Id: </b>" + location.OtherAgencyId;
+                if(location.WettedWidth)
+                    html += "<br/><b>Wetted Width: </b>" + location.WettedWidth;
+                if(location.WettedDepth)
+                    html += "<br/><b>Wetted Depth: </b>" + location.WettedDepth;
+                if(location.RiverMile)
+                    html += "<br/><b>River Mile: </b>" + location.RiverMile;
+                if(location.ImageLink)
+                    html += "<br/><br/><a href='"+location.ImageLink+"' target='_blank'><img width='200px' src='"+location.ImageLink+"'/></a>"
+
+                if($scope.Profile.isProjectOwner($scope.project) || $scope.Profile.isProjectEditor($scope.project))
+                    html += "<br/><div class='right'><a href='#/datasetimport/"+$scope.dataset.Id+"?LocationId="+location.Id+"'>Import data</a></div>";
+                
+                return html;
+
+            };
+
 		}
+
+
 ];
 
 mod_dac.controller('DatasetActivitiesCtrl', datasetActivitiesController);
