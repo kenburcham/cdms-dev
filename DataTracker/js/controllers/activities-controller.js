@@ -140,6 +140,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.clearLocation = function(){
                 $scope.map.infoWindow.hide();
+                $scope.selectedLocation = null;
 
                 if($scope.newGraphic)
                 {
@@ -270,6 +271,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.toggleMap = function(){
                 if($scope.ShowMap.Display)
                 {
+                    $scope.clearLocation();
                     $scope.ShowMap.Display = false;
                     $scope.ShowMap.Message = $scope.ShowMap.MessageToOpen;
                 }

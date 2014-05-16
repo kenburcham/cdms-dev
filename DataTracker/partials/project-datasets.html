@@ -84,6 +84,60 @@
 	    </div>
 
 	</tab>
+
+	<tab heading="Instruments">
+		<div class="container-fluid">
+		    <div class="row-fluid">
+		        <div class="span10">
+		     
+		           <div class="panel panel-default">
+
+					  <div class="panel-body">
+					  		<h3>{{project.Name}} :: Manage Instruments</h3>
+
+					  		<p><i>Manage instruments and their accuracy checks for this project</i></p>
+					  		<hr/>
+
+					  		<div ng-show="project.Instruments.length==0">No instruments are associated with this project.</div>
+					  		<div class="col-md-6 admin-field-list-box" ng-show="project.Instruments.length>0">
+								<div class="row">
+										<div ng-click="viewSelectedInstrument(instrument)" class="admin-field" ng-class="{'admin-field-selected': instrument.Id == viewInstrument.Id}" ng-repeat="instrument in project.Instruments">
+											<span class="admin-field-name">{{instrument.Name}}/{{instrument.SerialNumber}}</span><br/>
+											<span class="admin-field-desc">{{instrument.Description}}</span>
+										</div>
+								</div>
+
+							</div>
+							
+							<div ng-show="viewInstrument" class="col-md-6 admin-criteria-list-box">
+								<div class="row">
+									<div class="col-md-12">
+										<div ng-include="'partials/instruments/accuracychecks.html'"></div>
+									</div>
+								</div>
+								
+
+							</div>
+
+					  </div>
+
+					<div class="panel-body" style="width: 600px;">
+						<h3>Add an Instrument:</h3>
+						
+						<select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-model="selectedInstrument" style="width: 300px;">
+							    <option ng-repeat="instrument in allInstruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+						</select>
+
+						<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="createInstrument()">Create New</button>
+						<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="addInstrument()">Add to Project</button>
+						
+					</div>
+
+		        </div>
+		    </div>
+		</div>
+	</tab>
+
 </tabset>
 
 <br/>

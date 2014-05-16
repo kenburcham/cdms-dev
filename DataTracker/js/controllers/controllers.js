@@ -27,17 +27,44 @@ var projectsController = ['$scope', 'DataService',
 ];
 
 
-var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
-	function(scope, routeParams, DataService){
+mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    $scope.row = {};
+
+    
+    $scope.save = function(){
+      
+      var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.row);
+      promise.$promise.then(function(){
+          $scope.reloadProject();  
+          $modalInstance.dismiss();  
+      });
+      
+
+    };
+
+    $scope.cancel = function(){
+      $modalInstance.dismiss();
+    };
+
+  }
+]);
+
+
+var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal',
+	function(scope, routeParams, DataService, DatastoreService, $rootScope, $modal){
 		scope.datasets = DataService.getProjectDatasets(routeParams.Id);
-        scope.project = DataService.getProject(routeParams.Id);
-        scope.currentUserId = 1; /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        scope.filteredUsers = false;
+    scope.project = DataService.getProject(routeParams.Id);
+    scope.currentUserId = $rootScope.Profile.Id;
+    scope.filteredUsers = false;
+    scope.allInstruments = DatastoreService.getAllInstruments();
+
 		var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
             				   '<a href="#/activities/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
             				   '</div>';
 
-        var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+    var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
             				   '1/10/2014 @ 8:20 AM by Ken Burcham' +
             				   '</div>';
 
@@ -83,7 +110,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
                 {field: 'Size'},
             ]
         };
-
+         
          scope.users = [];
          scope.$watch('project.Id', function(){
             if(scope.project && scope.project.Id)
@@ -107,12 +134,48 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
                         scope.project.Docs.push(file);
                 });
                 
-
+                //reload if it is already selected
+                if(scope.viewInstrument)
+                {
+                    scope.viewInstrument = getMatchingByField(scope.project.Instruments, scope.viewInstrument.Id, 'Id')[0]; 
+                }
             }
 
          });
 
-        scope.clearUsersWatch = scope.$watch('users', function(){
+         scope.openAccuracyCheckForm = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
+              controller: 'ModalAddAccuracyCheckCtrl',
+              scope: scope, //very important to pass the scope along... 
+        
+            });
+         };
+
+         scope.viewInstrument = null; //what they've clicked to view accuracy checks
+         scope.selectedInstrument = null; //what they've selected in the dropdown to add to the project
+         scope.reloadProject = function(){
+                //reload project instruments -- this will reload the instruments, too
+                DataService.clearProject();
+                scope.project = DataService.getProject(routeParams.Id);
+         };
+
+         scope.addInstrument = function(){
+            if(!scope.selectedInstrument || getMatchingByField(scope.project.Instruments, scope.selectedInstrument, 'Id').length > 0)
+                return;
+
+            var Instruments = getMatchingByField(scope.allInstruments, scope.selectedInstrument, 'Id');
+            
+            var promise = DatastoreService.saveProjectInstrument(scope.project.Id, Instruments[0]);
+
+            promise.$promise.then(function(){
+                scope.reloadProject();
+            });
+
+
+         };
+
+         scope.clearUsersWatch = scope.$watch('users', function(){
                 if(scope.users)
                 {
                     if(scope.users.length > 0)
@@ -125,6 +188,22 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService',
                     console.log("not yet.");
 
         },true); //note this TRUE here... this is required when watching an array directly.
+
+         scope.viewSelectedInstrument = function(instrument){
+            scope.viewInstrument = instrument;
+         };
+
+         scope.getDataGrade = function(check)
+         {
+          console.dir(check);
+            var grade = "N/A";
+            if(check.CheckMethod == 1)
+                grade = check.Bath1Grade + "-" + check.Bath2Grade;
+            else if (check.CheckMethod == 2)
+                grade = check.Bath1Grade;
+
+            return grade;
+         };
 
         //remove this editor from the users dropdown.
         scope.filterUsers = function()

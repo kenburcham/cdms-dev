@@ -1,0 +1,58 @@
+<div class="modal">
+	<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+  			<h4>Add an accuracy check</h4>
+  		</div>
+  		<div class="modal-body">
+		  	<form name="form" class="css-form" novalidate>
+		  			<div class="header-label">Check Date</div>
+		  			<div class="header-value">
+			  				<input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row.CheckDate" is-open="opened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+			  		</div>
+
+					<div class="header-label">Check Method</div>
+					<div class="header-value">
+			  				<select class="form-control" ng-model="row.CheckMethod" >
+			  					<option value="1">NIST check in BOTH warm and ice baths</option>
+			  					<option value="2">NIST check in ice bath only</option>
+			  					<option value="3">Manufacturer Calibration</option>
+			  					<option value="4">No Accuracy</option>
+			  					<option value="5" selected="selected">Unknown Accuracy Method</option>
+			  				</select>
+			  		</div>
+
+			  		<div class="header-label">Bath 1 Grade</div>
+			  		<div class="header-value">
+			  				<select class="form-control" ng-model="row.Bath1Grade">
+			  					<option value="A">A</option>
+			  					<option value="B">B</option>
+			  					<option value="C">C</option>
+			  				</select>
+							
+					</div>
+
+					<div class="header-label">Bath 2 Grade</div>
+					<div class="header-value">
+			  				<select class="form-control" ng-model="row.Bath2Grade">
+			  					<option value="A">A</option>
+			  					<option value="B">B</option>
+			  					<option value="C">C</option>
+			  				</select>
+
+			  		</div>
+
+			  		<div class="header-label">Comments</div>
+			  		<div class="header-value">
+			  				<textarea class="form-control" ng-model="row.Comments" name="Comments"></textarea>
+			  		</div>
+			  	
+			</form>
+		</div>
+		<div class="modal-footer">
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+            <button class="btn btn-primary" ng-click="save()">Save</button>
+        </div>
+
+  </div>
+</div>

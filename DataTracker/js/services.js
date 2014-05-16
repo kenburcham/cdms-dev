@@ -163,11 +163,27 @@ mod.factory('SaveProjectLocation', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/SaveProjectLocation');
 }]);
 
+mod.factory('GetAllInstruments', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetAllInstruments');
+}]);
+
+mod.factory('SaveProjectInstrument', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/SaveProjectInstrument');
+}]);
+
+mod.factory('SaveInstrument', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/SaveInstrument');
+}]);
+
+mod.factory('SaveInstrumentAccuracyCheck', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/SaveInstrumentAccuracyCheck');
+}]);
 
 
 
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation){
+
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck){
         var service = {
 
             datastoreId: null,
@@ -254,7 +270,22 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             removeField: function(datasetId, fieldId)
             {
                 return DeleteDatasetField.save({DatasetId: datasetId, FieldId: fieldId});
+            },
+            getAllInstruments: function()
+            {
+                return GetAllInstruments.query();
+            },
+            saveInstrument: function(instrument){
+                return SaveInstrument.save({Instrument: instrument});
+            },
+            saveProjectInstrument: function(projectId, instrument){
+                return SaveProjectInstrument.save({ProjectId: projectId, Instrument: instrument});
+            },
+            saveInstrumentAccuracyCheck: function(instrumentId, ac)
+            {
+                return SaveInstrumentAccuracyCheck.save({InstrumentId: instrumentId, AccuracyCheck: ac});
             }
+
 
         };
 
