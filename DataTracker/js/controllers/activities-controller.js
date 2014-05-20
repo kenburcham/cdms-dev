@@ -81,8 +81,6 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
 
 
 
-
-
 var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope',
     	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope) {
             $scope.dataset = DataService.getDataset($routeParams.Id);

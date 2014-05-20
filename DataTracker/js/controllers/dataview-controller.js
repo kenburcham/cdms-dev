@@ -127,6 +127,8 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 	    	});
 
+			$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
+
 	        $scope.changeQa = function(){
 	        	$scope.QaSaveResults = {};
 				$scope.row = {ActivityQAStatus: {}}; //modal selections

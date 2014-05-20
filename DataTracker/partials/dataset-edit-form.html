@@ -11,7 +11,7 @@
 <div ng-include="'partials/dataentry/messages.html'"/>
 
 <div class="row" ng-show="!activities.success">
-    <div class="error-table" style="width: 400px; margin-top: 10px; float: right; margin-right: 50px;" >
+    <div ng-show="dataset" class="error-table" style="width: 400px; margin-top: 10px; float: right; margin-right: 50px;" >
         <table class="table table-striped table-bordered table-condensed" style="width: 250px;">
             <tbody>
                 <tr>
@@ -26,7 +26,7 @@
         <div style="margin-top: 10px;" ng-include="'partials/grid-validation-error-box.html'"></div>
     </div>
 
-    <div class="header-box" style="margin-top: 20px; width: 500px;">
+    <div ng-show="dataset" class="header-box" style="margin-top: 20px; width: 500px;">
             <div class="header-label">Location:</div>
             <div class="header-value">
                 <select class="form-control" ng-model="row['locationId']" ng-input="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
@@ -37,6 +37,23 @@
                 <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" min="'2000-01-01'" 
                 max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
             </div>
+
+            <div ng-show="project.Instruments.length > 0" >
+
+                <div class="header-label">Instrument: </div>
+                <div class="header-value">                    
+                    <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
+                </div>
+
+                <div class="header-label">Accuracy Check: </div>
+                <div class="header-value">
+                    <select class="form-control" ng-model="row.AccuracyCheckId" ng-change="selectAccuracyCheck()">
+                        <option ng-repeat="check in viewInstrument.AccuracyChecks" ng-selected="check.Id == row.AccuracyCheckId" value="{{check.Id}}">{{getDataGrade(check)}} on {{check.CheckDate | date}}</option>
+                    </select>
+                </div>
+
+            </div>
+
         <form novalidate class="row-form" name="headerForm">
         <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
             <ctuir-text-field ng-switch-when="text"></ctuir-text-field>

@@ -98,6 +98,38 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.ValidRecordsBucket = [];
 			$scope.TempRecordsBucket = [];
 
+			$scope.reloadProject = function(){
+                //reload project instruments -- this will reload the instruments, too
+                DataService.clearProject();
+                $scope.project = DataService.getProject($scope.dataset.ProjectId);
+                var watcher = $scope.$watch('project.Id', function(){
+                	$scope.selectInstrument();	
+                	watcher();
+                });
+                
+	         };
+
+
+			$scope.openAccuracyCheckModal = function(){
+
+	            var modalInstance = $modal.open({
+	              templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
+	              controller: 'ModalQuickAddAccuracyCheckCtrl',
+	              scope: $scope, //very important to pass the scope along... 
+	        
+	            });
+
+			};
+
+			$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
+
+			$scope.selectInstrument = function(){
+				//get latest accuracy check
+				$scope.viewInstrument = getByField($scope.project.Instruments, $scope.ActivityFields.InstrumentId, "Id");
+				$scope.ActivityFields.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
+				$scope.ActivityFields.DataGradeText = getDataGrade($scope.ActivityFields.LastAccuracyCheck) ;
+			};
+
 			$scope.toggleDuplicates = function(){
 
 				try{

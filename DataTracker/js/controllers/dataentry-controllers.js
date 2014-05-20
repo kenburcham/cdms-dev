@@ -3,6 +3,29 @@
 
 var mod_de = angular.module('DataEntryControllers', ['ui.bootstrap']);
 
+mod_de.controller('ModalQuickAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    $scope.ac_row = {};
+
+    $scope.save = function(){
+      
+      var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.ac_row);
+      promise.$promise.then(function(){
+          $scope.reloadProject();  
+          $modalInstance.dismiss();  
+      });
+      
+
+    };
+
+    $scope.cancel = function(){
+      $modalInstance.dismiss();
+    };
+
+  }
+]);
+
 //datasheet version of the data entrypage
 mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$route',
 	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $route){
@@ -35,7 +58,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		//fire up our dataset
         $scope.dataset = DataService.getDataset($routeParams.Id);
 
-        //update our location options as soon as our project is loaded.
+		//update our location options as soon as our project is loaded.
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
@@ -210,7 +233,39 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 
     	});
 
-		 $scope.cancel = function(){
+		$scope.reloadProject = function(){
+                //reload project instruments -- this will reload the instruments, too
+                DataService.clearProject();
+                $scope.project = DataService.getProject($scope.dataset.ProjectId);
+                var watcher = $scope.$watch('project.Id', function(){
+                	$scope.selectInstrument();	
+                	watcher();
+                });
+                
+         };
+
+
+		$scope.openAccuracyCheckModal = function(){
+
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
+              controller: 'ModalQuickAddAccuracyCheckCtrl',
+              scope: $scope, //very important to pass the scope along... 
+        
+            });
+
+		};
+
+		$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
+
+		$scope.selectInstrument = function(){
+			//get latest accuracy check
+			$scope.viewInstrument = getByField($scope.project.Instruments, $scope.row.InstrumentId, "Id");
+			$scope.row.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
+			$scope.row.DataGradeText = getDataGrade($scope.row.LastAccuracyCheck) ;
+		};
+
+		$scope.cancel = function(){
 		 	if($scope.dataChanged)
 		 	{	
 			 	if(!confirm("Looks like you've made changes.  Are you sure you want to leave this page?"))

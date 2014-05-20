@@ -37,6 +37,22 @@
                 <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" min="'2000-01-01'" 
                 max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
             </div>
+
+            <div ng-show="project.Instruments.length > 0" >
+
+                <div class="header-label">Instrument: </div>
+                <div class="header-value">
+                    
+                    <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
+                    
+                    <div ng-show="row.DataGradeText">
+                    <a href ng-click="openAccuracyCheckModal()">
+                        <span style="margin-left: 200px" ng-show="row.DataGradeText">Grade: {{row.DataGradeText}} on {{row.LastAccuracyCheck.CheckDate | date}} </span>
+                    </a></div>
+                </div>
+
+            </div>
+
         <form novalidate class="row-form">
         <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
             <ctuir-text-field ng-switch-when="text"></ctuir-text-field>

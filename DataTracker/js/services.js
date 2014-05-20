@@ -179,11 +179,16 @@ mod.factory('SaveInstrumentAccuracyCheck', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/SaveInstrumentAccuracyCheck');
 }]);
 
+mod.factory('GetInstrumentTypes', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetInstrumentTypes');
+}]);
 
 
 
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck){
+
+
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes){
         var service = {
 
             datastoreId: null,
@@ -227,6 +232,10 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             getInstruments: function()
             {
                 return GetInstruments.query();
+            },
+            getInstrumentTypes: function()
+            {
+                return GetInstrumentTypes.query();
             },
             getLocationTypes: function()
             {
@@ -275,8 +284,8 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             {
                 return GetAllInstruments.query();
             },
-            saveInstrument: function(instrument){
-                return SaveInstrument.save({Instrument: instrument});
+            saveInstrument: function(projectId, instrument){
+                return SaveInstrument.save({ProjectId: projectId, Instrument: instrument}); //will connect to this project if creating instrument
             },
             saveProjectInstrument: function(projectId, instrument){
                 return SaveProjectInstrument.save({ProjectId: projectId, Instrument: instrument});
@@ -667,6 +676,8 @@ mod.service('ActivityParser',[ 'Logger',
                     activities.activities[key] = {
                         LocationId: row.locationId,
                         ActivityDate: new Date(Date.parse(row.activityDate)).toJSON(),
+                        InstrumentId: row.InstrumentId,
+                        AccuracyCheckId: row.LastAccuracyCheck.Id,
                         Header: {},
                         Details: [],
                     };
@@ -781,18 +792,28 @@ mod.service('DataSheet',[ 'Logger', '$window',
                 
                 //dynamically set the width of the grids.
                 var grid_width_watcher = scope.$watch('FieldLookup', function(){
-                    var length = array_count(scope.FieldLookup);
-                    var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 100 : 980;
-                    //console.log(minwidth + " <----");
-                    var width = 100 * length; //multiply number of columns by 100px
+                    var length = array_count(getMatchingByField(scope.FieldLookup,"2","FieldRoleId"));
+                    
+                    //console.log("length: " + length);
+
+                    var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
+                    //console.log("minwidth: " + minwidth);
+
+                    var width = 110 * length; //multiply number of columns by 100px
+                    //console.log("or multiplied: " + width);
+
+                    //if(width < minwidth) width=minwidth; //min-width
                     if(width < minwidth) width=minwidth; //min-width
+
+                    //console.log("Decided: " + width);
+
                     scope.gridWidth = { width: width };
                     //refresh the grid
                     setTimeout(function() {
                         scope.gridDatasheetOptions.$gridServices.DomUtilityService.RebuildGrid(scope.gridDatasheetOptions.$gridScope, scope.gridDatasheetOptions.ngGrid); //refresh
                       //  console.log("Width now: " + width);
                         grid_width_watcher(); //remove watcher.
-                    }, 200);
+                    }, 400);
                 },true);
 
                 //only do this for pages that have editing enabled
@@ -1833,3 +1854,18 @@ function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+
+//give me an instrument's accuracy check and I'll give you the datagrade to display
+function getDataGrade(check)
+{
+    if(!check)
+        return;
+
+    var grade = "N/A";
+    if(check.CheckMethod == 1)
+        grade = check.Bath1Grade + "-" + check.Bath2Grade;
+    else if (check.CheckMethod == 2)
+        grade = check.Bath1Grade;
+
+    return grade;
+};

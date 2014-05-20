@@ -30,12 +30,12 @@ var projectsController = ['$scope', 'DataService',
 mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
 
-    $scope.row = {};
+    $scope.ac_row = {};
 
     
     $scope.save = function(){
       
-      var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.row);
+      var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.ac_row);
       promise.$promise.then(function(){
           $scope.reloadProject();  
           $modalInstance.dismiss();  
@@ -50,6 +50,31 @@ mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'Data
 
   }
 ]);
+
+
+mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    $scope.row = {
+        StatusId: 0
+    };      
+
+    $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
+
+    $scope.save = function(){      
+        var promise = DatastoreService.saveInstrument($scope.project.Id, $scope.row);
+        promise.$promise.then(function(){
+            $scope.reloadProject();  
+            $modalInstance.dismiss();  
+        });
+    };
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss();
+    };
+  }
+]);
+
 
 
 var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal',
@@ -152,6 +177,17 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             });
          };
 
+         scope.createInstrument = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-create-instrument.html',
+              controller: 'ModalCreateInstrumentCtrl',
+              scope: scope, //very important to pass the scope along... 
+        
+            });
+         };
+
+         scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
+
          scope.viewInstrument = null; //what they've clicked to view accuracy checks
          scope.selectedInstrument = null; //what they've selected in the dropdown to add to the project
          scope.reloadProject = function(){
@@ -193,17 +229,6 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             scope.viewInstrument = instrument;
          };
 
-         scope.getDataGrade = function(check)
-         {
-          console.dir(check);
-            var grade = "N/A";
-            if(check.CheckMethod == 1)
-                grade = check.Bath1Grade + "-" + check.Bath2Grade;
-            else if (check.CheckMethod == 2)
-                grade = check.Bath1Grade;
-
-            return grade;
-         };
 
         //remove this editor from the users dropdown.
         scope.filterUsers = function()

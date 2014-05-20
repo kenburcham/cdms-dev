@@ -62,6 +62,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 			}
 
 			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+			$scope.selectInstrument(); 
 
         });
 
@@ -77,6 +78,9 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         	//set the header field values 
         	$scope.row['activityDate'] = $scope.dataset_activities.Header.Activity.ActivityDate;
         	$scope.row['locationId'] = ""+$scope.dataset_activities.Header.Activity.LocationId; //note the conversion of this to a string!
+        	$scope.row['InstrumentId'] = $scope.dataset_activities.Header.Activity.InstrumentId; 
+        	$scope.row['AccuracyCheckId'] = $scope.dataset_activities.Header.Activity.AccuracyCheckId; 
+
         	if($scope.dataset_activities.Header.Activity.ActivityQAStatus)
         	{
         		$scope.row.ActivityQAStatus = {
@@ -109,6 +113,41 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 		});
         
+		$scope.reloadProject = function(){
+                //reload project instruments -- this will reload the instruments, too
+                DataService.clearProject();
+                $scope.project = DataService.getProject($scope.dataset.ProjectId);
+                var watcher = $scope.$watch('project.Id', function(){
+                	$scope.selectInstrument();	
+                	watcher();
+                });
+                
+         };
+
+
+		$scope.openAccuracyCheckModal = function(){
+
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
+              controller: 'ModalQuickAddAccuracyCheckCtrl',
+              scope: $scope, //very important to pass the scope along... 
+        
+            });
+
+		};
+
+		$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
+
+		$scope.selectInstrument = function(){
+			$scope.viewInstrument = getByField($scope.project.Instruments, $scope.row.InstrumentId, "Id");
+			$scope.selectAccuracyCheck();
+		};
+
+		$scope.selectAccuracyCheck = function(){
+			$scope.row.LastAccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
+		};
+
+
 		 $scope.cancel = function(){
 		 	if($scope.dataChanged)
 		 	{	

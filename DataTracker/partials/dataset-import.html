@@ -61,6 +61,22 @@
                     <div class="mapped-activity-field" ng-show="mappedActivityFields['1']">Use: {{mappedActivityFields['1']}}</div>
                     </td>
                 </tr>
+
+
+                <tr ng-show="project.Instruments.length > 0" >
+                    <td>Instrument: </td>
+                    <td>
+                        
+                        <select class="form-control" ng-model="ActivityFields.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
+                        
+                        <div ng-show="ActivityFields.DataGradeText">
+                            <a href title="Accuracy Checks" ng-click="openAccuracyCheckModal()">
+                                <span ng-show="ActivityFields.DataGradeText">Grade: {{ActivityFields.DataGradeText}} on {{ActivityFields.LastAccuracyCheck.CheckDate | date}} </span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
                 <tr>
                     <td>QA Status:</td>
                     <td>
