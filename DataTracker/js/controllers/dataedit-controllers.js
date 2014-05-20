@@ -16,7 +16,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 		$scope.detailFields = [];
 
 		$scope.cellInputEditableTemplate = '<input ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" />';
-		$scope.cellSelectEditableTemplate = '<select ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in QAStatuses"/>';
+		$scope.cellSelectEditableTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'QAStatusId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in RowQAStatuses"/>';
 
 		$scope.datasheetColDefs = [
 				{
@@ -25,13 +25,13 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
     				minWidth: 50, maxWidth: 180,
     				enableCellEditOnFocus: true, 
         			editableCellTemplate: $scope.cellSelectEditableTemplate,
- 					cellFilter: 'mapStatus'
+ 					cellFilter: 'RowQAStatusFilter'
     			}
 		];
-        
-		$scope.QAStatuses = {   1: 'Ok',   2: 'Flagged'  }; //Row qa status ids, Get from DB -------------------------------- TODO
 
-        $scope.dataset_activities = DataService.getActivityData($routeParams.Id);
+		$scope.option = { enableMultiselect: false };
+		
+		$scope.dataset_activities = DataService.getActivityData($routeParams.Id);
 
         $scope.dataSheetDataset = [];
         $scope.row = {ActivityQAStatus: {}}; //header field values get attached here by dbcolumnname
@@ -40,11 +40,12 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 		$scope.gridDatasheetOptions = {
 			data: 'dataSheetDataset',
 			enableCellSelection: true,
-	        enableRowSelection: false,
+			enableRowSelection: false,
+	        multiSelect: false,
 	        enableCellEdit: true,
 	        columnDefs: 'datasheetColDefs',
 	        enableColumnResize: true,
-	        
+        
 		};
 
         //config the fields for the datasheet - include mandatory location and activityDate fields
@@ -89,6 +90,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         		}
 			}
 
+			$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+		
 			//set the detail (grid) values.
         	$scope.dataSheetDataset = $scope.dataset_activities.Details;
 

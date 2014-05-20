@@ -92,6 +92,17 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 		    		else
 		    			delete $scope.chartData; 
 
+		    		//if we have more than 1 row qa status then show them.
+		    		if($scope.dataset.RowQAStatuses.length > 1)
+		    		{
+		    			$scope.datasheetColDefs.unshift(
+				    	{
+		    				field: "QAStatusId", //QARowStatus
+		    				displayName: "QA",
+		 					cellFilter: 'RowQAStatusFilter'
+		    			});
+		    		}
+
 	    		}
 
     		});
@@ -99,7 +110,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		//setup a listener to populate column headers on the grid
 			$scope.$watch('grid.Dataset', function() { 
 				if(!$scope.grid.Dataset) return; //not done cooking yet.
-				$scope.dataset = DataService.getDataset($scope.grid.Dataset.Id);
+				$scope.dataset = $scope.grid.Dataset;//DataService.getDataset($scope.grid.Dataset.Id);
 
 				if(!$scope.fieldsloaded)
 				{
@@ -123,7 +134,9 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 		    		$scope.dataSheetDataset = $scope.grid.Details;
 				}
 				$scope.query.loading = false;
-				$scope.datasheetDat
+
+				$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+
 
 	    	});
 

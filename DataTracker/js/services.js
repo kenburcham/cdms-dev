@@ -677,10 +677,14 @@ mod.service('ActivityParser',[ 'Logger',
                         LocationId: row.locationId,
                         ActivityDate: new Date(Date.parse(row.activityDate)).toJSON(),
                         InstrumentId: row.InstrumentId,
-                        AccuracyCheckId: row.LastAccuracyCheck.Id,
                         Header: {},
                         Details: [],
                     };
+
+                    if(row.LastAccuracyCheck)
+                    {
+                        activities.activities[key].AccuracyCheckId = row.LastAccuracyCheck.Id;
+                    }
 
                     //add in activityqa if there isn't one (now required)
                     if(!row.ActivityQAStatus)
@@ -741,8 +745,8 @@ mod.service('ActivityParser',[ 'Logger',
 
 
 //gridDatasheetOptions needs to be set to your datasheet grid
-mod.service('DataSheet',[ 'Logger', '$window',
-    function(Logger,$window){
+mod.service('DataSheet',[ 'Logger', '$window', '$route',
+    function(Logger,$window, $route){
         //var LocationCellTemplate = '<input ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />';
 
         var LocationCellEditTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'locationId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in locationOptions"/>';
@@ -793,8 +797,13 @@ mod.service('DataSheet',[ 'Logger', '$window',
                 //dynamically set the width of the grids.
                 var grid_width_watcher = scope.$watch('FieldLookup', function(){
                     var length = array_count(getMatchingByField(scope.FieldLookup,"2","FieldRoleId"));
+
+                    //however -- if we are in full-grid mode, we need space calculated on adding in the header fields.
+                    //  currently that is only for import, full datasheet and query.
+                    if($route.current.controller == 'DatasetImportCtrl' || $route.current.controller == 'DataQueryCtrl' || $route.current.controller == 'DataEntryDatasheetCtrl')
+                        length = array_count(scope.FieldLookup);
                     
-                    //console.log("length: " + length);
+                    console.log("length: " + length);
 
                     var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
                     //console.log("minwidth: " + minwidth);
@@ -979,7 +988,7 @@ mod.service('DataSheet',[ 'Logger', '$window',
             //fired whenever a cell value changes.
             updateCell: function(row, field_name, scope)
             {
-                //console.log("Field changed: " + field_name);
+                console.log("Field changed: " + field_name);
 
                 scope.dataChanged = true;
 
@@ -1004,6 +1013,9 @@ mod.service('DataSheet',[ 'Logger', '$window',
                     //else
                     //    console.log("Not updating a record.");
                 }
+                //else
+                    //console.log("not row.entity.id");
+
 
                 //set value of multiselect back to an array
 

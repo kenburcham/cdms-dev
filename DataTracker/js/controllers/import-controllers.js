@@ -14,9 +14,9 @@ var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 var USE_FAKE_DATA = false;
 var USE_FAKE_COLS = false;
 
-mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location', 'ActivityQAStatusesConstant','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal',
-    	function($scope, $routeParams, DataService, $location, QAActivityStatuses, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal) {
-    		$scope.QAActivityStatuses = QAActivityStatuses;
+mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal',
+    	function($scope, $routeParams, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal) {
+//    		$scope.QAActivityStatuses = QAActivityStatuses;
     		$scope.dataset = DataService.getDataset($routeParams.Id);    			
 			$scope.mappedActivityFields = {};
 			$scope.userId = $rootScope.Profile.Id;
@@ -209,6 +209,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.datasheetColDefs = DataSheet.getColDefs();
 			DataSheet.initScope($scope);
 
+			$scope.cellRowQATemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'RowQAStatusId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in RowQAStatuses"/>';
+
+
 			//setup our mappableFields list
     		$scope.$watch('dataset.Name', function(){
     			if($scope.dataset.Fields)
@@ -216,6 +219,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					$scope.project = DataService.getProject($scope.dataset.ProjectId);
 
 					$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+					$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+
 					$scope.ActivityFields.QAStatusId = ""+$scope.dataset.DefaultActivityQAStatusId;
 
 					//setup special columns so they participate in validation
@@ -240,6 +245,20 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	    				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 	    				
 					});
+
+					//if we have more than 1 row qa status then show them.
+		    		if($scope.dataset.RowQAStatuses.length > 1)
+		    		{
+		    			$scope.datasheetColDefs.unshift(
+				    	{
+		    				field: "RowQAStatusId", //QARowStatus
+		    				displayName: "Row QA",
+		 					cellFilter: 'RowQAStatusFilter',
+		 					enableCellEditOnFocus: true, 
+        					editableCellTemplate: $scope.cellRowQATemplate
+		    			});
+		    		}
+
 				}
 
 				if(USE_FAKE_DATA || USE_FAKE_COLS)
@@ -388,7 +407,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 				angular.forEach($scope.UploadResults.Data.rows, function(data_row){
 					try{
-					var new_row = {};
+
+						//set default Row QA StatusId
+					var new_row = {
+						RowQAStatusId: $scope.dataset.DefaultRowQAStatusId
+					};
 
 					//ActivityFields first
 					//Logger.debug($scope.mapping[$scope.ActivityFields.LocationId]);
@@ -586,7 +609,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	        		};
 
 	        		//set our default rowqastatusid to be what is defined in the dataset definition
-	        		row.QAStatusId = $scope.dataset.DefaultRowQAStatusId;
+//	        		if(!row.QAStatusId)
+//	        			row.QAStatusId = $scope.dataset.DefaultRowQAStatusId;
 
 				}
 

@@ -306,7 +306,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 mod_ds.controller('ProjectsCtrl', projectsController);
 mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
 
-
+/*
 mod_ds.filter('mapStatus', function( StatusesConstant ) {
   return function(input) {
     if (StatusesConstant[input]) {
@@ -330,5 +330,5 @@ mod_ds.factory('ActivityQAStatusesConstant', function(){
 		7:"Needs Review",
 	};
 });
-
+*/
 

@@ -48,7 +48,16 @@ angular.module('DatasetFilters', [])
 
             return result;
         };
-    })
+    }).filter('RowQAStatusFilter', function( $rootScope ) {
+          return function(input) {
+            if ($rootScope.RowQAStatuses[input]) {
+              return $rootScope.RowQAStatuses[input];
+            } else {
+              return 'unknown';
+            }
+          };
+        })
+
 
 
 ;
