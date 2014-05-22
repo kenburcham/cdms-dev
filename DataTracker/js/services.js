@@ -790,22 +790,24 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 scope.recalculateGridWidth = function(length)
                 {
+                    console.log("recalculateGridWidth with length: " + length);
+
                     var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
-                    //console.log("minwidth: " + minwidth);
+                    console.log("minwidth: " + minwidth);
 
                     var width = 110 * length; //multiply number of columns by 100px
-                    //console.log("or multiplied: " + width);
+                    console.log("or multiplied: " + width);
 
                     //if(width < minwidth) width=minwidth; //min-width
                     if(width < minwidth) width=minwidth; //min-width
 
-                    //console.log("Decided: " + width);
+                    console.log("Decided: " + width);
 
                     scope.gridWidth = { width: width };
                     //refresh the grid
                     setTimeout(function() {
                         scope.gridDatasheetOptions.$gridServices.DomUtilityService.RebuildGrid(scope.gridDatasheetOptions.$gridScope, scope.gridDatasheetOptions.ngGrid); //refresh
-                      //  console.log("Width now: " + width);
+                        console.log("Width now: " + width);
                     }, 400);
                 };
 
@@ -815,18 +817,24 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 };
                 
                 //dynamically set the width of the grids.
+                /*
                 var grid_width_watcher = scope.$watch('FieldLookup', function(){
                     var length = array_count(getMatchingByField(scope.FieldLookup,"2","FieldRoleId"));
+
+                    console.log("Found number of detail fields: "+length);
 
                     //however -- if we are in full-grid mode, we need space calculated on adding in the header fields.
                     //  currently that is only for import, full datasheet and query.
                     if($route.current.controller == 'DatasetImportCtrl' || $route.current.controller == 'DataQueryCtrl' || $route.current.controller == 'DataEntryDatasheetCtrl')
                         length = array_count(scope.FieldLookup);
                     
+                    console.log("calling with length: "+ length);
+
                     scope.recalculateGridWidth(length);
                     grid_width_watcher(); //remove watcher.
 
                 },true);
+                */
 
                 //only do this for pages that have editing enabled
                 if(scope.gridDatasheetOptions.enableCellEdit)
@@ -1402,6 +1410,7 @@ function makeObjects(optionList, keyProperty, valueProperty)
 //give us a unique key to reference it by for caching.
 function makeObjectsFromValues(key, valuesList)
 {
+    console.log("KEY: "+ key);
     var objects = angular.rootScope.Cache[key]; //see if we have it squirreled away in our cache
 
     if(!objects)
@@ -1616,9 +1625,9 @@ function getAdultWeirChartData(data)
             dataCalc[row.Species].total += num;
 
             if(row.Sex == "M")
-                dataCalc[row.Species].males += 1;
+                dataCalc[row.Species].males += num;
             if(row.Sex == "F")
-                dataCalc[row.Species].females += 1;
+                dataCalc[row.Species].females += num;
             
         }
         

@@ -132,6 +132,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 		    		$scope.fieldsloaded = true;
 
 		    		$scope.dataSheetDataset = $scope.grid.Details;
+		    		$scope.recalculateGridWidth($scope.datasheetColDefs.length);
 				}
 				$scope.query.loading = false;
 

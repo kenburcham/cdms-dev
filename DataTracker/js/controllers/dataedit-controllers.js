@@ -4,6 +4,28 @@
 
 var mod_edit = angular.module('DataEditControllers', ['ui.bootstrap']);
 
+//modal to bulk update RowQAStatus
+mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance', 
+
+	function($scope,  $modalInstance){
+
+		$scope.newRowQAStatus = {};
+
+        $scope.save = function(){
+        	$scope.setSelectedBulkQAStatus($scope.newRowQAStatus.Id);
+            $modalInstance.dismiss();
+        };
+
+        $scope.cancel = function(){
+            $modalInstance.dismiss();
+        };
+
+    }
+]);
+
+
+
+
 
 //Fieldsheet / form version of the dataentry page
 mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet',
@@ -35,21 +57,22 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
         $scope.dataSheetDataset = [];
         $scope.row = {ActivityQAStatus: {}}; //header field values get attached here by dbcolumnname
-        
-		//datasheet grid
+        $scope.selectedItems = [];
+
+        //datasheet grid
 		$scope.gridDatasheetOptions = {
 			data: 'dataSheetDataset',
 			enableCellSelection: true,
-			enableRowSelection: false,
-	        multiSelect: false,
+			enableRowSelection: true,
+	        multiSelect: true,
 	        enableCellEdit: true,
 	        columnDefs: 'datasheetColDefs',
 	        enableColumnResize: true,
+	        selectedItems: $scope.selectedItems
         
 		};
 
         //config the fields for the datasheet - include mandatory location and activityDate fields
-		//$scope.datasheetColDefs = DataSheet.getColDefs();
 		DataSheet.initScope($scope);
 
 		//update our location options as soon as our project is loaded.
@@ -112,10 +135,39 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 			});
 
+			$scope.recalculateGridWidth($scope.detailFields.length);
             $scope.validateGrid($scope);
 
 		});
         
+		$scope.clearSelections = function()
+		{
+			$scope.gridDatasheetOptions.selectAll(false);
+		};
+
+		$scope.setSelectedBulkQAStatus = function(rowQAId)
+		{
+			angular.forEach($scope.gridDatasheetOptions.selectedItems, function(item, key){
+				//console.dir(item);
+				item.QAStatusId = rowQAId;
+			});
+
+			$scope.clearSelections();
+		};
+
+		$scope.openBulkQAChange = function(){
+
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/dataentry/modal-rowqaupdate.html',
+              controller: 'ModalBulkRowQAChangeCtrl',
+              scope: $scope, //very important to pass the scope along... 
+        
+            });
+
+		};
+
+
+
 		$scope.reloadProject = function(){
                 //reload project instruments -- this will reload the instruments, too
                 DataService.clearProject();
@@ -127,7 +179,6 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
                 
          };
 
-
 		$scope.openAccuracyCheckModal = function(){
 
             var modalInstance = $modal.open({
@@ -138,6 +189,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
             });
 
 		};
+
 
 		$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 

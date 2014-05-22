@@ -126,6 +126,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
 	    		});
 
+				$scope.recalculateGridWidth($scope.datasheetColDefs.length);
 
 	    	});
 
@@ -313,6 +314,7 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
 
 	    		});
 
+				$scope.recalculateGridWidth($scope.datasheetColDefs.length);
     			
     		},true);
 

@@ -103,6 +103,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 				$scope.addNewRow();
 			}
 
+			$scope.recalculateGridWidth($scope.datasheetColDefs.length);
             $scope.validateGrid($scope);
 
     	});
@@ -227,6 +228,8 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			}
 
 			$scope.row.ActivityQAStatus.QAStatusId = ""+$scope.dataset.DefaultActivityQAStatusId;
+
+			$scope.recalculateGridWidth($scope.detailFields.length);
 
 			$scope.validateGrid($scope);
 

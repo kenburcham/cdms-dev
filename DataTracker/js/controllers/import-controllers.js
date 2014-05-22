@@ -25,6 +25,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.dataSheetDataset = [];
 			$scope.showHeaderForm = false;
 			$scope.row = {}; //header form values if used...
+			$scope.selectedItems = [];
 
 			$scope.HeaderColDefs = []; //inserted into grid if wide-sheet view
 			$scope.DetailColDefs = []; //fields always present in the grid
@@ -114,6 +115,32 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
                 });
                 
 	         };
+
+			$scope.clearSelections = function()
+			{
+				$scope.gridDatasheetOptions.selectAll(false);
+			};
+
+			$scope.setSelectedBulkQAStatus = function(rowQAId)
+			{
+				angular.forEach($scope.gridDatasheetOptions.selectedItems, function(item, key){
+					//console.dir(item);
+					item.RowQAStatusId = rowQAId;
+				});
+
+				$scope.clearSelections();
+			};
+
+			$scope.openBulkQAChange = function(){
+
+	            var modalInstance = $modal.open({
+	              templateUrl: 'partials/dataentry/modal-rowqaupdate.html',
+	              controller: 'ModalBulkRowQAChangeCtrl',
+	              scope: $scope, //very important to pass the scope along... 
+	        
+	            });
+
+			};
 
 
 			$scope.openAccuracyCheckModal = function(){
@@ -208,10 +235,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.gridDatasheetOptions = {
 				data: 'dataSheetDataset',
 				enableCellSelection: true,
-		        enableRowSelection: false,
+		        enableRowSelection: true,
+		        multiSelect: true,
 		        enableCellEdit: true,
 		        columnDefs: 'datasheetColDefs',
 		        enableColumnResize: true,
+		        selectedItems: $scope.selectedItems
  				
 			};
 
@@ -258,6 +287,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						}
 
 					});
+
+    				
 
 					//if we have more than 1 row qa status then show them.
 		    		if($scope.dataset.RowQAStatuses.length > 1)

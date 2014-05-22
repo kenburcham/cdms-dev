@@ -80,8 +80,10 @@
 
 
     </div>
-
-<div class="right hidden">Enable Multiselect? <input type="checkbox" ng-model="option.enableMultiselect"/></div>
+<div class="right" style="margin-top: -25px;">
+    <button class="btn btn-sm" ng-click="clearSelections()">Clear selections</button>
+    <button class="btn btn-sm" ng-click="openBulkQAChange()">Bulk Row QA Change</button>
+</div>
 <div class="datasheet-grid" ng-grid="gridDatasheetOptions" ng-style="gridWidth" style="margin-top: 20px;"></div>
 
 <div ng-include="'partials/dataentry/bottom-bar.html'"/>
