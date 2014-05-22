@@ -116,11 +116,67 @@
                     </tbody>
                 </table>
             </div>
-            <span ng-hide="ignoreDuplicates && DuplicateRecordsBucket.length==0">
-                <span ng-show="DuplicateRecordsBucket.length>0"><i>Ignoring {{DuplicateRecordsBucket.length}} Duplicate Records</i> (<a href="" ng-click="openDuplicatesModal()">view</a>)</span>
-            </span>
-
+            
         <div style="height: 100px; width: 400px; float: right; margin-top: -120px;" ng-include="'partials/grid-validation-error-box.html'"></div>
+
+
+
+                <div class="header-box" style="margin-top: 20px; width: 500px;" ng-show="showHeaderForm">
+                    <div class="header-label">Location:</div>
+                    <div class="header-value">
+                        <select class="form-control" ng-model="ActivityFields.LocationId" ng-options="id as name for (id, name) in locationOptions">
+                        </select>
+                    </div>
+                    <div class="header-label">Activity Date:</div>
+                    <div class="header-value">
+                        <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="ActivityFields.ActivityDate" is-open="dopened" min="'2000-01-01'" 
+                        max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+                    </div>
+
+                    <div ng-show="project.Instruments.length > 0" >
+
+                        <div class="header-label">Instrument: </div>
+                        <div class="header-value">
+                            
+                            <select class="form-control" ng-model="ActivityFields.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
+                            
+                            <div ng-show="ActivityFields.DataGradeText">
+                            <a href ng-click="openAccuracyCheckModal()">
+                                <span style="margin-left: 200px" ng-show="ActivityFields.DataGradeText">Grade: {{ActivityFields.DataGradeText}} on {{ActivityFields.LastAccuracyCheck.CheckDate | date}} </span>
+                            </a></div>
+                        </div>
+
+                    </div>
+
+                <form novalidate class="row-form">
+                <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
+                    <ctuir-text-field ng-switch-when="text"></ctuir-text-field>
+                    <ctuir-textarea-field ng-switch-when="textarea"></ctuir-textarea-field>
+                    <ctuir-number-field ng-switch-when="number"></ctuir-number-field>    
+                    <ctuir-date-field ng-switch-when="date"></ctuir-date-field>
+                    <ctuir-radio-field ng-switch-when="radio"></ctuir-radio-field>
+                    <ctuir-checkbox-field ng-switch-when="checkbox"></ctuir-checkbox-field>
+                    <ctuir-select-field ng-switch-when="select"></ctuir-select-field>
+                    <ctuir-multiselect-field ng-switch-when="multiselect"></ctuir-multiselect-field>
+                    <ctuir-text-field ng-switch-default></ctuir-text-field>
+                </div>
+                <div class="header-label">QA Status:</div>
+                    <div class="header-value">
+                        <select class="form-control" ng-model="ActivityFields.QAStatusId" ng-options="id as name for (id, name) in QAStatusOptions"></select>
+                    </div>  
+
+                    <div class="header-label">QA Comments:</div>
+                    <div class="header-value">
+                        <textarea class="form-control" ng-model="ActivityFields.QAComments"></textarea>
+                    </div>  
+
+                </form>
+            </div>
+
+            <div style="margin-top: 20px;" ng-hide="ignoreDuplicates && DuplicateRecordsBucket.length==0">
+                <span ng-show="DuplicateRecordsBucket.length>0"><i>Ignoring {{DuplicateRecordsBucket.length}} Duplicate Records</i> (<a href ng-click="openDuplicatesModal()">view</a>)</span>
+            </div>
+
 
         <div class="datasheet-grid" ng-grid="gridDatasheetOptions" ng-style="gridWidth" style="margin-top: 20px;"></div>
         <div ng-include="'partials/dataentry/bottom-bar.html'"/>

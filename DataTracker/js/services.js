@@ -786,25 +786,10 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                         return false;
 
                     return(scope.onField.ControlType == "number");
-                }
-
-                
-                scope.selectCell = function(field) {
-                    //console.log("select cell!");
-                    scope.onField = scope.FieldLookup[field];
                 };
-                
-                //dynamically set the width of the grids.
-                var grid_width_watcher = scope.$watch('FieldLookup', function(){
-                    var length = array_count(getMatchingByField(scope.FieldLookup,"2","FieldRoleId"));
 
-                    //however -- if we are in full-grid mode, we need space calculated on adding in the header fields.
-                    //  currently that is only for import, full datasheet and query.
-                    if($route.current.controller == 'DatasetImportCtrl' || $route.current.controller == 'DataQueryCtrl' || $route.current.controller == 'DataEntryDatasheetCtrl')
-                        length = array_count(scope.FieldLookup);
-                    
-                    console.log("length: " + length);
-
+                scope.recalculateGridWidth = function(length)
+                {
                     var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
                     //console.log("minwidth: " + minwidth);
 
@@ -821,8 +806,26 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     setTimeout(function() {
                         scope.gridDatasheetOptions.$gridServices.DomUtilityService.RebuildGrid(scope.gridDatasheetOptions.$gridScope, scope.gridDatasheetOptions.ngGrid); //refresh
                       //  console.log("Width now: " + width);
-                        grid_width_watcher(); //remove watcher.
                     }, 400);
+                };
+
+                scope.selectCell = function(field) {
+                    //console.log("select cell!");
+                    scope.onField = scope.FieldLookup[field];
+                };
+                
+                //dynamically set the width of the grids.
+                var grid_width_watcher = scope.$watch('FieldLookup', function(){
+                    var length = array_count(getMatchingByField(scope.FieldLookup,"2","FieldRoleId"));
+
+                    //however -- if we are in full-grid mode, we need space calculated on adding in the header fields.
+                    //  currently that is only for import, full datasheet and query.
+                    if($route.current.controller == 'DatasetImportCtrl' || $route.current.controller == 'DataQueryCtrl' || $route.current.controller == 'DataEntryDatasheetCtrl')
+                        length = array_count(scope.FieldLookup);
+                    
+                    scope.recalculateGridWidth(length);
+                    grid_width_watcher(); //remove watcher.
+
                 },true);
 
                 //only do this for pages that have editing enabled
@@ -988,7 +991,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
             //fired whenever a cell value changes.
             updateCell: function(row, field_name, scope)
             {
-                console.log("Field changed: " + field_name);
+                //console.log("Field changed: " + field_name);
 
                 scope.dataChanged = true;
 
@@ -1091,11 +1094,11 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 }
 */
 // ------------------------------------------
-                if(value)
+                if(field && value)
                 {
                     try{
                         //fire Field rule if it exists -- OnChange
-                        if(field.Field.Rule && field.Field.Rule.OnChange){
+                        if(field.Field && field.Field.Rule && field.Field.Rule.OnChange){
                             eval(field.Field.Rule.OnChange);
                         }
 

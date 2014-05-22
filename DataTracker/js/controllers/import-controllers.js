@@ -23,11 +23,17 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.headerFields = [];
 			$scope.detailFields = [];
 			$scope.dataSheetDataset = [];
+			$scope.showHeaderForm = false;
+			$scope.row = {}; //header form values if used...
+
+			$scope.HeaderColDefs = []; //inserted into grid if wide-sheet view
+			$scope.DetailColDefs = []; //fields always present in the grid
+			$scope.RowQAColDef = [];
 			
 			$scope.existingActivitiesLoad = DataService.getActivities($routeParams.Id);
 			$scope.existingActivities = [];
 
-			$scope.ActivityFields = {};
+			$scope.ActivityFields = { QAComments: DEFAULT_IMPORT_QACOMMENT };
 
 			//set locationid if it is incoming as a query param (?LocationId=142)
     		if($routeParams.LocationId)
@@ -87,7 +93,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	        				$scope.existingActivities.push(activity.LocationId+"_"+activity.ActivityDate.substr(0,10));
 	        			});
 	        			$scope.existingActivitiesLoad = []; // cleanup
-	        			console.dir($scope.existingActivities);
+	        			//console.dir($scope.existingActivities);
 	        			ealoadwatcher();
 	        		});
 	        	}
@@ -138,8 +144,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						$scope.TempRecordsBucket = [];
 						$scope.DuplicateRecordsBucket = [];
 						angular.forEach($scope.dataSheetDataset, function(item, key){
-							//console.dir(item);
-							if($scope.existingActivities.indexOf(item.locationId + "_"+item.activityDate.substr(0,10)) != -1) //found a duplicate
+							var date_check = item.activityDate;
+
+							if(typeof item.activityDate == "object")
+								date_check = item.activityDate.toISOString();
+
+							if($scope.existingActivities.indexOf(item.locationId + "_"+date_check.substr(0,10)) != -1) //found a duplicate
 								$scope.DuplicateRecordsBucket.push(item);
 							else
 								$scope.TempRecordsBucket.push(item);
@@ -237,19 +247,22 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 						//setup the headers/details and datasheet fields
 						if(field.FieldRoleId == 1)
+						{
 							$scope.headerFields.push(field);
+							$scope.HeaderColDefs.push(makeFieldColDef(field, $scope)); 
+						}
 						else
+						{
 							$scope.detailFields.push(field);
+							$scope.DetailColDefs.push(makeFieldColDef(field, $scope));
+						}
 
-						//setup grid editing features and define as a grid field
-	    				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
-	    				
 					});
 
 					//if we have more than 1 row qa status then show them.
 		    		if($scope.dataset.RowQAStatuses.length > 1)
 		    		{
-		    			$scope.datasheetColDefs.unshift(
+		    			$scope.RowQAColDef.push(
 				    	{
 		    				field: "RowQAStatusId", //QARowStatus
 		    				displayName: "Row QA",
@@ -373,7 +386,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				if(!$scope.ActivityFields.ActivityDate)
 				{
 					if($scope.mappedActivityFields[ACTIVITY_DATE])
-						$scope.ActivityFields.ActivityDate = $scope.mappedActivityFields[ACTIVITY_DATE]
+						$scope.ActivityFields.ActivityDate = $scope.mappedActivityFields[ACTIVITY_DATE];
 					else
 						$scope.errors.push("Please select an activity date or map a date source field.");
 				}
@@ -383,7 +396,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					//if($scope.mappedActivityFields[QA_STATUS_ID])
 					//	$scope.ActivityFields.QAStatusId = $scope.mappedActivityFields[QA_STATUS_ID]
 					//else
-						$scope.errors.push("Please select a activity QA Status.");
+						$scope.errors.push("Please select an activity QA Status.");
 				}
 
 				if($scope.errors.length == 0)
@@ -402,8 +415,20 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			//iterates the import data rows according to mappings and copies into the grid datasheet
 			$scope.displayImportPreview = function()
 			{
-
-				console.log("Display Import Preview!");
+				
+				//decide if we are going to show the headerForm.  we DO if they entered an activity date, DO NOT if they mapped it.
+				if($scope.mappedActivityFields[ACTIVITY_DATE])
+				{
+					$scope.showHeaderForm = false; //because we have mapped the activity date field to our datafile, meaning multiple activity dates needs the wide sheet.	
+					$scope.datasheetColDefs =$scope.RowQAColDef.concat($scope.datasheetColDefs,$scope.HeaderColDefs, $scope.DetailColDefs);
+				}
+				else
+				{
+					$scope.showHeaderForm = true; //single activity, use the headerform.
+					$scope.datasheetColDefs = $scope.RowQAColDef.concat($scope.DetailColDefs);
+				}
+				
+				$scope.recalculateGridWidth($scope.datasheetColDefs.length);
 
 				angular.forEach($scope.UploadResults.Data.rows, function(data_row){
 					try{
@@ -484,8 +509,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 								new_row[field.DbColumnName] = data_row[col]; //but don't uppercase anything that isn't a multiselect or select.
 
 								//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
-								if(field.ControlType == "select" && data_row[col])
+								if(field.ControlType == "select" && data_row[col] && typeof data_row == "string")
+								{
+									//console.log(typeof data_row[col]);
+									//if(typeof data_row == "string") //might otherwise be a number or something...
 									new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....
+								}
 								
 							}
 
@@ -602,15 +631,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				for (var i = 0; i < $scope.dataSheetDataset.length; i++) {
 					var row = $scope.dataSheetDataset[i];
 
+					if($scope.showHeaderForm)
+						row = angular.extend(row, $scope.row, $scope.ActivityFields); // copy in the header fields...  //TODO: might be nicer to pass into parseActivitySheet below...
+
 					//copy in the selected qastatus (default was set above)
 					row.ActivityQAStatus = {
 	        			QAStatusId: ""+row.QAStatusId,
-	        			Comments: DEFAULT_IMPORT_QACOMMENT,
+	        			Comments: row.QAComments
 	        		};
 
-	        		//set our default rowqastatusid to be what is defined in the dataset definition
-//	        		if(!row.QAStatusId)
-//	        			row.QAStatusId = $scope.dataset.DefaultRowQAStatusId;
+	        		row.QAStatusId = row.RowQAStatusId; 
 
 				}
 

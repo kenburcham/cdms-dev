@@ -325,7 +325,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.reloadProjectLocations = function(){
 
-                console.log("reloading project locations");
+                //console.log("reloading project locations");
                 $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
                 $scope.locationObjectIdArray = [];
                 
@@ -334,12 +334,12 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 });
 
                 $scope.locationObjectIds = $scope.locationObjectIdArray.join();
-                console.log("found project locations: " + $scope.locationObjectIds);
+                //console.log("found project locations: " + $scope.locationObjectIds);
 
                 if($scope.map && $scope.map.locationLayer && $scope.map.locationLayer.hasOwnProperty('showLocationsById'))
                     $scope.map.locationLayer.showLocationsById($scope.locationObjectIds); //bump and reload the locations.
 
-                console.log("Project locations loaded!");
+                //console.log("Project locations loaded!");
 
             };      
 

@@ -147,7 +147,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 		};
 
 		$scope.selectAccuracyCheck = function(){
-			$scope.row.LastAccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
+			if($scope.row.AccuracyCheckId)
+				$scope.row.LastAccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
 		};
 
 

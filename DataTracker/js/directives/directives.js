@@ -100,13 +100,13 @@ mod.directive('projectRole', function($rootScope){
 
                 if(role == 'owner' && $rootScope.Profile.isProjectOwner(scope.project))
                 {
-                    console.log("Showing role 'owner' because user is owner.");
+                    //console.log("Showing role 'owner' because user is owner.");
                     show = true;
                 }
 
                 if(role == 'editor' && ($rootScope.Profile.isProjectOwner(scope.project) || $rootScope.Profile.isProjectEditor(scope.project)))
                 {
-                    console.log("Showing role 'editor' because user is owner or editor.");
+                    //console.log("Showing role 'editor' because user is owner or editor.");
                      show = true;
                 }
 

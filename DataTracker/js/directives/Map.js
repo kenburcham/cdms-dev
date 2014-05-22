@@ -59,8 +59,8 @@ define([
         this.addLayer = function(layer, filter){
           map.locationLayer = map.addLayer(layer);
 
-          console.log("Added layer to map");
-          console.log("layer_"+layer.id);
+//          console.log("Added layer to map");
+//          console.log("layer_"+layer.id);
 
           if(filter && filter == "location")
           {
