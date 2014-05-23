@@ -603,11 +603,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			{
 				$scope.loading=true;
 			      $scope.upload = $upload.upload({
-			        url: '/services/data/UploadImportFile', //upload.php script, node.js route, or servlet url
+			        url: serviceUrl + '/data/UploadImportFile', //upload.php script, node.js route, or servlet url
 			        method: "POST",
 			        // headers: {'headerKey': 'headerValue'},
 			        // withCredential: true,
-			        data: {ProjectId: $scope.project.Id},
+			        data: {ProjectId: $scope.project.Id, StartOnLine: $scope.startOnLine},
 			        file: $scope.file,
 			        // file: $files, //upload multiple files, this feature only works in HTML5 FromData browsers
 			        /* set file formData name for 'Content-Desposition' header. Default: 'file' */

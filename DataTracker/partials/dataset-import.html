@@ -26,10 +26,23 @@
             <div class="col-md-4" style="background-color: #CEE3F6; padding: 40px; height: 300px;border-radius:6px;">
                 <h4 class="text-center">Step 1: Upload data file</h4>
                 <br/>
+
                 <input type="file" ng-file-select="onFileSelect($files)" value="{{file.name}}">
+                
+                <div style="margin: 10px;" ng-show="openAdvanced==true">
+                    <div class="right" style="margin-right: 40px;">
+                        <input type="text" size="3" ng-model="startOnLine" ng-init="startOnLine=1"/>
+                    </div>
+                    <div>Columns on line:</div>
+                </div>
+
                 <br/>
                 <div class="right" style="margin-top: 3px; margin-left: 5px;"><img ng-show="loading" src="images/FishLoading.gif"/></div>
                 <button class="btn btn-primary right" ng-disabled="!file" ng-click="uploadFile()">Load >></button>
+                <br/>
+                <div style="margin-top: 80px">
+                    <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Set column line</a>
+                </div>
                 
             </div>
             
