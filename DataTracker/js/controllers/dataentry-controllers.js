@@ -84,12 +84,12 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 			angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
 				parseField(field, $scope);
 				
-				if(field.FieldRoleId == 1)
+				if(field.FieldRoleId == FIELD_ROLE_HEADER)
 				{
 					$scope.headerFields.push(field);
 					$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 				}
-				else
+				else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
 					$scope.detailFields.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
@@ -210,11 +210,11 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 				
 				parseField(field, $scope);
 
-				if(field.FieldRoleId == 1)
+				if(field.FieldRoleId == FIELD_ROLE_HEADER)
 				{
 					$scope.headerFields.push(field);
 				}
-				else
+				else if (field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
 					$scope.detailFields.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));

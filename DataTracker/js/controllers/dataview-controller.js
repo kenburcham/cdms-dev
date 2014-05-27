@@ -118,11 +118,11 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 						parseField(field, $scope);
 
-						if(field.FieldRoleId == 1)
+						if(field.FieldRoleId == FIELD_ROLE_HEADER)
 						{
 							$scope.headerFields.push(field);
 						}
-						else
+						else if (field.FieldRoleId == FIELD_ROLE_DETAIL)
 						{
 							$scope.detailFields.push(field);
 							$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));

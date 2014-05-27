@@ -121,13 +121,13 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         	//setup our header/detail field structure
 			angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
 				parseField(field, $scope);
-				if(field.FieldRoleId == 1)
+				if(field.FieldRoleId == FIELD_ROLE_HEADER)
 				{
 					$scope.headerFields.push(field);
 					//also copy the value to row
 					$scope.row[field.DbColumnName] = $scope.dataset_activities.Header[field.DbColumnName];
 				}
-				else
+				else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
 					$scope.detailFields.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));

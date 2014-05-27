@@ -101,11 +101,11 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
 				angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
 					parseField(field, $scope);
-					if(field.FieldRoleId == 1)
+					if(field.FieldRoleId == FIELD_ROLE_HEADER)
 					{
 						$scope.headerFields.push(field);
 					}
-					else
+					else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 					{
 						$scope.detailFields.push(field);
 					}

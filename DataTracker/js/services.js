@@ -1,6 +1,11 @@
 'use strict';
 
 var NUM_FLOAT_DIGITS = 3;
+var FIELD_ROLE_HEADER = 1;
+var FIELD_ROLE_DETAIL = 2;
+var FIELD_ROLE_SUMMARY = 3;
+var FIELD_ROLE_CALCULATED = 4;
+var FIELD_ROLE_VIRTUAL = 5;
 
 var mod = angular.module('DatasetServices', ['ngResource']);
 
@@ -793,15 +798,15 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     console.log("recalculateGridWidth with length: " + length);
 
                     var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
-                    console.log("minwidth: " + minwidth);
+                    //console.log("minwidth: " + minwidth);
 
                     var width = 110 * length; //multiply number of columns by 100px
-                    console.log("or multiplied: " + width);
+                    //console.log("or multiplied: " + width);
 
                     //if(width < minwidth) width=minwidth; //min-width
                     if(width < minwidth) width=minwidth; //min-width
 
-                    console.log("Decided: " + width);
+                    //console.log("Decided: " + width);
 
                     scope.gridWidth = { width: width };
                     //refresh the grid
@@ -1410,7 +1415,7 @@ function makeObjects(optionList, keyProperty, valueProperty)
 //give us a unique key to reference it by for caching.
 function makeObjectsFromValues(key, valuesList)
 {
-    console.log("KEY: "+ key);
+//    console.log("KEY: "+ key);
     var objects = angular.rootScope.Cache[key]; //see if we have it squirreled away in our cache
 
     if(!objects)
@@ -1575,12 +1580,19 @@ if(field.DbColumnName == "FinClip")
     try{
         //fire Field rule if it exists -- OnValidate
         if(field.Field && field.Field.Rule && field.Field.Rule.OnValidate)
+        {
+            //console.log("Running master rule: "+ field.Field.Rule.OnValidate);
             eval(field.Field.Rule.OnValidate);
+        }
 
         //fire Datafield rule if it exists -- OnValidate
         if(field.Rule && field.Rule.OnValidate)
+        {
+            //console.log("Running datafield rule: " + field.Rule.OnValidate);
             eval(field.Rule.OnValidate);
+        }
     }catch(e){
+        console.log("An error occurred processing a rule: ");
         console.dir(e);
     }
 
@@ -1744,7 +1756,7 @@ mod.service('wish', function () {
 //convert a F to C
 function convertFtoC(fahr){
     if(fahr != null)
-        return (parseFloat(fahr) - 32) * (5/9).toFixed(NUM_FLOAT_DIGITS);
+        return ((parseFloat(fahr) - 32) * (5/9)).toFixed(NUM_FLOAT_DIGITS);
 
     return fahr;
 }

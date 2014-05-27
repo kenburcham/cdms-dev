@@ -1,7 +1,7 @@
      <div class="import-has-errors"  ng-show="gridHasErrors && onRow">
                 <h4>Validation errors for selected row:</h4>
                 <div class="alert alert-danger" ng-show="onRow.entity.errors">
-                    <div ng-repeat="error in onRow.entity.errors">
+                    <div ng-repeat="error in onRow.entity.errors track by $index">
                         {{error}}
                     </div>
                 </div>

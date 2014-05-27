@@ -224,11 +224,11 @@ mod.controller('ImportModalCtrl', ['$scope','$upload',
     		//setup a listener to populate column headers on the grid
 			$scope.$watch('grid.Dataset', function() { 
 				angular.forEach($scope.grid.Dataset.Fields, function(field){
-					if(field.FieldRoleId == 1)
+					if(field.FieldRoleId == FIELD_ROLE_HEADER)
 					{
 						$scope.headerFields.push(field);
 					}
-					else
+					else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 					{
 						$scope.detailFields.push(field);
 						var displayName = field.Label;
