@@ -55,9 +55,18 @@ mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'Data
 mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
 
+    $scope.header_message = "Create new instrument";
+
     $scope.row = {
         StatusId: 0
     };      
+
+    if($scope.viewInstrument)
+    {
+        $scope.header_message = "Edit instrument: " + $scope.viewInstrument.Name;
+        $scope.row = $scope.viewInstrument;
+    }
+
 
     $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
 
@@ -186,6 +195,15 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             });
          };
 
+        scope.editViewInstrument = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-create-instrument.html',
+              controller: 'ModalCreateInstrumentCtrl',
+              scope: scope, //very important to pass the scope along... 
+        
+            });
+         };
+
          scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 
          scope.viewInstrument = null; //what they've clicked to view accuracy checks
@@ -208,6 +226,19 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 scope.reloadProject();
             });
 
+
+         };
+
+         scope.removeViewInstrument = function(){
+            if(!scope.viewInstrument)
+                return;
+
+            var promise = DatastoreService.removeProjectInstrument(scope.project.Id, scope.viewInstrument.Id);
+            
+            promise.$promise.then(function(){
+                scope.reloadProject();
+            });
+              
 
          };
 

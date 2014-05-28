@@ -188,12 +188,15 @@ mod.factory('GetInstrumentTypes', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/GetInstrumentTypes');
 }]);
 
+mod.factory('RemoveProjectInstrument', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/RemoveProjectInstrument');
+}]);
 
 
 
 
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes){
+mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument',
+    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument){
         var service = {
 
             datastoreId: null,
@@ -294,6 +297,9 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             },
             saveProjectInstrument: function(projectId, instrument){
                 return SaveProjectInstrument.save({ProjectId: projectId, Instrument: instrument});
+            },
+            removeProjectInstrument: function(projectId, instrumentId){
+                return RemoveProjectInstrument.save({ProjectId: projectId, InstrumentId: instrumentId});
             },
             saveInstrumentAccuracyCheck: function(instrumentId, ac)
             {

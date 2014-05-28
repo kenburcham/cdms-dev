@@ -33,10 +33,6 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 			$scope.ActivityFields = { QAComments: DEFAULT_IMPORT_QACOMMENT };
 
-			//set locationid if it is incoming as a query param (?LocationId=142)
-    		if($routeParams.LocationId)
-    			$scope.ActivityFields.LocationId = $routeParams.LocationId;
-
 			$scope.UploadResults = {};
 			$scope.UploadResults.errors = [];
 
@@ -79,6 +75,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				//setup location field to participate in validation 
 				$scope.FieldLookup['locationId'] = { DbColumnName: 'locationId', ControlType: "select" };
 				$scope.CellOptions['locationIdOptions'] = $scope.locationOptions;
+
+				//set locationid if it is incoming as a query param (?LocationId=142)
+	    		if($routeParams.LocationId){
+	    			$scope.ActivityFields.LocationId = $routeParams.LocationId;
+	    			$scope.ActivityFields.Location = getByField($scope.project.Locations, $routeParams.LocationId, "Id");
+	    		}
+
 					
 	        });
 

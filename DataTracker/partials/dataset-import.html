@@ -6,7 +6,8 @@
 </ul>
 
 <h3>Import dataset activity</h3>
-<h5>Target: {{dataset.Name}}</h5>
+<h5 ng-hide="ActivityFields.LocationId">Target: {{dataset.Name}}</h5>
+<h5 ng-show="ActivityFields.LocationId">Target: {{dataset.Name}} @ {{ActivityFields.Location.Label}}</h5>
 
 
 <div class="alert alert-danger" ng-show="uploadErrorMessage">
