@@ -36,14 +36,21 @@ angular.module('DatasetFilters', [])
             
             if(input)
             {
-                return angular.fromJson(input).toString();
-                
+
+                try{
+                    result = angular.fromJson(input).toString();
+                }
+                catch(e){
+                    result = input;
+                }
+                /*
                 var vals = angular.fromJson(input);
                 angular.forEach(vals, function(item){
                     if(result != '')
                         result += ',';
                     result += item;
                 });
+                */
             }
 
             return result;

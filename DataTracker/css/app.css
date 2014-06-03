@@ -433,3 +433,50 @@ table.metadata td
     background-color: #BDBDBD;
     margin-right: 10px;
 }
+
+.map-inset {
+	margin-top: -40px;
+	margin-left: 40px;
+	border: lightgray 1px solid;
+}
+
+.map-inset img
+{
+	width: 200px;
+}
+
+.quad-images
+{
+	border: lightgray 1px solid;	
+	padding: 7px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+.quad-images img
+{
+	width: 350px;
+	padding-bottom: 10px;
+}
+
+.input-label{
+	vertical-align: top;
+}
+
+.edit-project-modal .header-label, .edit-project-modal .header-value
+{
+	margin-top: 7px;
+}
+
+.edit-project-modal textarea.form-control { width: 400px;}
+
+.edit-project-modal { width: 700px;}
+
+.edit-project-modal .checkbox-itemlist
+{
+	width: 400px;
+	margin-left: 200px;
+	border: lightgrey 1px solid;
+	border-radius:6px;
+	padding: 8px;
+}

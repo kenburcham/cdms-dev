@@ -25,6 +25,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
 
         $scope.project = DataService.getProject($scope.dataset.ProjectId); 
         $scope.locationTypes = DatastoreService.getLocationTypes();
+        $scope.waterbodies = DatastoreService.getWaterBodies();
 
         $scope.save = function(){
             
@@ -98,6 +99,11 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             				   '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("ActivityDate") | date:\'MM/dd/yyyy\'}}</a>' +
             				   '</div>';
 
+            var desclinkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("Description") }}</a>' +
+                               '</div>';
+
+
             var QATemplate = '<div class="ngCellText" ng-class="col.colIndex()">{{QAStatusList[row.getProperty("ActivityQAStatus.QAStatusId")]}}</div>';
 
             //performance idea: if project-role evaluation ends up being slow, you can conditionally include here...
@@ -105,21 +111,24 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             				   '<a href="#/edit/{{row.getProperty(\'Id\')}}">Edit</a>' +
             				   '</div>';
 
+            $scope.columnDefs = [
+                        {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px'},
+                        {field:'Location.Label',displayName: 'Location'},
+                        {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
+                        {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
+                        {field:'User.Fullname',displayName: 'By User', width: '120px'},
+                        {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px'},
+                        {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '50px'},
+                    ];
+
             $scope.gridOptions = {
             	data: 'activities',
                 selectedItems: [],
-            	enablePaging: true,
+            	showColumnMenu: true,
                 sortInfo: {fields:['ActivityDate'], directions: ['desc']},
-            	columnDefs: 
-            		[
-            			{field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate},
-            			{field:'Location.Label',displayName: 'Location'},
-            			{field:'User.Fullname',displayName: 'By User'},
-            			{field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate},
-            			{field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '50px'}
-            		],
-
+            	columnDefs: 'columnDefs',
             };
+
 
             $scope.ShowMap = {
                 Display: false,
@@ -135,6 +144,12 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     scope: $scope, //very important to pass the scope along... 
                 });
             };
+
+            $scope.removeFilter = function()
+            {
+                $scope.activities = $scope.allActivities;
+                $scope.clearLocation();
+            }
 
             $scope.clearLocation = function(){
                 $scope.map.infoWindow.hide();
@@ -269,7 +284,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.toggleMap = function(){
                 if($scope.ShowMap.Display)
                 {
-                    $scope.clearLocation();
+                    $scope.removeFilter(); //also clears location
                     $scope.ShowMap.Display = false;
                     $scope.ShowMap.Message = $scope.ShowMap.MessageToOpen;
                 }
@@ -348,6 +363,15 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 //load our project based on the projectid we get back from the dataset
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
                 $scope.QAStatusList = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+
+                //hide irrelevant fields
+                if($scope.dataset.Datastore.Name == 'Water Temperature')
+                {
+                    console.log("showing fields");
+                    $scope.columnDefs[0].visible = false;
+                    $scope.columnDefs[2].visible = true;
+                    $scope.columnDefs[3].visible = true;
+                }
 
             });
 

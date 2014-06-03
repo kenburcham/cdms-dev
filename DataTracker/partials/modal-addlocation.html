@@ -17,6 +17,12 @@
                 <select class="form-control" ng-model="row.LocationTypeId" ng-options="p.Id as p.Name for p in locationTypes"></select>
             </div>  
 
+            <div class="header-label">Waterbody:</div>
+            <div class="header-value">
+                <select class="form-control" ng-model="row.WaterBodyId" ng-options="p.Id as p.Name for p in waterbodies"></select>
+            </div>  
+
+
 			<div class="header-label">Label:</div>
             <div class="header-value">
                 <input class="form-control" ng-model="row.Label" />
@@ -26,22 +32,6 @@
             <div class="header-value">
                 <textarea class="form-control" ng-model="row.Description"></textarea>
             </div>  
-
-            <div class="form-group" ng-class="{ 'has-error' :  form.Latitude.$error.float}" style="margin-bottom: 0px;">
-            <div class="header-label">Latitude:</div>
-            <div class="header-value">
-                <input class="form-control" name="Latitude" ng-model="row.Latitude" smart-float />
-                <p class="field-error-block" ng-show="form.Latitude.$error.float">This is not a valid Latitude</p>
-            </div>  
-            </div>
-
-            <div class="form-group" ng-class="{ 'has-error' :  form.Longitude.$error.float}" style="margin-bottom: 0px;">
-            <div class="header-label">Longitude:</div>
-            <div class="header-value">
-                <input class="form-control" name="Longitude" ng-model="row.Longitude" smart-float />
-                <p class="field-error-block" ng-show="form.Longitude.$error.float">This is not a valid Longitude</p>
-            </div>  
-            </div>
 
             <div class="form-group" ng-class="{ 'has-error' :  form.Easting.$error.float}" style="margin-bottom: 0px;">
             <div class="header-label">Easting:</div>

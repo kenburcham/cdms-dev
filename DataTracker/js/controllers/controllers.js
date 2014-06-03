@@ -51,6 +51,37 @@ mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'Data
   }
 ]);
 
+mod_ds.controller('ModalProjectEditorCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    if($scope.row && $scope.row.Id)
+    {
+        $scope.header_message = "Edit project: " + $scope.project.Name;  
+    }
+    else
+    {
+        $scope.header_message = "Create new project";
+        $scope.row = {};
+    }
+    
+    $scope.save = function(){
+      
+      var promise = DatastoreService.saveProject($scope.row);
+      promise.$promise.then(function(){
+          $scope.reloadProject();  
+          $modalInstance.dismiss();  
+      });
+      
+
+    };
+
+    $scope.cancel = function(){
+      $modalInstance.dismiss();
+    };
+
+  }
+]);
+
 
 mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
@@ -86,20 +117,25 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
 
 
 
-var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal',
-	function(scope, routeParams, DataService, DatastoreService, $rootScope, $modal){
+var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal','$sce',
+	function(scope, routeParams, DataService, DatastoreService, $rootScope, $modal,$sce){
 		scope.datasets = DataService.getProjectDatasets(routeParams.Id);
     scope.project = DataService.getProject(routeParams.Id);
     scope.currentUserId = $rootScope.Profile.Id;
     scope.filteredUsers = false;
     scope.allInstruments = DatastoreService.getAllInstruments();
+    scope.CellOptions = {}; //for metadata dropdown options
+    scope.metadataList = {}; 
+
+    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID); 
+    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
 
 		var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
             				   '<a href="#/activities/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
             				   '</div>';
 
     var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
-            				   '1/10/2014 @ 8:20 AM by Ken Burcham' +
+            				   '1/10/2014 @ 8:20 AM by Ken Burcham -- FIXME' +
             				   '</div>';
 
 		scope.gridOptions = {
@@ -112,15 +148,15 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             		]	
             };
 
-        var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}">' +
-                                '<img src="{{row.getProperty(\'Link\')}}"" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
-                               '{{row.getProperty("Name")}}</a>' +
+        var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
+                                '<img src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '</a>' +
                                '</div>';
 
         var uploadedBy = '<div class="ngCellText" ng-class="col.colIndex()">' + 
                                '{{row.getProperty("UploadDate")|date}} by {{row.getProperty("User.Fullname")}}' +
                                '</div>';                               
-
+        scope.FileFilterOptions = {};
         scope.gridFiles = {
             data: 'project.Docs',
             columnDefs:
@@ -130,9 +166,11 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 {field: 'Description'},
                 {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
                 {field: 'Size'},
-            ]
+            ],
+            filterOptions: scope.FileFilterOptions
         };
 
+        scope.GalleryFilterOptions = {};
         scope.gridGallery = {
             data: 'project.Images',
             columnDefs:
@@ -142,7 +180,9 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 {field: 'Description'},
                 {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
                 {field: 'Size'},
-            ]
+            ],
+            filterOptions: scope.GalleryFilterOptions
+
         };
          
          scope.users = [];
@@ -155,10 +195,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 scope.project.MetadataValue = {};
                 scope.project.Images = [];
                 scope.project.Docs = [];
-                angular.forEach(scope.project.Metadata, function(property, key){
-                    scope.project.MetadataValue[property.MetadataPropertyId] = property.Values;
-                });
-
+                
                 //split out the images and other files.
                 
                 angular.forEach(scope.project.Files, function(file, key){
@@ -173,9 +210,97 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 {
                     scope.viewInstrument = getMatchingByField(scope.project.Instruments, scope.viewInstrument.Id, 'Id')[0]; 
                 }
+
+                //add in the metadata to our metadataList that came with this dataset
+                scope.addMetadataProperties(scope.project.Metadata);
+                
+                scope.mapHtml = $sce.trustAsHtml(scope.project.MetadataValue[25]);
+                scope.imagesHtml = $sce.trustAsHtml(scope.project.MetadataValue[13]);
+
+
+                //get habitat (and possibly other?) metadata values for this project.  they don't come with project metadata as they are their own category.
+                var habitatProjectMetadataPromise = DataService.getMetadataFor(scope.project.Id, METADATA_ENTITY_HABITATTYPEID);
+                habitatProjectMetadataPromise.$promise.then(function(list){
+                    scope.addMetadataProperties(list);
+                });
+
             }
 
          });
+
+        //metadata -- we have a list of metadata properties that are configured for "project" entities.
+        //  any metadata already associated with a project come in teh project's Metadata array, but ones that haven't
+        //  been given a value yet on a specific project won't appear and need to be added in separately.
+
+
+        scope.metadataPropertiesPromise.promise.then(function(list){
+            scope.addMetadataProperties(list);
+        });
+
+        scope.habitatPropertiesPromise.promise.then(function(list){
+            scope.addMetadataProperties(list);
+        });
+          
+        //might be a list of metadata values from project.Metadata or a list of actual properties.
+        scope.addMetadataProperties = function(metadata_list)
+        {
+            angular.forEach(metadata_list, function(i_property, key){
+              
+                var property = i_property;
+                if(i_property.MetadataPropertyId) //is it a value from project.Metadata? if so then grab the property.
+                    property = DataService.getMetadataProperty(i_property.MetadataPropertyId);
+
+              
+                //if it isn't already there, add it as an available option
+                if(!(property.Name in scope.metadataList))
+                {
+                    scope.metadataList[property.Name] =
+                    {
+                        field: property.Name,
+                        propertyId: property.Id,
+                        controlType: property.ControlType,
+                    };
+                }
+
+                //set the value no matter what if we have it.
+                if(i_property.Values)
+                {
+                  if(property.ControlType == "multiselect")
+                  {
+                      //need to see if we are dealing with old style (just a list) or if it is a bonafide object.
+                      var values;
+                      try{
+                        values = angular.fromJson(i_property.Values);
+                      }
+                      catch(e)  //if we can't then it wasn't an object... use split instead.
+                      {
+                        values = i_property.Values.split(",")
+                      }
+                        
+                      scope.metadataList[property.Name].value = values;
+                  }
+                  else
+                  {
+                      scope.metadataList[property.Name].value = i_property.Values;
+                  }
+                
+                  scope.project.MetadataValue[property.Id] = scope.metadataList[property.Name].value; //make it easy to get values by metadata id.
+                }
+                else
+                  scope.metadataList[property.Name].value = "";
+
+
+
+                if(property.PossibleValues)
+                {
+                  populateMetadataDropdowns(scope,property); //setup the dropdown
+                  scope.metadataList[property.Name].options = scope.CellOptions[property.Id+"_Options"];      
+                }
+
+                
+            });
+        }
+
 
          scope.openAccuracyCheckForm = function(){
             var modalInstance = $modal.open({
@@ -191,7 +316,6 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
               templateUrl: 'partials/instruments/modal-create-instrument.html',
               controller: 'ModalCreateInstrumentCtrl',
               scope: scope, //very important to pass the scope along... 
-        
             });
          };
 
@@ -199,6 +323,15 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-create-instrument.html',
               controller: 'ModalCreateInstrumentCtrl',
+              scope: scope, //very important to pass the scope along... 
+            });
+         };
+
+         scope.openProjectEditor = function(){
+            scope.row = scope.project; //
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/project/modal-edit-project.html',
+              controller: 'ModalProjectEditorCtrl',
               scope: scope, //very important to pass the scope along... 
         
             });

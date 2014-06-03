@@ -7,7 +7,7 @@
 <ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
-    <li class="active">{{dataset.Name}}</li>    
+    <li class="active">{{dataset.Name}}</li>  
 </ul>
 
 <div ng-show="selectedLocation" project-role="editor">
@@ -33,6 +33,7 @@
             </esri-map>
             
             <h4>{{dataset.Name}}</h4>
+            <div ng-show="selectedLocation"><i>Filtering by location: <b>{{selectedLocation.Label}}</b></i>  <button ng-click="removeFilter()" class="btn btn-xs">clear</button><br/><br/></div>
             <div class="btn-group" project-role="editor">
                 <button class="btn border-right">Data Entry</button>
                 <button class="btn dropdown-toggle" data-toggle="dropdown">

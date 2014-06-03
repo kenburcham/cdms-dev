@@ -506,6 +506,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 								    for(var a = 0; a < row_items.length; a++)
 								    {        
 								        var row_item = row_items[a].trim().toUpperCase();
+
 								        //$scope.Logger.debug(" on --> "+row_item);
 								        if(new_row[field.DbColumnName].indexOf(row_item) == -1)
 								            new_row[field.DbColumnName].push(row_item);
@@ -522,10 +523,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									//set the value
 									new_row[field.DbColumnName] = data_row[col]; //but don't uppercase anything that isn't a multiselect or select.
 
+									//console.log(field.ControlType);
+									//console.log(typeof data_row[col]);
+
 									//$scope.Logger.debug("found a map value: " +new_row[field.DbColumnName]+" = "+data_row[col]);
-									if(field.ControlType == "select" && data_row[col] && typeof data_row == "string")
+									if(field.ControlType == "select" && data_row[col] && typeof data_row[col] == "string")
 									{
-										//console.log(typeof data_row[col]);
+										//console.log(" -- " + data_row[col].trim().toUpperCase());
 										//if(typeof data_row == "string") //might otherwise be a number or something...
 										new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....
 									}
@@ -544,7 +548,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					//console.log("Ok, now we'll run the rules...");
 					angular.forEach($scope.mapping, function(field, col){
 						
-						var value = data_row[col];
+						var value = new_row[col];
 						
 						 try{
 	                        //fire Field rule if it exists -- OnChange

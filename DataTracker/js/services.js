@@ -6,6 +6,9 @@ var FIELD_ROLE_DETAIL = 2;
 var FIELD_ROLE_SUMMARY = 3;
 var FIELD_ROLE_CALCULATED = 4;
 var FIELD_ROLE_VIRTUAL = 5;
+var METADATA_ENTITY_PROJECTTYPEID = 1;
+var METADATA_ENTITY_HABITATTYPEID = 2;
+var METADATA_ENTITY_DATASETTYPEID = 5;
 
 var mod = angular.module('DatasetServices', ['ngResource']);
 
@@ -192,11 +195,19 @@ mod.factory('RemoveProjectInstrument', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/RemoveProjectInstrument');
 }]);
 
+mod.factory('GetMetadataFor',['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetMetadataFor', {}, {
+           save: {method: 'POST', isArray: true} 
+        });
+}]);
+
+mod.factory('GetWaterBodies', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetWaterBodies');
+}]);
 
 
-
-mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument',
-    function(GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument){
+mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies',
+    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies){
         var service = {
 
             datastoreId: null,
@@ -227,6 +238,11 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
             getDatastores: function()
             {
                 return GetAllDatastores.query();
+            },
+
+            getWaterBodies: function()
+            {
+                return GetWaterBodies.query();
             },
             
             getDatasets: function(id)
@@ -313,8 +329,8 @@ mod.service('DatastoreService', ['GetAllPossibleDatastoreLocations','GetAllDatas
     }
 ]);
 
-mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata',
-    function(resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata){
+mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor',
+    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor){
     var service = {
         
         //our "singleton cache" kinda thing
@@ -374,54 +390,61 @@ mod.service('DataService', ['$resource', 'Projects', 'Users','Project','ProjectD
         },
 
         getMetadataProperty: function(propertyId){
+
             if(!service.metadataProperties)
             {
-                //console.log("Looking up properties.");
-                service.metadataPropertiesPromise = GetMetadataProperties.query(function(data){
-                    service.metadataProperties = {};
-                    angular.forEach(data, function(value, key){
-                        service.metadataProperties["ID_"+value.Id] = value;
-                    });    
-                  //  console.log("done and now returing");
-                  //  console.dir(service.metadataProperties);
-                  //  console.log("returning: " + service.metadataProperties["ID_"+propertyId].Name);
-                   return service.metadataProperties["ID_"+propertyId];
-
-                });
-            }else{
-                //console.log("not looking up just returning");
+                this._loadMetadataProperties().$promise.then(function(){
+                   return service.metadataProperties["ID_"+propertyId]; 
+               });
+            }
+            else
+            {
                 return service.metadataProperties["ID_"+propertyId];                
             }
         },
 
-        getMetadataProperties: function(scope, propertyTypeId) {
-            if(!service.metadataPropertiesPromise.$resolved)
+        getMetadataProperties: function(propertyTypeId) {
+
+            var properties = $q.defer();
+
+            if(!service.metadataProperties)
             {
-                service.metadataPropertiesPromise.$promise.then(function(){
-                    scope.metadataProperties = getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId');
+                this._loadMetadataProperties().$promise.then(function(){
+                    properties.resolve(getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId'));
                 });
+            }else{
+                properties.resolve(getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId'));
             }
-            else
-            {
-                scope.metadataProperties = getMatchingByField(service.metadataProperties, propertyTypeId, 'MetadataEntityId');
-            }
+
+            return properties;
+
+        },
+
+        getMetadataFor: function(projectId, typeId)
+        {
+            return GetMetadataFor.save({ProjectId: projectId, EntityTypeId: typeId});
+        },
+
+        //returns promise so you can carry on once it loads.
+        _loadMetadataProperties: function()
+        {
+            return GetMetadataProperties.query(function(data){
+                service.metadataProperties = {};
+                angular.forEach(data, function(value, key){
+                    service.metadataProperties["ID_"+value.Id] = value;
+                });
+            });
+
         },
 
         saveDatasetMetadata: function(datasetId, metadata, saveResults)
         {
-            saveResults.saving = true;
             var payload = {
                 DatasetId: datasetId,
                 Metadata: metadata
             };
 
-            SaveDatasetMetadata.save(payload, function(data){
-                saveResults.saving = false;
-                saveResults.success = true;
-            }, function(data){
-                saveResults.saving = false;
-                saveResults.failure = true;
-            });
+            return SaveDatasetMetadata.save(payload);
 
         },
 
@@ -1910,4 +1933,12 @@ function getDataGrade(check)
         grade = check.Bath1Grade;
 
     return grade;
+};
+
+function populateMetadataDropdowns(scope, property)
+{
+    if(property.ControlType == "select" || property.ControlType == "multiselect")
+    {
+        scope.CellOptions[property.Id+'_Options'] = makeObjectsFromValues(property.Id+"_Options", property.PossibleValues);
+    }
 };

@@ -22,7 +22,8 @@ define([
 	  'angularFileUpload',
 	  'DatasetDirectives',
 	  'AdminController',
-	  'angularCharts'
+	  'angularCharts',
+	  'checklist-model'
 	  ])
 	    .config(['$routeProvider', function($routeProvider) {
 	        $routeProvider.when('/projects', {templateUrl: 'partials/projects.html', controller: 'ProjectsCtrl'});
