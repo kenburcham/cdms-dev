@@ -149,7 +149,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             };
 
         var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
-                                '<img src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
                                '</a>' +
                                '</div>';
 

@@ -79,11 +79,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				//set locationid if it is incoming as a query param (?LocationId=142)
 	    		if($routeParams.LocationId){
 	    			$scope.ActivityFields.LocationId = $routeParams.LocationId;
-	    			$scope.ActivityFields.Location = getByField($scope.project.Locations, $routeParams.LocationId, "Id");
+	    			$scope.setLocation();
 	    		}
 
 					
 	        });
+
+			$scope.setLocation = function()
+			{
+				$scope.ActivityFields.Location = getByField($scope.project.Locations, $scope.ActivityFields.LocationId, "Id");
+			};
 
 			//setup our existingActivities array so we can manage duplicates
 	        var ealoadwatcher = $scope.$watch('existingActivitiesLoad.length', function(){

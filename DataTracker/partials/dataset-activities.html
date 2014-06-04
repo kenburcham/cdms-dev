@@ -47,6 +47,7 @@
             <button project-role="editor" class="btn" ng-click="openImportWindow()">Import data</button>
             <button class="btn" ng-click="openQueryWindow()">Query/Export data</button>
             <button class="btn" ng-click="openDetailsWindow()">Metadata</button>
+            <button class="btn" ng-click="showFilter= !showFilter">Filter</button>
             <div class="right">
                 <div ng-show="saveResults" style="float: left;">
                     <div ng-click="saveResults=null" ng-show="saveResults.success" class="delete-error alert alert-success">Deleted</div>
@@ -54,6 +55,10 @@
                 </div>
                 <button project-role="editor" class="btn right" ng-show="gridOptions.selectedItems.length > 0" ng-click="deleteActivities()">Delete {{gridOptions.selectedItems.length}} Activities</button>
                 
+            </div>
+
+            <div ng-show="showFilter" style="padding: 8px; width: 260px;">
+                <input class="form-control" ng-model="gridOptionsFilter.filterText" placeholder="Filter By" type="text"/><img class="right" style="margin-top: -30px;" src="images/search-sm.png"/>
             </div>
 
             <div class="gridActivities" ng-grid="gridOptions" style="margin-top: 10px;"></div>

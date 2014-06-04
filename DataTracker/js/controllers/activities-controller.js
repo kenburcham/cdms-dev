@@ -121,12 +121,18 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '50px'},
                     ];
 
+            $scope.showFilter = false;
+
+            $scope.gridOptionsFilter = {};
             $scope.gridOptions = {
             	data: 'activities',
                 selectedItems: [],
             	showColumnMenu: true,
                 sortInfo: {fields:['ActivityDate'], directions: ['desc']},
             	columnDefs: 'columnDefs',
+                filterOptions: $scope.gridOptionsFilter,
+
+
             };
 
 

@@ -145,6 +145,11 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					$scope.executeQuery();
     		};
 
+    		$scope.clearValue = function()
+    		{
+    			$scope.Criteria.Value = null;
+    		};
+
     		$scope.addCriteria = function(){
 				$scope.criteriaList.push({
 					//commenting these out because they will be read at EXECUTE time, not saved per query.
@@ -155,8 +160,6 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					Id: 				$scope.Criteria.ParamFieldSelect[0].Id,
 					Value: 				$scope.Criteria.Value,
 				});
-
-				console.dir($scope.criteriaList);
 
 				$scope.Criteria.Value = null;
 

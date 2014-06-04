@@ -59,12 +59,12 @@
 	            </thead>
 	            <tbody>
 	            <tr>
-	            	<td><img class="img-rounded" src="{{project.Owner.ProfileImageUrl}}"/></td>
+	            	<td><img class="img-rounded" ng-src="{{project.Owner.ProfileImageUrl}}"/></td>
 	                <td class="large-font">{{project.Owner.Fullname}}</td>
 	                <td>Owner</td>
 	            </tr>
 	            <tr ng-repeat="user in editors">
-	            	<td><img class="img-rounded" src="{{user.ProfileImageUrl}}"/></td>
+	            	<td><img class="img-rounded" ng-src="{{user.ProfileImageUrl}}"/></td>
 	                <td class="large-font">{{user.Fullname}}</td>
 	                <td><button project-role="owner" class="btn-xs btn-red" ng-click="removeEditor($index)">Remove</button></td>
 	            </tr>

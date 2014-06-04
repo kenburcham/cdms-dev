@@ -6,8 +6,8 @@
 </ul>
 
 <h3>Import dataset activity</h3>
-<h5 ng-hide="ActivityFields.LocationId">Target: {{dataset.Name}}</h5>
-<h5 ng-show="ActivityFields.LocationId">Target: {{dataset.Name}} @ {{ActivityFields.Location.Label}}</h5>
+<h5 ng-hide="ActivityFields.LocationId"><i>Target: {{dataset.Name}}</i></h5>
+<h5 ng-show="ActivityFields.LocationId"><i>Target: {{dataset.Name}} @ {{ActivityFields.Location.Label}}</i></h5>
 
 
 <div class="alert alert-danger" ng-show="uploadErrorMessage">
@@ -64,7 +64,7 @@
             <h4 class="text-center">Step 3: Options</h4>
                 <table ng-show="fileFields">
                 <tr>
-                    <td>Location:</td><td> <select ng-show="!mappedActivityFields['2']" class="query-form-control form-control" ng-model="ActivityFields.LocationId"  ng-options="id as name for (id, name) in locationOptions">
+                    <td>Location:</td><td> <select ng-change="setLocation()" ng-show="!mappedActivityFields['2']" class="query-form-control form-control" ng-model="ActivityFields.LocationId"  ng-options="id as name for (id, name) in locationOptions">
                                 
                             </select>
                             <div class="mapped-activity-field" ng-show="mappedActivityFields['2']">Use: {{mappedActivityFields['2']}}</div>
