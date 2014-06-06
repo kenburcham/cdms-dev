@@ -22,12 +22,12 @@
 
 				<div class="header-label">Program:</div>
 		  		<div class="header-value">
-		  				<select class="form-control" ng-model="metadataList['Program'].value" ng-options="id as name for (id, name) in metadataList['Program'].options"></select>
+		  				<select class="form-control" ng-model="metadataList['Program'].Values" ng-options="id as name for (id, name) in metadataList['Program'].options"></select>
 				</div>
 				
 				<div class="header-label">Sub-program:</div>
 		  		<div class="header-value">
-		  				<select class="form-control" ng-model="metadataList['Sub-program'].value" ng-options="id as name for (id, name) in metadataList['Sub-program'].options"></select>
+		  				<select class="form-control" ng-model="metadataList['Sub-program'].Values" ng-options="id as name for (id, name) in metadataList['Sub-program'].options"></select>
 				</div>
 
 				<div class="header-label">Project Start Date</div>
@@ -37,7 +37,7 @@
 
 		  		<div class="header-label">Project End Date</div>
 	  			<div class="header-value">
-		  				<input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row.EnteredService" is-open="bopened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+		  				<input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row.EndDate" is-open="bopened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
 		  		</div>
 
 
@@ -45,7 +45,7 @@
 	  			<div class="header-value">
 	  				<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['First Foods'].options">
-		  					<input type="checkbox" checklist-model="metadataList['First Foods'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['First Foods'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>
 		  		</div>
@@ -54,7 +54,7 @@
 	  			<div class="header-value">
 	  				<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['River Vision Touchstone'].options">
-		  					<input type="checkbox" checklist-model="metadataList['River Vision Touchstone'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['River Vision Touchstone'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>
 		  		</div>
@@ -72,60 +72,60 @@
 				
 		  		<div class="header-label">Period Description:</div>
 	  			<div class="header-value">
-		  			<input  class="form-control" type="text" ng-model="metadataList['Period'].value" />
+		  			<input  class="form-control" type="text" ng-model="metadataList['Period'].Values" />
 		  		</div>
 
 				<div class="header-label">Program/Project Statement/Goal:</div>
 	  			<div class="header-value">
-		  			<textarea rows="5" class="form-control" ng-model="metadataList['Project Goal Statement'].value" ></textarea>
+		  			<textarea rows="5" class="form-control" ng-model="metadataList['Project Goal Statement'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Program/Project Objectives:</div>
 	  			<div class="header-value">
-		  			<textarea rows="5" class="form-control" ng-model="metadataList['Project Objectives'].value" ></textarea>
+		  			<textarea rows="5" class="form-control" ng-model="metadataList['Project Objectives'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Outputs (specific 6 month accomplishments):</div>
 	  			<div class="header-value">
-		  			<textarea rows="8" class="form-control" ng-model="metadataList['Outputs'].value" ></textarea>
+		  			<textarea rows="8" class="form-control" ng-model="metadataList['Outputs'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Outcomes:</div>
 	  			<div class="header-value">
-		  			<textarea rows="8" class="form-control" ng-model="metadataList['Outcomes'].value" ></textarea>
+		  			<textarea rows="8" class="form-control" ng-model="metadataList['Outcomes'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Impacts:</div>
 	  			<div class="header-value">
-		  			<textarea rows="8" class="form-control" ng-model="metadataList['Impacts'].value" ></textarea>
+		  			<textarea rows="8" class="form-control" ng-model="metadataList['Impacts'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Inputs - Funding:</div>
 	  			<div class="header-value">
-		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Funding'].value" ></textarea>
+		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Funding'].Values" ></textarea>
 		  		</div>
 
 				<div class="header-label">Inputs - Staff:</div>
 	  			<div class="header-value">
-		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Staff'].value" ></textarea>
+		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Staff'].Values" ></textarea>
 		  		</div>
 
 
 				<div class="header-label">Inputs - Collaborators:</div>
 	  			<div class="header-value">
-		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Collaborators'].value" ></textarea>
+		  			<textarea rows="5" class="form-control" ng-model="metadataList['Inputs: Collaborators'].Values" ></textarea>
 		  		</div>
 				
 
 			</tab>
 
-			<tab ng-show="metadataList['Sub-program'].value=='Habitat'" heading="Habitat">
+			<tab ng-show="metadataList['Sub-program'].Values=='Habitat'" heading="Habitat">
 				
 				<div class="header-label">Habitat Objectives:</div>
 	  			<div class="header-value">
 		  			<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['Habitat Objectives'].options">
-		  					<input type="checkbox" checklist-model="metadataList['Habitat Objectives'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['Habitat Objectives'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>	
 		  		</div>
@@ -134,7 +134,7 @@
 		  		<div class="header-value">
 		  			<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['NOAA Ecological Concerns'].options">
-		  					<input type="checkbox" checklist-model="metadataList['NOAA Ecological Concerns'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['NOAA Ecological Concerns'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>	
 				</div>
@@ -143,7 +143,7 @@
 		  		<div class="header-value">
 		  			<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['NOAA Ecological Concerns: Sub-categories'].options">
-		  					<input type="checkbox" checklist-model="metadataList['NOAA Ecological Concerns: Sub-categories'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['NOAA Ecological Concerns: Sub-categories'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>
 				</div>
@@ -152,7 +152,7 @@
 		  		<div class="header-value">
 		  			<div class="checkbox-itemlist">
 		  				<div ng-repeat="item in metadataList['Limiting Factors'].options">
-		  					<input type="checkbox" checklist-model="metadataList['Limiting Factors'].value" checklist-value="item"/> {{item}}
+		  					<input type="checkbox" checklist-model="metadataList['Limiting Factors'].Values" checklist-value="item"/> {{item}}
 		  				</div>
 	  				</div>
 				</div>

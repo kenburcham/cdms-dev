@@ -26,6 +26,7 @@ define([
 	  'checklist-model'
 	  ])
 	    .config(['$routeProvider', function($routeProvider) {
+	    	
 	        $routeProvider.when('/projects', {templateUrl: 'partials/projects.html', controller: 'ProjectsCtrl'});
 	        $routeProvider.when('/projects/:Id', {templateUrl: 'partials/project-datasets.html', controller: 'ProjectDatasetsCtrl'});
 
@@ -46,6 +47,7 @@ define([
 	        $routeProvider.when('/admin-dataset/:Id', {templateUrl: 'partials/admin/admin-dataset.html', controller: 'AdminEditDatasetCtrl'});
 
 	        $routeProvider.when('/admin-master/:Id', {templateUrl: 'partials/admin/admin-master.html', controller: 'AdminEditMasterCtrl'});
+
 
 	        $routeProvider.otherwise({redirectTo: '/projects'});
 	    }]);

@@ -6,27 +6,6 @@
 
 var mod_ds = angular.module('DatasetControllers', ['ui.bootstrap', 'angularFileUpload','ui.select2']);
 
-var projectsController = ['$scope', 'DataService',
-	function(scope, DataService){
-		scope.projects = DataService.getProjects();
-
-        var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
-                               '<a href="#/projects/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
-                               '</div>';
-
-        scope.gridOptions = {
-            data: 'projects',
-            columnDefs:
-            [
-                {field: 'Name', displayName: 'Project Name', width: '35%', cellTemplate: linkTemplate},
-                {field: 'Description', displayName: 'Description'}
-            ]
-        }
-
-	}
-];
-
-
 mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
 
@@ -66,12 +45,25 @@ mod_ds.controller('ModalProjectEditorCtrl', ['$scope','$modalInstance', 'DataSer
     
     $scope.save = function(){
       
-      var promise = DatastoreService.saveProject($scope.row);
-      promise.$promise.then(function(){
-          $scope.reloadProject();  
-          $modalInstance.dismiss();  
-      });
-      
+       $scope.row.Metadata = [];
+
+       //need to make multi-selects into json objects
+       angular.forEach($scope.metadataList, function(md){
+            //flatten multiselect values into an json array string
+            if(md.Values && md.controlType == "multiselect")
+            {
+                md = angular.copy(md);
+                md.Values = angular.toJson(md.Values).toString(); //wow, definitely need tostring here!
+            }
+
+            $scope.row.Metadata.push(md);
+        });
+
+        var promise = DataService.saveProject($scope.row);
+        promise.$promise.then(function(){
+            $scope.reloadProject();  
+            $modalInstance.dismiss();  
+        });
 
     };
 
@@ -250,14 +242,15 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 if(i_property.MetadataPropertyId) //is it a value from project.Metadata? if so then grab the property.
                     property = DataService.getMetadataProperty(i_property.MetadataPropertyId);
 
-              
+                //property var is a "metadataProperty" (not a metadata value)
+
                 //if it isn't already there, add it as an available option
                 if(!(property.Name in scope.metadataList))
                 {
                     scope.metadataList[property.Name] =
                     {
                         field: property.Name,
-                        propertyId: property.Id,
+                        MetadataPropertyId: property.Id,
                         controlType: property.ControlType,
                     };
                 }
@@ -277,17 +270,17 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                         values = i_property.Values.split(",")
                       }
                         
-                      scope.metadataList[property.Name].value = values;
+                      scope.metadataList[property.Name].Values = values;
                   }
                   else
                   {
-                      scope.metadataList[property.Name].value = i_property.Values;
+                      scope.metadataList[property.Name].Values = i_property.Values;
                   }
                 
-                  scope.project.MetadataValue[property.Id] = scope.metadataList[property.Name].value; //make it easy to get values by metadata id.
+                  scope.project.MetadataValue[property.Id] = scope.metadataList[property.Name].Values; //make it easy to get values by metadata id.
                 }
                 else
-                  scope.metadataList[property.Name].value = "";
+                  scope.metadataList[property.Name].Values = "";
 
 
 
@@ -467,32 +460,54 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 ];
 
 
+var projectsController = ['$scope', 'DataService',
+  function(scope, DataService){
+    scope.projects = DataService.getProjects();
+
+        var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '<a title="{{row.getProperty(\'Description\')}}" href="#/projects/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
+                               '</div>';
+
+        scope.gridOptionsFilter = {};
+        scope.gridOptions = {
+            data: 'projects',
+            columnDefs:
+            [
+                {field: 'Program', displayName:'Program', width:'200'},
+                {field: 'ProjectType.Name',displayName:'Type', width: '100'},
+                {field: 'Name', displayName: 'Project Name', cellTemplate: linkTemplate},
+            ],
+            showColumnMenu: true,
+            filterOptions: scope.gridOptionsFilter,
+            multiSelect: false,
+        };
+
+        scope.$watch('projects',function(){
+            if(scope.projects)
+            {
+                //spin through and add a "Program" field to our project that we can display easily in teh grid.
+                angular.forEach(scope.projects, function(project, key){
+                    var program = getByField(project.Metadata,'23','MetadataPropertyId');
+                    var subprogram = getByField(project.Metadata,'24','MetadataPropertyId');
+                  
+                    if(program) project.Program = program.Values;
+
+                    if(subprogram && subprogram.Values != "(None)")
+                      project.Program += " > " + subprogram.Values;
+
+                });
+            }
+        },true);
+
+  }
+];
+
+var loginController = ['$scope','DataService',
+  function(scope, DataService){
+    
+  }
+];
+
 mod_ds.controller('ProjectsCtrl', projectsController);
 mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
-
-/*
-mod_ds.filter('mapStatus', function( StatusesConstant ) {
-  return function(input) {
-    if (StatusesConstant[input]) {
-      return StatusesConstant[input];
-    } else {
-      return 'unknown';
-    }
-  };
-})
-.factory( 'StatusesConstant', function() {
-  return {
-    1: 'Ok',
-    2: 'Flagged'
-  };
-});
-
-mod_ds.factory('ActivityQAStatusesConstant', function(){
-	return {
-		5:"Ready for QA",
-		6:"Approved",
-		7:"Needs Review",
-	};
-});
-*/
 

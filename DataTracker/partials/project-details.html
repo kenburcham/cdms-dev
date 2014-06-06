@@ -38,12 +38,12 @@
                         
                         <tr>
                          <td class="metadata-field">Start Date</td>
-                         <td class="metadata-value"></td>
+                         <td class="metadata-value">{{project.StartDate | date}}</td>
                         </tr>
 
                         <tr>
                          <td class="metadata-field">End Date</td>
-                         <td class="metadata-value"></td>
+                         <td class="metadata-value">{{project.EndDate | date}}</td>
                         </tr>
 
 
@@ -103,20 +103,20 @@
                          <td class="metadata-value">{{project.MetadataValue[8] | arrayValues}}</td>
                         </tr>
 
-                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].value=='Habitat'">
+                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].Values=='Habitat'">
                          <td class="metadata-field">Habitat Objectives</td>
                          <td class="metadata-value">{{project.MetadataValue[10] | arrayValues}}</td>
                         </tr>
                         
-                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].value=='Habitat'">
+                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].Values=='Habitat'">
                          <td class="metadata-field">Limiting Factors</td>
                          <td class="metadata-value">{{project.MetadataValue[21] | arrayValues}}</td>
                         </tr>
-                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].value=='Habitat'">
+                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].Values=='Habitat'">
                          <td class="metadata-field">NOAA Ecological Concerns</td>
                          <td class="metadata-value">{{project.MetadataValue[19] | arrayValues}}</td>
                         </tr>
-                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].value=='Habitat'">
+                        <tr class="habitat-fields" ng-show="metadataList['Sub-program'].Values=='Habitat'">
                          <td class="metadata-field">NOAA Ecological Concerns Sub-Categories</td>
                          <td class="metadata-value">{{project.MetadataValue[18] | arrayValues}}</td>
                         </tr>
