@@ -164,7 +164,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		$scope.datasheetColDefs = [];
         
         $scope.dataSheetDataset = [];
-        $scope.row = {ActivityQAStatus: {}}; //header field values get attached here by dbcolumnname
+        $scope.row = {ActivityQAStatus: {}, activityDate: new Date()}; //header field values get attached here by dbcolumnname
         
 		//datasheet grid
 		$scope.gridDatasheetOptions = {
@@ -189,6 +189,17 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
         	if(!$scope.project) return;
         	//console.dir($scope.project);
 			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+
+			//if there is only one location, just set it to that location
+			if(array_count($scope.locationOptions)==1)
+			{
+				//there will only be one.
+				angular.forEach(Object.keys($scope.locationOptions), function(key){
+					console.log(key);
+					$scope.row['locationId'] = key;	
+				});
+				
+			}
 
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
@@ -226,6 +237,11 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			{
 				$scope.addNewRow();
 			}
+
+			//set defaults for header fields
+			angular.forEach($scope.headerFields, function(headerfield){
+				$scope.row[headerfield.DbColumnName] = (headerfield.DefaultValue) ? headerfield.DefaultValue : null;
+			});
 
 			$scope.row.ActivityQAStatus.QAStatusId = ""+$scope.dataset.DefaultActivityQAStatusId;
 

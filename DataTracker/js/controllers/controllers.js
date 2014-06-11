@@ -141,7 +141,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             };
 
         var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
-                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                                '<img src="images/file_image.png" width="100px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
                                '</a>' +
                                '</div>';
 
@@ -162,12 +162,16 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             filterOptions: scope.FileFilterOptions
         };
 
+        var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
+                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '</a>' +
+                               '</div>';
         scope.GalleryFilterOptions = {};
         scope.gridGallery = {
             data: 'project.Images',
             columnDefs:
             [
-                {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate},
+                {field:'Name',displayName: 'File Name', cellTemplate: galleryLinkTemplate},
                 {field: 'Title'},
                 {field: 'Description'},
                 {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
@@ -482,6 +486,10 @@ var projectsController = ['$scope', 'DataService',
             multiSelect: false,
         };
 
+        scope.locationObjectArray = [];
+        scope.locationObjectIdArray = [];
+        scope.locationObjectIds = "";
+
         scope.$watch('projects',function(){
             if(scope.projects)
             {
@@ -495,10 +503,25 @@ var projectsController = ['$scope', 'DataService',
                     if(subprogram && subprogram.Values != "(None)")
                       project.Program += " > " + subprogram.Values;
 
+                    var primary_location = getByField(project.Locations,3,"LocationTypeId");
+                    if(primary_location)
+                      scope.locationObjectArray.push(primary_location);
                 });
+
+                angular.forEach(scope.locationObjectArray, function(item, key){
+                    scope.locationObjectIdArray.push(item.SdeObjectId);
+                });
+
+                scope.locationObjectIds = scope.locationObjectIdArray.join();
+                console.log("found project locations: " + scope.locationObjectIds);
+
+                if(scope.map && scope.map.locationLayer && scope.map.locationLayer.hasOwnProperty('showLocationsById'))
+                    scope.map.locationLayer.showLocationsById(scope.locationObjectIds); //bump and reload the locations.
+
             }
         },true);
 
+        
   }
 ];
 

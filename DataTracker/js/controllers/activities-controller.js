@@ -346,16 +346,9 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.reloadProjectLocations = function(){
 
-                //console.log("reloading project locations");
                 $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
-                $scope.locationObjectIdArray = [];
-                
-                angular.forEach($scope.locationsArray, function(item, key){
-                    $scope.locationObjectIdArray.push(item.SdeObjectId);
-                });
 
-                $scope.locationObjectIds = $scope.locationObjectIdArray.join();
-                //console.log("found project locations: " + $scope.locationObjectIds);
+                $scope.locationObjectIds = getLocationObjectIdsByType(2,$scope.project.Locations);
 
                 if($scope.map && $scope.map.locationLayer && $scope.map.locationLayer.hasOwnProperty('showLocationsById'))
                     $scope.map.locationLayer.showLocationsById($scope.locationObjectIds); //bump and reload the locations.

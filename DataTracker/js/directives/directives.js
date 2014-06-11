@@ -238,7 +238,7 @@ mod.directive('ctuirSelectField',
             templateUrl: 'partials/dataentry/field-select.html',
             restrict: 'E',
             controller: function($scope, $element, $attrs) {
-                $scope.selectOptions = makeObjectsFromValues($scope.field.DbColumnName, $scope.field.Field.PossibleValues);
+                $scope.selectOptions = makeObjectsFromValues($scope.dataset.DatastoreId+$scope.field.DbColumnName, $scope.field.Field.PossibleValues);
             }
         };
 

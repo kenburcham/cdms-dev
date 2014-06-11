@@ -107,7 +107,7 @@ mod_ac.controller('AdminEditDatasetCtrl', ['$scope','DatastoreService','$modal',
 			angular.forEach($scope.dataset.Fields.sort(orderByAlpha), function(field){
 				//parseField(field, $scope);
 				if(field.Field.PossibleValues)
-					field.Values = makeObjectsFromValues(field.DbColumnName, field.Field.PossibleValues);
+					field.Values = makeObjectsFromValues($scope.dataset.DatastoreId+field.DbColumnName, field.Field.PossibleValues);
 
 				field.SourceId = ""+field.SourceId; //so we can find it in the dropdown!
 				field.InstrumentId = ""+field.InstrumentId;
@@ -176,7 +176,7 @@ mod_ac.controller('AdminEditMasterCtrl', ['$scope','DatastoreService','$modal', 
 				angular.forEach($scope.datastoreFields, function(field){
 					//parseField(field, $scope);
 					if(field.PossibleValues)
-						field.Values = makeObjectsFromValues(field.DbColumnName, field.PossibleValues);
+						field.Values = makeObjectsFromValues($scope.datastore.Id+field.DbColumnName, field.PossibleValues);
 
 				});				
 			

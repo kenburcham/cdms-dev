@@ -14,8 +14,6 @@ var mod = angular.module('DatasetServices', ['ngResource']);
 
 var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
 
-var serviceUrl = '//data.ctuir.org/servicesSTAGE';
-
 //Note: typically you won't want to use these factories directly in your
 // controllers, but rather use the DataService below.
 mod.factory('Projects',['$resource', function(resource){
@@ -715,14 +713,20 @@ mod.service('ActivityParser',[ 'Logger',
             addActivity: function(activities, key, row, headerFields, detailFields){
                 if(!activities.activities[key])
                 {
+
+                    //console.dir(row.activityDate);
+
+                    var a_date = (typeof row.activityDate == "object") ? a_date.toISOString() : new Date(row.activityDate).toISOString();
                     //setup the new activity object structure
                     activities.activities[key] = {
                         LocationId: row.locationId,
-                        ActivityDate: new Date(Date.parse(row.activityDate)).toJSON(),
+                        ActivityDate: a_date,
                         InstrumentId: row.InstrumentId,
                         Header: {},
                         Details: [],
                     };
+
+                    //console.dir(a_date);
 
                     if(row.LastAccuracyCheck)
                     {
@@ -997,22 +1001,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 //fire rules - OnChange
                 
-                try{
-                    //fire Field rule if it exists -- OnChange
-                    if(field.Field.Rule && field.Field.Rule.OnChange){
-                        eval(field.Field.Rule.OnChange);
-                    }
-
-                    //fire Datafield rule if it exists -- OnChange
-                    if(field.Rule && field.Rule.OnChange){
-                        eval(field.Rule.OnChange);
-                    }
-                }catch(e){
-                    //so we don't die if the rule fails....
-                    console.dir(e);
-                }
-            
-
+                fireRules("OnChange", row, field, value, errors);
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
 
@@ -1147,20 +1136,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 // ------------------------------------------
                 if(field && value)
                 {
-                    try{
-                        //fire Field rule if it exists -- OnChange
-                        if(field.Field && field.Field.Rule && field.Field.Rule.OnChange){
-                            eval(field.Field.Rule.OnChange);
-                        }
-
-                        //fire Datafield rule if it exists -- OnChange
-                        if(field.Rule && field.Rule.OnChange){
-                            eval(field.Rule.OnChange);
-                        }
-                    }catch(e){
-                        //so we don't die if the rule fails....
-                        console.dir(e);
-                    }
+                    fireRules("OnChange",row, field, value, []);
                 }
 
                 //this is expensive in that it runs every time a value is changed in the grid.
@@ -1296,8 +1272,8 @@ function makeFieldColDef(field, scope) {
         displayName: field.Label, 
         minWidth: 70, 
         maxWidth: 180,
+        defaultValue: field.DefaultValue
     };
-
 
     //only setup edit templates for fields in grids with cell editing enabled.
     if(scope.gridDatasheetOptions.enableCellEdit)
@@ -1310,13 +1286,15 @@ function makeFieldColDef(field, scope) {
         {
             case 'select':
                 coldef.editableCellTemplate = '<select ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"><option value="" selected="selected"></option></select>';
-                scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(field.DbColumnName, field.Field.PossibleValues);
+                scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(scope.dataset.DatastoreId+field.DbColumnName, field.Field.PossibleValues);
+//                console.log("and we used: " + scope.dataset.DatastoreId+field.DbColumnName + " as the key");
                 break;
             case 'multiselect':
                 //coldef.editableCellTemplate = '<select class="field-multiselect" multiple="true" ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"/>';
                 //coldef.cellTemplate = '<div class="ngCellText cell-multiselect" ng-class="col.colIndex()"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>';
                 coldef.editableCellTemplate = '<select class="field-multiselect" multiple="true" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"/>';
-                scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(field.DbColumnName, field.Field.PossibleValues);
+                scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(scope.dataset.DatastoreId+field.DbColumnName, field.Field.PossibleValues);
+//                console.log("and we used: " + scope.dataset.DatastoreId+field.DbColumnName + " as the key");
                 break;
             case 'date':
                 editableCellTemplate: '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
@@ -1403,6 +1381,7 @@ function parseField(field, scope)
         }
     }
 
+    //setup and parse the rule if there is one.
     try{
         field.Rule = (field.Rule) ? angular.fromJson(field.Rule) : {};
 
@@ -1415,6 +1394,8 @@ function parseField(field, scope)
         console.dir(e);
     }
 
+    fireRules("DefaultValue", null, field, null, null);
+
     field.parsed = true;
 
 }
@@ -1424,8 +1405,9 @@ function makeNewRow(coldefs)
 {
     var obj = {};
 
+    //sets to default value of this field if one is specified as a "DefaultValue" rule; otherwise null
     angular.forEach(coldefs, function(col){
-        obj[col.field] = null
+        obj[col.field] = (col.defaultValue) ?  col.defaultValue : null; 
     });
 
     obj.isValid=true;
@@ -1453,7 +1435,6 @@ function makeObjects(optionList, keyProperty, valueProperty)
 //give us a unique key to reference it by for caching.
 function makeObjectsFromValues(key, valuesList)
 {
-//    console.log("KEY: "+ key);
     var objects = angular.rootScope.Cache[key]; //see if we have it squirreled away in our cache
 
     if(!objects)
@@ -1614,26 +1595,9 @@ if(field.DbColumnName == "FinClip")
 }
 */
 
+    fireRules("OnValidate",row,field,value,row_errors);
 
-    try{
-        //fire Field rule if it exists -- OnValidate
-        if(field.Field && field.Field.Rule && field.Field.Rule.OnValidate)
-        {
-            //console.log("Running master rule: "+ field.Field.Rule.OnValidate);
-            eval(field.Field.Rule.OnValidate);
-        }
-
-        //fire Datafield rule if it exists -- OnValidate
-        if(field.Rule && field.Rule.OnValidate)
-        {
-            //console.log("Running datafield rule: " + field.Rule.OnValidate);
-            eval(field.Rule.OnValidate);
-        }
-    }catch(e){
-        console.log("An error occurred processing a rule: ");
-        console.dir(e);
-    }
-
+    
 }
    
 function stringIsNumber(s) {
@@ -1951,3 +1915,47 @@ function populateMetadataDropdowns(scope, property)
         scope.CellOptions[property.Id+'_Options'] = makeObjectsFromValues(property.Id+"_Options", property.PossibleValues);
     }
 };
+
+function getLocationObjectIdsByType(type, locations)
+{
+    //console.log("reloading project locations");
+    var locationsArray = getMatchingByField(locations,type,"LocationTypeId");
+    var locationObjectIdArray = [];
+
+    angular.forEach(locationsArray, function(item, key){
+        locationObjectIdArray.push(item.SdeObjectId);
+    });
+
+    var locationObjectIds = locationObjectIdArray.join();
+    console.log("found project locations: " + locationObjectIds);
+
+    return locationObjectIds;
+}
+
+function fireRules(type, row, field, value, errors)
+{
+    var row_errors = errors; //older rules use "row_errors"
+    try{
+        //fire Field rule if it exists -- OnChange
+        if(field.Field && field.Field.Rule && field.Field.Rule[type]){
+            //console.log("Dataset field rule: " + field.Field.Rule[type]);
+            if(type == "DefaultValue")
+                field.DefaultValue = field.Field.Rule[type];
+            else
+                eval(field.Field.Rule[type]);
+        }
+
+        //fire Datafield rule if it exists -- OnChange
+        if(field.Rule && field.Rule[type]){
+            //console.log("Master field rule: " + field.Rule[type]);
+            if(type=="DefaultValue")
+                field.DefaultValue = field.Rule[type];
+            else
+                eval(field.Rule[type]);
+        }
+    }catch(e){
+        //so we don't die if the rule fails....
+        console.dir(e);
+    }
+
+}

@@ -480,3 +480,39 @@ table.metadata td
 	border-radius:6px;
 	padding: 8px;
 }
+
+.basemap-menu {
+	color: white;
+	border: none;
+	padding: 10px;
+	padding-top: 12px;
+	padding-bottom: 15px;
+
+}
+
+.basemap-menu:hover
+{
+	background-color: #157ab5;
+}
+
+.basemap-menu .dijitButtonNode {
+	border: none;
+}
+
+.dijitMenuItemLabel {
+	padding-left: 8px !important;
+	padding-right: 8px !important;
+	padding-top: 5px !important;
+	padding-bottom: 10px !important;
+}
+
+.dijitMenuTable {
+	margin-top: 18px !important;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.dijitMenuItemSelected, .digitMenuItemHover
+{
+	background-color: #157ab5 !important;	
+}

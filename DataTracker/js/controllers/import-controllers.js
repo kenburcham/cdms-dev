@@ -31,7 +31,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.existingActivitiesLoad = DataService.getActivities($routeParams.Id);
 			$scope.existingActivities = [];
 
-			$scope.ActivityFields = { QAComments: DEFAULT_IMPORT_QACOMMENT };
+			$scope.ActivityFields = { QAComments: DEFAULT_IMPORT_QACOMMENT, ActivityDate: new Date() };
 
 			$scope.UploadResults = {};
 			$scope.UploadResults.errors = [];
@@ -80,7 +80,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	    		if($routeParams.LocationId){
 	    			$scope.ActivityFields.LocationId = $routeParams.LocationId;
 	    			$scope.setLocation();
+
+	    		//single location?  go ahead and set it to the default.
+	    		}else if(array_count($scope.locationOptions) == 1){ 
+	    			angular.forEach(Object.keys($scope.locationOptions), function(key){
+	    				$scope.ActivityFields.LocationId = key;	
+	    				$scope.setLocation();
+	    			});
 	    		}
+
+
 
 					
 	        });
@@ -293,7 +302,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 					});
 
-    				
+    				//set defaults for header fields
+					angular.forEach($scope.headerFields, function(headerfield){
+						$scope.row[headerfield.DbColumnName] = (headerfield.DefaultValue) ? headerfield.DefaultValue : null;
+					});
 
 					//if we have more than 1 row qa status then show them.
 		    		if($scope.dataset.RowQAStatuses.length > 1)
@@ -401,12 +413,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						$scope.errors.push("Please select an activity location.");
 				}
 
+				if($scope.mappedActivityFields[ACTIVITY_DATE])
+					$scope.ActivityFields.ActivityDate = $scope.mappedActivityFields[ACTIVITY_DATE];
+
 				if(!$scope.ActivityFields.ActivityDate)
 				{
-					if($scope.mappedActivityFields[ACTIVITY_DATE])
-						$scope.ActivityFields.ActivityDate = $scope.mappedActivityFields[ACTIVITY_DATE];
-					else
-						$scope.errors.push("Please select an activity date or map a date source field.");
+					$scope.errors.push("Please select an activity date or map a date source field.");
 				}
 
 				if(!$scope.ActivityFields.QAStatusId)

@@ -50,7 +50,7 @@ var ngMoveSelectionHandler = function($scope, elm, evt, grid) {
     if (charCode !== 37 && charCode !== 38 && charCode !== 39 && charCode !== 40 && charCode !== 9 && charCode !== 13) {
         return true;
     }
-    if ($scope.enableCellSelection) {
+    if ($scope.enableCellSelection) { 
         if (charCode === 9) { 
             evt.preventDefault();
         }

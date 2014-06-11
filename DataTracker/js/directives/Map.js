@@ -1,9 +1,26 @@
+
+var BING_KEY = "AuaAtT6zhx1rfuP1hR_e0zh5pxy6u7Echhe9KbwfCcQRG_Y_ewSg5OcFDm-DF-8w";
+var DEFAULT_BASEMAP = "BingMapsRoad";
+
+var basemapConfig = [
+       // { type: 'streets', title: 'ESRI Roads'},
+        //{ type: 'topo', title: 'Topographical'},
+        //{ type: 'hybrid', title: 'Hybrid' },
+        { type: 'BingMapsRoad', title: 'Roads' },
+        { type: 'BingMapsAerial', title: 'Aerial' },
+        { type: 'BingMapsHybrid', title: 'Hybrid' },
+];
+
+
 define([
   'app',
   'esri/map',
   'esri/geometry/Point',
   'esri/dijit/InfoWindow',
-  'esri/InfoTemplate'
+  'esri/InfoTemplate',
+  'esri/dijit/BasemapLayer',
+  'esri/dijit/BasemapGallery',
+  'esri/dijit/Basemap'
 ], function (app, Map, Point, InfoWindow, InfoTemplate) {
 
   // register a new directive called esriMap with our app
@@ -46,14 +63,12 @@ define([
         var mapOptions = {
           center: ($attrs.center) ? $attrs.center.split(",") : $scope.center,
           zoom: ($attrs.zoom) ? $attrs.zoom : $scope.zoom,
-          basemap: ($attrs.basemap) ? $attrs.basemap : $scope.basemap,
-        
+          basemap: 'streets', //($attrs.basemap) ? $attrs.basemap : $scope.basemap,
         };
 
         // declare our map
         var map = new Map($attrs.id, mapOptions);
 
-        
         // start exposing an API by setting properties on "this" which is our controller
         // lets expose the "addLayer" method so child directives can add themselves to the map
         this.addLayer = function(layer, filter){
@@ -61,6 +76,21 @@ define([
 
 //          console.log("Added layer to map");
 //          console.log("layer_"+layer.id);
+
+            //setup our layer locationid function so we can all it again sometime
+            layer.showLocationsById = function(locationObjectIds){
+              try{
+                this.clearSelection();
+                var definitionExpression = "OBJECTID IN (" + locationObjectIds + ")";
+                console.log("Definition expression: " + definitionExpression);
+                this.setDefinitionExpression(definitionExpression);
+                this.refresh();
+              }catch(e)
+
+              {
+                console.dir(e);
+              }                  
+            };
 
           if(filter && filter == "location")
           {
@@ -71,15 +101,6 @@ define([
                   //skip the first run
                   if(typeof $scope.locationObjectIds == "undefined")
                     return;
-
-                  //setup our layer locationid function so we can all it again sometime
-                  layer.showLocationsById = function(locationObjectIds){
-                      this.clearSelection();
-                      var definitionExpression = "OBJECTID IN (" + locationObjectIds + ")";
-                      console.log("Definition expression: " + definitionExpression);
-                      this.setDefinitionExpression(definitionExpression);
-                      this.refresh();
-                  };
                   
                   layer.showLocationsById($scope.locationObjectIds); // now call it
 
@@ -116,6 +137,10 @@ define([
           });
         });
 
+        map.on("load", function(e){
+          createBasemapDropdown(map);
+        });
+
         $scope.map = map;
         //map.resize();
         
@@ -125,3 +150,70 @@ define([
     };
   });
 });
+
+
+//In order to use bing maps, we have to use a basemapGallery.
+//  A dojo menu div named "basemapMenu" is required to exist
+//  and we fill it up with the configured map options.
+function createBasemapDropdown(map) {
+        console.dir(map);
+      var basemapGallery
+
+      //create an array of Basemap objects corresponding to the above list
+      var basemaps = dojo.map(basemapConfig, function (item) {
+          return new esri.dijit.Basemap({
+              layers: [new esri.dijit.BasemapLayer({
+                  type: item.type
+              })], id: item.type, title: item.title
+          });
+      });
+
+      console.dir(basemaps);
+
+      try{
+
+          basemapGallery = new esri.dijit.BasemapGallery({
+              basemaps: basemaps,
+              //showArcGISBasemaps: true,
+              bingMapsKey: BING_KEY,
+              map: map,
+          });
+
+
+
+          //add each one to the existing "basemapMenu" dropdown and wire up an onclick to set the basemap.
+          dojo.forEach(basemaps, function (basemap) {
+
+            var menu = dijit.byId("basemapMenu");
+
+              //clear out any that exist.
+              if(menu.hasChildren())
+              angular.forEach(menu.getChildren, function(child){
+                console.log("removing a child...");
+                  menu.removeChild(child);
+              });
+
+              menu.addChild(new dijit.MenuItem({
+                  label: basemap.title,
+                  onClick: dojo.hitch(this, function () {
+                      if (basemap.id == "streets")
+                          projectMap.setBasemap(basemap.id);
+                      else {
+                          basemapGallery.select(basemap.id);
+                          //projectMap.setBasemap(basemap.id);
+                      }
+                      
+                  })
+              }));
+          });
+
+          basemapGallery.select("BingMapsRoad");
+
+      } catch (e) {
+        console.log("----------------------------------------------------");
+
+          console.dir(e);
+      }
+
+      return basemapGallery;
+}
