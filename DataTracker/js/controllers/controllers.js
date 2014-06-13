@@ -117,8 +117,8 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
     scope.filteredUsers = false;
     scope.allInstruments = DatastoreService.getAllInstruments();
     scope.CellOptions = {}; //for metadata dropdown options
+    
     scope.metadataList = {}; 
-
     scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID); 
     scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
 
@@ -208,7 +208,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 }
 
                 //add in the metadata to our metadataList that came with this dataset
-                scope.addMetadataProperties(scope.project.Metadata);
+                addMetadataProperties(scope.project.Metadata, scope.metadataList, scope, DataService);
                 
                 scope.mapHtml = $sce.trustAsHtml(scope.project.MetadataValue[25]);
                 scope.imagesHtml = $sce.trustAsHtml(scope.project.MetadataValue[13]);
@@ -217,7 +217,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 //get habitat (and possibly other?) metadata values for this project.  they don't come with project metadata as they are their own category.
                 var habitatProjectMetadataPromise = DataService.getMetadataFor(scope.project.Id, METADATA_ENTITY_HABITATTYPEID);
                 habitatProjectMetadataPromise.$promise.then(function(list){
-                    scope.addMetadataProperties(list);
+                    addMetadataProperties(list, scope.metadataList, scope, DataService);
                 });
 
             }
@@ -230,73 +230,14 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
 
         scope.metadataPropertiesPromise.promise.then(function(list){
-            scope.addMetadataProperties(list);
+            addMetadataProperties(list, scope.metadataList, scope, DataService);
         });
 
         scope.habitatPropertiesPromise.promise.then(function(list){
-            scope.addMetadataProperties(list);
+            addMetadataProperties(list, scope.metadataList, scope, DataService);
         });
           
-        //might be a list of metadata values from project.Metadata or a list of actual properties.
-        scope.addMetadataProperties = function(metadata_list)
-        {
-            angular.forEach(metadata_list, function(i_property, key){
-              
-                var property = i_property;
-                if(i_property.MetadataPropertyId) //is it a value from project.Metadata? if so then grab the property.
-                    property = DataService.getMetadataProperty(i_property.MetadataPropertyId);
-
-                //property var is a "metadataProperty" (not a metadata value)
-
-                //if it isn't already there, add it as an available option
-                if(!(property.Name in scope.metadataList))
-                {
-                    scope.metadataList[property.Name] =
-                    {
-                        field: property.Name,
-                        MetadataPropertyId: property.Id,
-                        controlType: property.ControlType,
-                    };
-                }
-
-                //set the value no matter what if we have it.
-                if(i_property.Values)
-                {
-                  if(property.ControlType == "multiselect")
-                  {
-                      //need to see if we are dealing with old style (just a list) or if it is a bonafide object.
-                      var values;
-                      try{
-                        values = angular.fromJson(i_property.Values);
-                      }
-                      catch(e)  //if we can't then it wasn't an object... use split instead.
-                      {
-                        values = i_property.Values.split(",")
-                      }
-                        
-                      scope.metadataList[property.Name].Values = values;
-                  }
-                  else
-                  {
-                      scope.metadataList[property.Name].Values = i_property.Values;
-                  }
-                
-                  scope.project.MetadataValue[property.Id] = scope.metadataList[property.Name].Values; //make it easy to get values by metadata id.
-                }
-                else
-                  scope.metadataList[property.Name].Values = "";
-
-
-
-                if(property.PossibleValues)
-                {
-                  populateMetadataDropdowns(scope,property); //setup the dropdown
-                  scope.metadataList[property.Name].options = scope.CellOptions[property.Id+"_Options"];      
-                }
-
-                
-            });
-        }
+        
 
 
          scope.openAccuracyCheckForm = function(){
@@ -464,9 +405,22 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 ];
 
 
-var projectsController = ['$scope', 'DataService',
-  function(scope, DataService){
+var projectsController = ['$scope', 'DataService', '$modal',
+  function(scope, DataService, $modal){
     scope.projects = DataService.getProjects();
+    
+    scope.CellOptions = {}; //for metadata dropdown options
+    scope.metadataList = {}; 
+    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID); 
+    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
+
+    scope.metadataPropertiesPromise.promise.then(function(list){
+        addMetadataProperties(list, scope.metadataList, scope, DataService);
+    });
+
+    scope.habitatPropertiesPromise.promise.then(function(list){
+        addMetadataProperties(list, scope.metadataList, scope, DataService);
+    });
 
         var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
                                '<a title="{{row.getProperty(\'Description\')}}" href="#/projects/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
@@ -477,7 +431,7 @@ var projectsController = ['$scope', 'DataService',
             data: 'projects',
             columnDefs:
             [
-                {field: 'Program', displayName:'Program', width:'200'},
+                {field: 'Program', displayName:'Program', width:'230'},
                 {field: 'ProjectType.Name',displayName:'Type', width: '100'},
                 {field: 'Name', displayName: 'Project Name', cellTemplate: linkTemplate},
             ],
@@ -489,6 +443,20 @@ var projectsController = ['$scope', 'DataService',
         scope.locationObjectArray = [];
         scope.locationObjectIdArray = [];
         scope.locationObjectIds = "";
+
+        scope.reloadProject = function()
+        {
+            scope.projects = DataService.getProjects();
+        };
+
+        scope.openAddProject = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/project/modal-edit-project.html',
+              controller: 'ModalProjectEditorCtrl',
+              scope: scope, //very important to pass the scope along... 
+        
+            });  
+        };
 
         scope.$watch('projects',function(){
             if(scope.projects)
@@ -534,3 +502,64 @@ var loginController = ['$scope','DataService',
 mod_ds.controller('ProjectsCtrl', projectsController);
 mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
 
+//might be a list of metadata values from project.Metadata or a list of actual properties.
+function addMetadataProperties(metadata_list, all_metadata, scope, DataService)
+{
+    angular.forEach(metadata_list, function(i_property, key){
+      
+        var property = i_property;
+        if(i_property.MetadataPropertyId) //is it a value from project.Metadata? if so then grab the property.
+            property = DataService.getMetadataProperty(i_property.MetadataPropertyId);
+
+        //property var is a "metadataProperty" (not a metadata value)
+
+        //if it isn't already there, add it as an available option
+        if(!(property.Name in all_metadata))
+        {
+            scope.metadataList[property.Name] =
+            {
+                field: property.Name,
+                MetadataPropertyId: property.Id,
+                controlType: property.ControlType,
+            };
+        }
+
+        //set the value no matter what if we have it.
+        if(i_property.Values)
+        {
+          if(property.ControlType == "multiselect")
+          {
+              //need to see if we are dealing with old style (just a list) or if it is a bonafide object.
+              var values;
+              try{
+                values = angular.fromJson(i_property.Values);
+              }
+              catch(e)  //if we can't then it wasn't an object... use split instead.
+              {
+                values = i_property.Values.split(",")
+              }
+                
+              all_metadata[property.Name].Values = values;
+          }
+          else
+          {
+              all_metadata[property.Name].Values = i_property.Values;
+          }
+        
+          if(scope.project)
+              scope.project.MetadataValue[property.Id] = all_metadata[property.Name].Values; //make it easy to get values by metadata id.
+        }
+        else
+          all_metadata[property.Name].Values = "";
+
+
+
+        if(property.PossibleValues)
+        {
+          populateMetadataDropdowns(scope,property); //setup the dropdown
+          all_metadata[property.Name].options = scope.CellOptions[property.Id+"_Options"];      
+        }
+
+        
+    });
+};
