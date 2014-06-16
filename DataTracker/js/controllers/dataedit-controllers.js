@@ -95,6 +95,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         	$scope.row['locationId'] = ""+$scope.dataset_activities.Header.Activity.LocationId; //note the conversion of this to a string!
         	$scope.row['InstrumentId'] = $scope.dataset_activities.Header.Activity.InstrumentId; 
         	$scope.row['AccuracyCheckId'] = $scope.dataset_activities.Header.Activity.AccuracyCheckId; 
+        	$scope.row['PostAccuracyCheckId'] = $scope.dataset_activities.Header.Activity.PostAccuracyCheckId; 
 
         	if($scope.dataset_activities.Header.Activity.ActivityQAStatus)
         	{
@@ -204,8 +205,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 		};
 
 		$scope.selectAccuracyCheck = function(){
-			if($scope.row.AccuracyCheckId)
-				$scope.row.LastAccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
+			//if($scope.row.AccuracyCheckId)
+			//	$scope.row.AccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
 		};
 
 

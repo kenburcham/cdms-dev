@@ -47,8 +47,15 @@
 
                 <div class="header-label">Accuracy Check: </div>
                 <div class="header-value">
-                    <select class="form-control" ng-model="row.AccuracyCheckId" ng-change="selectAccuracyCheck()">
+                    <select class="form-control" ng-model="row.AccuracyCheckId">
                         <option ng-repeat="check in viewInstrument.AccuracyChecks" ng-selected="check.Id == row.AccuracyCheckId" value="{{check.Id}}">{{getDataGrade(check)}} on {{check.CheckDate | date}}</option>
+                    </select>
+                </div>
+
+                <div class="header-label">Post-deploy Accuracy: </div>
+                <div class="header-value">
+                    <select class="form-control" ng-model="row.PostAccuracyCheckId">
+                        <option ng-repeat="check in viewInstrument.AccuracyChecks" ng-selected="check.Id == row.PostAccuracyCheckId" value="{{check.Id}}">{{getDataGrade(check)}} on {{check.CheckDate | date}}</option>
                     </select>
                 </div>
 

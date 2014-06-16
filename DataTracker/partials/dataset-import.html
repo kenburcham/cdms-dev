@@ -30,11 +30,11 @@
 
                 <input type="file" ng-file-select="onFileSelect($files)" value="{{file.name}}">
                 
-                <div style="margin: 10px;" ng-show="openAdvanced==true">
-                    <div class="right" style="margin-right: 40px;">
+                <div ng-show="openAdvanced==true">
+                    <div class="right" style="margin-right: 10px;">
                         <input type="text" size="3" ng-model="startOnLine" ng-init="startOnLine=1"/>
                     </div>
-                    <div>Columns on line:</div>
+                    <div>Column headers start on line:</div>
                 </div>
 
                 <br/>
@@ -42,7 +42,7 @@
                 <button class="btn btn-primary right" ng-disabled="!file" ng-click="uploadFile()">Load >></button>
                 <br/>
                 <div style="margin-top: 80px">
-                    <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Column headers on line 1</a>
+                    <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Column headers start on line: 1</a>
                 </div>
                 
             </div>
@@ -80,14 +80,11 @@
                 <tr ng-show="project.Instruments.length > 0" >
                     <td>Instrument: </td>
                     <td>
+
+                        <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 170px; margin-top: 4px;" ng-model="ActivityFields.InstrumentId">
+                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+                        </select>
                         
-                        <select class="form-control" ng-model="ActivityFields.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
-                        
-                        <div ng-show="ActivityFields.DataGradeText">
-                            <a href title="Accuracy Checks" ng-click="openAccuracyCheckModal()">
-                                <span ng-show="ActivityFields.DataGradeText">Grade: {{ActivityFields.DataGradeText}} on {{ActivityFields.LastAccuracyCheck.CheckDate | date}} </span>
-                            </a>
-                        </div>
                     </td>
                 </tr>
 
@@ -148,16 +145,27 @@
                     </div>
 
                     <div ng-show="project.Instruments.length > 0" >
-
                         <div class="header-label">Instrument: </div>
+                        <div class="header-value">                            
+                            <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 170px; margin-top: 4px; margin-bottom: 4px;" ng-model="ActivityFields.InstrumentId">
+                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+                            </select>
+
+                        </div>
+
+                        <div class="header-label">Pre-deploy Accuracy: </div>
+                        <div class="right"><a href title="Accuracy Checks" ng-click="openAccuracyCheckModal()">manage</a></div>
                         <div class="header-value">
-                            
-                            <select class="form-control" ng-model="ActivityFields.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
-                            
-                            <div ng-show="ActivityFields.DataGradeText">
-                            <a href ng-click="openAccuracyCheckModal()">
-                                <span style="margin-left: 200px" ng-show="ActivityFields.DataGradeText">Grade: {{ActivityFields.DataGradeText}} on {{ActivityFields.LastAccuracyCheck.CheckDate | date}} </span>
-                            </a></div>
+                            <select class="form-control" ng-model="row.AccuracyCheckId">
+                                <option ng-repeat="check in viewInstrument.AccuracyChecks" ng-selected="check.Id == row.AccuracyCheckId" value="{{check.Id}}">{{getDataGrade(check)}} on {{check.CheckDate | date}}</option>
+                            </select>
+                        </div>
+
+                        <div class="header-label">Post-deploy Accuracy: </div>
+                        <div class="header-value">
+                            <select class="form-control" ng-model="row.PostAccuracyCheckId">
+                                <option ng-repeat="check in viewInstrument.AccuracyChecks" ng-selected="check.Id == row.PostAccuracyCheckId" value="{{check.Id}}">{{getDataGrade(check)}} on {{check.CheckDate | date}}</option>
+                            </select>
                         </div>
 
                     </div>
@@ -215,3 +223,4 @@
     </div>
 
 </div>
+

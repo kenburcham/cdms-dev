@@ -29,8 +29,11 @@
                 <div class="header-label">Instrument: </div>
                 <div class="header-value">{{grid.Header.Activity.Instrument.Name}} (SN:{{grid.Header.Activity.Instrument.SerialNumber}})</div>
 
-                <div class="header-label">Data Grade: </div>
+                <div class="header-label">Deploy Grade: </div>
                 <div class="header-value">{{getDataGrade(grid.Header.Activity.AccuracyCheck)}} on {{grid.Header.Activity.AccuracyCheck.CheckDate | date}}</div>
+
+                <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-label">Post-Deploy Grade: </div>
+                <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-value">{{getDataGrade(grid.Header.Activity.PostAccuracyCheck)}} on {{grid.Header.Activity.PostAccuracyCheck.CheckDate | date}}</div>
 
             </div>
 

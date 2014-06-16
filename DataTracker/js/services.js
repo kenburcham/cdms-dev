@@ -716,7 +716,7 @@ mod.service('ActivityParser',[ 'Logger',
 
                     //console.dir(row.activityDate);
 
-                    var a_date = (typeof row.activityDate == "object") ? a_date.toISOString() : new Date(row.activityDate).toISOString();
+                    var a_date = new Date(row.activityDate).toISOString();
                     //setup the new activity object structure
                     activities.activities[key] = {
                         LocationId: row.locationId,
@@ -726,12 +726,11 @@ mod.service('ActivityParser',[ 'Logger',
                         Details: [],
                     };
 
-                    //console.dir(a_date);
+                    if(row.AccuracyCheckId)
+                        activities.activities[key].AccuracyCheckId = row.AccuracyCheckId;
 
-                    if(row.LastAccuracyCheck)
-                    {
-                        activities.activities[key].AccuracyCheckId = row.LastAccuracyCheck.Id;
-                    }
+                    if(row.PostAccuracyCheckId)
+                        activities.activities[key].PostAccuracyCheckId = row.PostAccuracyCheckId;
 
                     //add in activityqa if there isn't one (now required)
                     if(!row.ActivityQAStatus)

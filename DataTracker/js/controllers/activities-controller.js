@@ -226,9 +226,6 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 if(e.graphic)
                 {
                       //filter activities based on the location they clicked.
-                      if(!$scope.allActivities)
-                            $scope.allActivities = $scope.activities;
-
                       var filterActivities = [];
                       var location = getByField($scope.locationsArray,e.graphic.attributes.OBJECTID,"SdeObjectId");
 
@@ -378,6 +375,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 $scope.loading = true;
                 if($scope.activities && $scope.activities.$resolved)
                 {
+
+                    if(!$scope.allActivities)
+                       $scope.allActivities = $scope.activities;
+
                     $scope.loading = false;
                     
                     if($scope.activities.length > 0)

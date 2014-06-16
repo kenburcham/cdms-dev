@@ -173,8 +173,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.selectInstrument = function(){
 				//get latest accuracy check
 				$scope.viewInstrument = getByField($scope.project.Instruments, $scope.ActivityFields.InstrumentId, "Id");
-				$scope.ActivityFields.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
-				$scope.ActivityFields.DataGradeText = getDataGrade($scope.ActivityFields.LastAccuracyCheck) ;
+				if($scope.viewInstrument.AccuracyChecks)
+					$scope.row.AccuracyCheckId = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1].Id; //set to last one
 			};
 
 			$scope.toggleDuplicates = function(){
