@@ -207,6 +207,13 @@ mod.factory('SaveProject', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/SaveProject');
 }]);
 
+
+mod.factory('GetHeadersDataForDataset', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetHeadersDataForDataset');
+}]);
+
+
+
 mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies',
     function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies){
         var service = {
@@ -331,8 +338,8 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
     }
 ]);
 
-mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject',
-    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject){
+mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset',
+    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset){
     var service = {
         
         //our "singleton cache" kinda thing
@@ -368,6 +375,10 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
             
             service.dataset = Datasets.query({id: datasetId});
             return service.dataset;
+        },
+
+        getHeadersDataForDataset: function(datasetId) {
+            return GetHeadersDataForDataset.query({id: datasetId});
         },
 
         getActivityData: function(id) {

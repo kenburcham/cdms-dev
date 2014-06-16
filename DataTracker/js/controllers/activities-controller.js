@@ -91,6 +91,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.saveResults = null;
             $scope.isFavorite = $rootScope.Profile.isDatasetFavorite($routeParams.Id);
             $scope.allActivities = null;
+            $scope.headerdata = DataService.getHeadersDataForDataset($routeParams.Id);
 
             //console.log("Profile = ");
             //console.dir($rootScope.Profile);
@@ -115,6 +116,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px'},
                         {field:'Location.Label',displayName: 'Location'},
                         {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
+                        {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px'},
@@ -367,6 +369,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     $scope.columnDefs[0].visible = false;
                     $scope.columnDefs[2].visible = true;
                     $scope.columnDefs[3].visible = true;
+                    $scope.columnDefs[4].visible = true;
                 }
 
             });
@@ -387,6 +390,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                             $rootScope.GridActivities = $scope.gridOptions.ngGrid.data;
                         });
                     }
+
                 }
 
                 //turn off the wheel of fishies
@@ -394,6 +398,16 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     $scope.loading = false;
                 
             });
+
+            //Maybe there is a better way?!
+            $scope.activities.$promise.then(function(){
+                $scope.headerdata.$promise.then(function(){
+                    angular.forEach($scope.activities, function(activity, key){
+                        activity.headerdata = getByField($scope.headerdata, activity.Id, "ActivityId");
+                    });
+                });
+            });
+
 
             $scope.openQueryWindow = function(p) {
             	$location.path("/datasetquery/"+$scope.dataset.Id);
