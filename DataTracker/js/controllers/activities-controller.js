@@ -28,7 +28,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
         $scope.waterbodies = DatastoreService.getWaterBodies();
 
         $scope.save = function(){
-            
+            $scope.locationErrorMessage = undefined;
             //OK -- if we are saving a NEW location then start off by adding the point to the featurelayer
             if(!$scope.row.Id)
             {
@@ -50,17 +50,27 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
                     }
                     else
                     {
-                        $scope.errorMessage = "There was a problem saving that location.";
+                        $scope.locationErrorMessage = "There was a problem saving that location.";
                     }
 
                 });
             }
             else //updating an existing...
             {
-                var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
+                //need to remove these info objects for saving
+                var save_row = angular.copy($scope.row);
+                    save_row.LocationType = undefined;
+                    save_row.WaterBody = undefined;
+
+                var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, save_row);
                 promise.$promise.then(function(){
-                    //done updating.
+                    //success
+                    $scope.reloadActivities();
                     $modalInstance.dismiss();                 
+                },
+                function(){
+                    //failed
+                    $scope.locationErrorMessage = "There was a problem saving that location.";
                 });
             }
 
@@ -355,6 +365,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 //console.log("Project locations loaded!");
 
             };      
+
+            $scope.reloadActivities = function(){
+                $scope.activities = DataService.getActivities($routeParams.Id);
+            }
 
             $scope.$watch('dataset.Fields', function() { 
                 if(!$scope.dataset.Fields ) return;

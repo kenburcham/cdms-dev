@@ -562,10 +562,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					//now that the row is populated with import values, lets spin through each filed again and fire any rules
 					//* ---- Run the rules for each field on this row ---- *//
 					var row = new_row;
-					//console.log("Ok, now we'll run the rules...");
+					//console.log("Ok, now we'll run the rules for each column in this row");
 					angular.forEach($scope.mapping, function(field, col){
 						
-						var value = new_row[col];
+						var value = row[field.DbColumnName];
 						
 						 try{
 	                        //fire Field rule if it exists -- OnChange

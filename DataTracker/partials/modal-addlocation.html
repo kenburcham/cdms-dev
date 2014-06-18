@@ -3,6 +3,9 @@
 	<div class="modal-content">
 		<div class="modal-header">
             <h3>{{headingMessage}}</h3>
+            <div>    
+                <p ng-show="locationErrorMessage" class="alert alert-danger">{{locationErrorMessage}}</p>
+            </div>
         </div>
         <div class="modal-body">
         <form name="form" class="css-form" novalidate>

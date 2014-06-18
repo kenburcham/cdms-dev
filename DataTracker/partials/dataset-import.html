@@ -147,7 +147,7 @@
                     <div ng-show="project.Instruments.length > 0" >
                         <div class="header-label">Instrument: </div>
                         <div class="header-value">                            
-                            <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 170px; margin-top: 4px; margin-bottom: 4px;" ng-model="ActivityFields.InstrumentId">
+                            <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 200px; margin-top: 4px; margin-bottom: 4px;" ng-model="ActivityFields.InstrumentId">
                                 <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
                             </select>
 
