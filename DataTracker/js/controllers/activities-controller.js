@@ -362,7 +362,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
                 $scope.QAStatusList = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
 
-                //hide irrelevant fields
+                //hide irrelevant fields TODO -- code smell pretty ripe here...  genericize
                 if($scope.dataset.Datastore.Name == 'Water Temperature')
                 {
                     console.log("showing fields");
