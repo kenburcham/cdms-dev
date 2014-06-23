@@ -109,8 +109,84 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
 
 
 
-var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal','$sce',
-	function(scope, routeParams, DataService, DatastoreService, $rootScope, $modal,$sce){
+mod_ds.controller('ModalEditFileCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    $scope.header_message = "Edit file";
+
+    $scope.save = function(){      
+        var promise = DatastoreService.updateFile($scope.project.Id, $scope.row);
+        promise.$promise.then(function(){
+            $scope.reloadProject();  
+            $modalInstance.dismiss();  
+        });
+    };
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss();
+    };
+  }
+]);
+
+
+
+mod_ds.controller('ModalNewFileCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService', '$upload',
+  function($scope,  $modalInstance, DataService, DatastoreService, $upload){
+
+    $scope.header_message = "Add file(s) to "+$scope.project.Name;
+
+    $scope.onFileSelect = function($files)
+    {
+          $scope.uploadFiles = $files;              
+          console.dir($scope.uploadFiles);
+    };
+      
+    $scope.save = function(){      
+
+      $scope.uploadErrorMessage = undefined;
+
+      for(var i = 0; i < $scope.uploadFiles.length; i++)
+      {
+          var file = $scope.uploadFiles[i];
+          
+          if(file.success != "Success")
+          {
+            $scope.upload = $upload.upload({
+              url: serviceUrl + '/data/UploadProjectFile', 
+              method: "POST",
+              // headers: {'headerKey': 'headerValue'},
+              // withCredential: true,
+              data: {ProjectId: $scope.project.Id, Description: file.Info.Description, Title: file.Info.Title},
+              file: file,
+
+            }).progress(function(evt) {
+                console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+            }).success(function(data, status, headers, config) {
+               config.file.success = "Success";
+            })
+            .error(function(data, status, headers, config) {
+                $scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
+                //console.log(file.name + " was error.");
+                config.file.success = "Failed";
+              });
+          }
+      }
+         
+    };
+
+    $scope.cancel = function(){
+      if($scope.uploadFiles)
+        $scope.reloadProject();  
+
+      $modalInstance.dismiss();
+    };
+  }
+]);
+
+
+
+var projectDatasetsController = ['$scope', '$routeParams', 'DataService','DatastoreService', '$rootScope','$modal','$sce','$window',
+	function(scope, routeParams, DataService, DatastoreService, $rootScope, $modal,$sce, $window){
 		scope.datasets = DataService.getProjectDatasets(routeParams.Id);
     scope.project = DataService.getProject(routeParams.Id);
     scope.currentUserId = $rootScope.Profile.Id;
@@ -140,7 +216,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             		]	
             };
 
-        var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
+        var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
                                 '<img src="images/file_image.png" width="100px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
                                '</a>' +
                                '</div>';
@@ -148,39 +224,88 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
         var uploadedBy = '<div class="ngCellText" ng-class="col.colIndex()">' + 
                                '{{row.getProperty("UploadDate")|date}} by {{row.getProperty("User.Fullname")}}' +
                                '</div>';                               
+        
+        scope.fileSelection = []; 
         scope.FileFilterOptions = {};
         scope.gridFiles = {
             data: 'project.Docs',
             columnDefs:
             [
-                {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate},
+                {field:'Name',displayName: 'File Name', cellTemplate: fileLinkTemplate, width: "18%"},
                 {field: 'Title'},
                 {field: 'Description'},
-                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
-                {field: 'Size'},
+                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy, width: "15%"},
+                //{field: 'Size'},
             ],
-            filterOptions: scope.FileFilterOptions
+            filterOptions: scope.FileFilterOptions,
+            multiSelect: false,
+            selectedItems: scope.fileSelection
         };
 
-        var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank">' +
+
+
+
+        var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
                                 '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
                                '</a>' +
                                '</div>';
+        scope.galleryFileSelection = [];
         scope.GalleryFilterOptions = {};
         scope.gridGallery = {
             data: 'project.Images',
             columnDefs:
             [
-                {field:'Name',displayName: 'File Name', cellTemplate: galleryLinkTemplate},
+                {field:'Name',displayName: 'File', cellTemplate: galleryLinkTemplate, width: "18%"},
                 {field: 'Title'},
                 {field: 'Description'},
-                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy},
-                {field: 'Size'},
+                {field: 'Uploaded', displayName: "Uploaded", cellTemplate: uploadedBy, width: "15%"},
+                //{field: 'Size'},
             ],
-            filterOptions: scope.GalleryFilterOptions
+            filterOptions: scope.GalleryFilterOptions,
+            multiSelect: false,
+            selectedItems: scope.galleryFileSelection
 
         };
          
+        scope.openEditFileModal = function(selection)
+        {
+            scope.row = selection;
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/project/modal-edit-file.html',
+              controller: 'ModalEditFileCtrl',
+              scope: scope, //very important to pass the scope along... 
+            });
+        };
+
+        scope.openNewFileModal = function(selection)
+        {
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/project/modal-upload-files.html',
+              controller: 'ModalNewFileCtrl',
+              scope: scope, //very important to pass the scope along... 
+            });
+        };
+
+        scope.editGalleryFile = function()
+        {
+            scope.openEditFileModal(scope.galleryFileSelection[0]);
+        };
+
+        scope.newGalleryFile = function()
+        {
+            scope.openNewFileModal();
+        };
+
+        scope.editFile = function()
+        {
+            scope.openEditFileModal(scope.fileSelection[0]);
+        };
+
+        scope.newFile = function()
+        {
+            scope.openNewFileModal();
+        };
+
          scope.users = [];
          scope.$watch('project.Id', function(){
             if(scope.project && scope.project.Id)
@@ -273,6 +398,11 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
               scope: scope, //very important to pass the scope along... 
         
             });
+         };
+
+         scope.openPrintWindow = function()
+         {
+            $window.open('http://gis-sql/ReportServer/Pages/ReportViewer.aspx?%2fQuadReport_Prototype%2fQuadReport_Single&rs:Command=Render&Id='+scope.project.Id,'_blank');
          };
 
          scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service

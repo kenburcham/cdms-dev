@@ -212,10 +212,17 @@ mod.factory('GetHeadersDataForDataset', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/GetHeadersDataForDataset');
 }]);
 
+mod.factory('UpdateFile', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/UpdateFile');
+}]);
+
+mod.factory('DeleteFile', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/DeleteFile');
+}]);
 
 
-mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies',
-    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies){
+mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile',
+    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies,UpdateFile,DeleteFile){
         var service = {
 
             datastoreId: null,
@@ -328,6 +335,14 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             saveInstrumentAccuracyCheck: function(instrumentId, ac)
             {
                 return SaveInstrumentAccuracyCheck.save({InstrumentId: instrumentId, AccuracyCheck: ac});
+            },
+            updateFile: function(projectId, file)
+            {
+                return UpdateFile.save({ProjectId: projectId, File: file});  
+            },
+            deleteFile: function(projectId, file)
+            {
+                return DeleteFile.save({ProjectId: projectId, File: file});  
             }
 
 
@@ -1309,6 +1324,9 @@ function makeFieldColDef(field, scope) {
             case 'date':
                 editableCellTemplate: '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 break;
+            case 'datetime':
+                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';          
+                break;                
             case 'text':
                 coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';          
                 break;
@@ -1338,6 +1356,10 @@ function makeFieldColDef(field, scope) {
             
         case 'date':
             coldef.cellFilter = 'date: \'MM/dd/yyyy\'';
+            break;
+
+        case 'datetime':
+            coldef.cellFilter = 'date: \'MM/dd/yyyy HH:mm:ss\'';
             break;
     }
 
