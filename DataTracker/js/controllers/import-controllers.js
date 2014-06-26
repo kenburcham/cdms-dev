@@ -300,6 +300,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							$scope.DetailColDefs.push(makeFieldColDef(field, $scope));
 						}
 
+						if(field.DbColumnName == "ReadingDateTime")
+						{
+							$scope.hasReadingDateTime = true;
+							$scope.ActivityFields.Timezone = getByField($scope.SystemTimezones, new Date().getTimezoneOffset() * -60000, "TimezoneOffset"); //set default timezone
+						}
+
 					});
 
     				//set defaults for header fields

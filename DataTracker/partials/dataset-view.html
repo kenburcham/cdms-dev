@@ -26,18 +26,23 @@
                 <div class="header-label">Activity Date:</div>
                 <div class="header-value">{{grid.Header.Activity.ActivityDate | date: 'MM/dd/yyyy'}}&nbsp;</div>            
 
-            <div ng-show="grid.Header.Activity.Instrument" >
+                <div ng-show="grid.Header.Activity.Timezone">
+                    <div class="header-label">Reading Timezone:</div>
+                    <div class="header-value">{{grid.Header.Activity.Timezone.Name}}&nbsp;</div>
+                </div>
 
-                <div class="header-label">Instrument: </div>
-                <div class="header-value">{{grid.Header.Activity.Instrument.Name}} (SN:{{grid.Header.Activity.Instrument.SerialNumber}})</div>
+                <div ng-show="grid.Header.Activity.Instrument" >
 
-                <div ng-show="grid.Header.Activity.AccuracyCheck" class="header-label">Deploy Accuracy: </div>
-                <div ng-show="grid.Header.Activity.AccuracyCheck" class="header-value">{{getDataGrade(grid.Header.Activity.AccuracyCheck)}} on {{grid.Header.Activity.AccuracyCheck.CheckDate | date}}</div>
+                    <div class="header-label">Instrument: </div>
+                    <div class="header-value">{{grid.Header.Activity.Instrument.Name}} (SN:{{grid.Header.Activity.Instrument.SerialNumber}})</div>
 
-                <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-label">Post-Deploy Accuracy: </div>
-                <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-value">{{getDataGrade(grid.Header.Activity.PostAccuracyCheck)}} on {{grid.Header.Activity.PostAccuracyCheck.CheckDate | date}}</div>
+                    <div ng-show="grid.Header.Activity.AccuracyCheck" class="header-label">Deploy Accuracy: </div>
+                    <div ng-show="grid.Header.Activity.AccuracyCheck" class="header-value">{{getDataGrade(grid.Header.Activity.AccuracyCheck)}} on {{grid.Header.Activity.AccuracyCheck.CheckDate | date}}</div>
 
-            </div>
+                    <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-label">Post-Deploy Accuracy: </div>
+                    <div ng-show="grid.Header.Activity.PostAccuracyCheck" class="header-value">{{getDataGrade(grid.Header.Activity.PostAccuracyCheck)}} on {{grid.Header.Activity.PostAccuracyCheck.CheckDate | date}}</div>
+
+                </div>
 
 
                 <div ng-repeat="field in headerFields">

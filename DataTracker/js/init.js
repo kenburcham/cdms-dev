@@ -35,3 +35,49 @@ require([
   });
   
 });
+
+
+var millis_per_h = 3600000;
+
+var SystemTimezones = [
+  {
+    "Name" : "Pacific Standard Time",
+    "Description" : "(GMT-08:00) Pacific Standard Time (US & Canada)",
+    "TimezoneOffset" : -8 * millis_per_h,
+  }, 
+{
+    "Name" : "Pacific Daylight Time",
+    "Description" : "(GMT-07:00) Pacific Daylight Time (US & Canada)",
+    "TimezoneOffset" : -7 * millis_per_h,
+  },
+  {
+    "Name" : "Mountain Standard Time",
+    "Description" : "(GMT-07:00) Mountain Standard Time (US & Canada)",
+    "TimezoneOffset" : -7 * millis_per_h,
+  },
+
+  // {
+  //  "Name" : "Central Standard Time",
+  //  "Description" : "(GMT-06:00) Central Standard Time (US & Canada)",
+  //  "TimezoneOffset" : -6 * millis_per_h,
+  //}, {
+  //  "Name" : "Eastern Standard Time",
+  //  "Description" : "(GMT-05:00) Eastern Standard Time (US & Canada)",
+  //  "TimezoneOffset" : -5 * millis_per_h,
+  //},
+  {
+    "Name" : "Mountain Daylight Time",
+    "Description" : "(GMT-06:00) Mountain Daylight Time (US & Canada)",
+    "TimezoneOffset" : -6 * millis_per_h,
+  }, 
+
+  //{
+  //  "Name" : "Central Daylight Time",
+  //  "Description" : "(GMT-05:00) Central Daylight Time (US & Canada)",
+  //  "TimezoneOffset" : -5 * millis_per_h,
+  // }, {
+  //  "Name" : "Eastern Daylight Time",
+  //  "Description" : "(GMT-04:00) Eastern Daylight Time (US & Canada)",
+  //  "TimezoneOffset" : -4 * millis_per_h,
+  //}
+];

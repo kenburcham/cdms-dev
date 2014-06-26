@@ -126,11 +126,11 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px'},
                         {field:'Location.Label',displayName: 'Location'},
                         {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
-                        {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false},
+                        {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false, width: '120px'},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px'},
-                        {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '50px'},
+                        {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '40px'},
                     ];
 
             $scope.showFilter = false;

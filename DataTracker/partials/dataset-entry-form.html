@@ -37,6 +37,14 @@
                 <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
             </div>
 
+            <div ng-show="hasReadingDateTime">
+                <div class="header-label">Reading Timezone:</div>
+                <div class="header-value">
+                    <select class="form-control" ng-model="row.Timezone" ng-options="zone.Name for zone in SystemTimezones">
+                    </select>  
+                </div>                
+            </div>
+
             <div ng-show="project.Instruments.length > 0" >
 
                 <div class="header-label">Instrument: </div>

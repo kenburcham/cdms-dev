@@ -220,9 +220,13 @@ mod.factory('DeleteFile', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/DeleteFile');
 }]);
 
+mod.factory('GetTimeZones', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetTimeZones');
+}]);        
 
-mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile',
-    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies,UpdateFile,DeleteFile){
+
+mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile','GetTimeZones',
+    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies,UpdateFile,DeleteFile, GetTimeZones){
         var service = {
 
             datastoreId: null,
@@ -343,6 +347,10 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             deleteFile: function(projectId, file)
             {
                 return DeleteFile.save({ProjectId: projectId, File: file});  
+            },
+            getTimeZones: function()
+            {
+                return GetTimeZones.query();
             }
 
 
@@ -758,6 +766,12 @@ mod.service('ActivityParser',[ 'Logger',
                     if(row.PostAccuracyCheckId)
                         activities.activities[key].PostAccuracyCheckId = row.PostAccuracyCheckId;
 
+                    if(row.Timezone)
+                    {
+                        activities.activities[key].Timezone = angular.toJson(row.Timezone).toString();
+                        row.Timezone = undefined;
+                    }
+
                     //add in activityqa if there isn't one (now required)
                     if(!row.ActivityQAStatus)
                     {
@@ -1011,6 +1025,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 var field = scope.FieldLookup[field_name];
                 var errors = [];
                 var row = scope.row;
+                var headers = []; //there are none; our row is the headers.
              
                 validateField(field, scope.row, field_name, scope, errors);
              
@@ -1026,7 +1041,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 //fire rules - OnChange
                 
-                fireRules("OnChange", row, field, value, errors);
+                fireRules("OnChange", row, field, value, headers, errors);
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
 
@@ -1159,9 +1174,10 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 }
 */
 // ------------------------------------------
+                var headers = scope.row;
                 if(field && value)
                 {
-                    fireRules("OnChange",row, field, value, []);
+                    fireRules("OnChange",row, field, value, headers, []);
                 }
 
                 //this is expensive in that it runs every time a value is changed in the grid.
@@ -1426,7 +1442,7 @@ function parseField(field, scope)
         console.dir(e);
     }
 
-    fireRules("DefaultValue", null, field, null, null);
+    fireRules("DefaultValue", null, field, null, null, null);
 
     field.parsed = true;
 
@@ -1627,7 +1643,7 @@ if(field.DbColumnName == "FinClip")
 }
 */
 
-    fireRules("OnValidate",row,field,value,row_errors);
+    fireRules("OnValidate",row,field,value,scope.row,row_errors);
 
     
 }
@@ -1964,13 +1980,13 @@ function getLocationObjectIdsByType(type, locations)
     return locationObjectIds;
 }
 
-function fireRules(type, row, field, value, errors)
+function fireRules(type, row, field, value, headers, errors)
 {
     var row_errors = errors; //older rules use "row_errors"
     try{
         //fire Field rule if it exists -- OnChange
         if(field.Field && field.Field.Rule && field.Field.Rule[type]){
-            //console.log("Dataset field rule: " + field.Field.Rule[type]);
+            console.log("Dataset field rule: " + field.Field.Rule[type]);
             if(type == "DefaultValue")
                 field.DefaultValue = field.Field.Rule[type];
             else
@@ -1979,7 +1995,7 @@ function fireRules(type, row, field, value, errors)
 
         //fire Datafield rule if it exists -- OnChange
         if(field.Rule && field.Rule[type]){
-            //console.log("Master field rule: " + field.Rule[type]);
+            console.log("Master field rule: " + field.Rule[type]);
             if(type=="DefaultValue")
                 field.DefaultValue = field.Rule[type];
             else
@@ -1989,5 +2005,35 @@ function fireRules(type, row, field, value, errors)
         //so we don't die if the rule fails....
         console.dir(e);
     }
+
+}
+
+//give me a date and I will convert it to a UTC date.
+//  used in rules.
+function dateToUTC(a_date)
+{
+    var utc = new Date(Date.UTC(
+        a_date.getFullYear(),
+        a_date.getMonth(),
+        a_date.getDate(),
+        a_date.getHours(),
+        a_date.getMinutes(),
+        a_date.getSeconds()
+    ));
+
+    return utc;
+}
+
+//give me a date string and offset (in ms) and I'll give you back a Date 
+//  with the offset applied. 
+//  used in rules.
+function toGMTDate(str_date, int_offset)
+{
+    var orig_date = new Date(str_date);
+    var d = new Date(orig_date.getTime() + int_offset);
+    var d_str = 
+        [d.getMonth()+1,d.getDate(), d.getFullYear()].join('/') + " " +
+        [("00" + d.getHours()).slice(-2), ("00" + d.getMinutes()).slice(-2), ("00" + d.getSeconds()).slice(-2)].join(':');
+    return d_str;
 
 }

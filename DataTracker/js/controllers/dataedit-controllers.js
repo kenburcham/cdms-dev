@@ -105,6 +105,9 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         		}
 			}
 
+			if($scope.dataset_activities.Header.Activity.Timezone)
+				$scope.row.Timezone = getByField($scope.SystemTimezones, angular.fromJson($scope.dataset_activities.Header.Activity.Timezone).Name, "Name"); //set default timezone
+			
 			$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
 		
 			if($scope.dataset.RowQAStatuses.length > 1)
@@ -146,6 +149,11 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 		});
         
+		$scope.selectTimezone = function()
+        {
+        	$scope.validateGrid($scope);
+        }
+
 		$scope.clearSelections = function()
 		{
 			$scope.gridDatasheetOptions.selectAll(false);

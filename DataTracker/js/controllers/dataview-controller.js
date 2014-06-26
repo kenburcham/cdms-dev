@@ -79,7 +79,6 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
     		DataSheet.initScope($scope);
 
-    		
     		$scope.$watch('dataset.ProjectId', function()
     		{
     			if($scope.dataset && $scope.dataset.ProjectId)
@@ -134,6 +133,9 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 				$scope.query.loading = false;
 
 				$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+
+   				$scope.grid.Header.Activity.Timezone = angular.fromJson($scope.grid.Header.Activity.Timezone);
+
 
 	    	});
 

@@ -203,7 +203,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             				   '</div>';
 
     var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
-            				   '1/10/2014 @ 8:20 AM by Ken Burcham -- FIXME' +
+            				   'PLACEHOLDER' +
             				   '</div>';
 
 		scope.gridOptions = {
@@ -375,6 +375,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
          };
 
          scope.createInstrument = function(){
+            scope.viewInstrument = null; 
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-create-instrument.html',
               controller: 'ModalCreateInstrumentCtrl',
