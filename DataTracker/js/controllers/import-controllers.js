@@ -679,6 +679,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 			$scope.saveDataSheet = function() {
 
+				if($scope.gridHasErrors)
+				{
+					if(!confirm("There are validation errors.  Are you sure you want to save anyway?"))
+						return;
+				}
+
 				//prepare dataset for saving -- add defaultrowqastatusid, move activityqastatusid
 				for (var i = 0; i < $scope.dataSheetDataset.length; i++) {
 					var row = $scope.dataSheetDataset[i];

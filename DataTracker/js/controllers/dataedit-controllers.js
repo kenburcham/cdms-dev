@@ -240,6 +240,12 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 
 		$scope.saveData = function(){
 			
+			if($scope.gridHasErrors)
+			{
+				if(!confirm("There are validation errors.  Are you sure you want to save anyway?"))
+					return;
+			}
+
 			$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.headerFields, $scope.detailFields);
 			
 			if(!$scope.activities.errors)

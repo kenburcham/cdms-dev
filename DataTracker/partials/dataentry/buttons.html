@@ -3,7 +3,7 @@
     <button class="btn" ng-disabled="!onRow" ng-click="removeRow()">Remove Row</button>
     <button ng-show="deletedRows.length" class="btn" ng-click="undoRemoveRow()">Undo</button>
     
-    <button class="right btn" ng-disabled="gridHasErrors || headerHasErrors || activities.saving" ng-click="saveData()">Save and close</button>
+    <button class="right btn" ng-disabled="activities.saving" ng-click="saveData()">Save and close</button>
     <button class="btn btn-warning right" ng-click="cancel()" style="margin-right: 10px;">Cancel</button>
     <br/>
 	<div ng-show="activities.saving" style="float: right;margin-right: 20px;" class="alert alert-success">Saving...</div>
