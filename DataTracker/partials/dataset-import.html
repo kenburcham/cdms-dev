@@ -41,8 +41,10 @@
                 <div class="right" style="margin-top: 3px; margin-left: 5px;"><img ng-show="loading" src="images/FishLoading.gif"/></div>
                 <button class="btn btn-primary right" ng-disabled="!file" ng-click="uploadFile()">Load >></button>
                 <br/>
-                <div style="margin-top: 80px">
+                <div style="margin-top: 70px">
                     <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Column headers start on line: 1</a>
+                    <br/>
+                    <i>File types supported: .xls, .csv, .tsv</i>
                 </div>
                 
             </div>

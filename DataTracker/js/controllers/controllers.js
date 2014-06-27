@@ -81,7 +81,8 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
     $scope.header_message = "Create new instrument";
 
     $scope.row = {
-        StatusId: 0
+        StatusId: 0,
+        OwningDepartmentId: 1,
     };      
 
     if($scope.viewInstrument)
@@ -92,6 +93,7 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
 
 
     $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
+    $scope.Departments = DataService.getDepartments();
 
     $scope.save = function(){      
         var promise = DatastoreService.saveInstrument($scope.project.Id, $scope.row);

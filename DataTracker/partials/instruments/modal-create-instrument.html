@@ -15,6 +15,13 @@
   			<div class="header-value">
 	  			<textarea class="form-control" ng-model="row.Description" ></textarea>
 	  		</div>
+	  		<div class="header-label">Owning Department/Org</div>
+
+	  		<div class="header-value">
+	  				<select class="form-control" ng-model="row.OwningDepartmentId">
+	  					<option ng-repeat="dept in Departments" ng-selected="dept.Id == row.OwningDepartmentId" value="{{dept.Id}}">{{dept.Organization.Name}}: {{dept.Name}}</option>
+	  				</select>	
+			</div>
 
 	  		<div class="header-label">Serial Number</div>
   			<div class="header-value">
