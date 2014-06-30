@@ -23,8 +23,8 @@ mod_dq.controller('ModalExportController',['$scope','DataService','$modalInstanc
 	}
 ]);
 
-mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$location', '$modal','DataSheet', '$rootScope',
-    	function($scope, $routeParams, DataService, $location, $modal, DataSheet, $rootScope) {
+mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$location', '$modal','DataSheet', '$rootScope','ChartService',
+    	function($scope, $routeParams, DataService, $location, $modal, DataSheet, $rootScope, ChartService) {
 
 			$scope.dataset = DataService.getDataset($routeParams.Id);
 			
@@ -198,8 +198,10 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
 	    	$scope.$watch('query.loading', function(){
 	    		console.log("-- gathering graph data");
-	    		$scope.chartData = getAdultWeirChartData($scope.query.results);	
 	    		$scope.dataSheetDataset = $scope.query.results;
+	    		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {height: 360, width: 800});
+	    		//$scope.chartData = getAdultWeirChartData($scope.query.results);	
+	    		
 	    	});
 	    	
 

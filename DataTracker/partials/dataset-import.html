@@ -241,3 +241,6 @@
 
 </div>
 
+    <div ng-show="dataSheetDataset.length>0" class="large-graph-box" id="chart-div">
+        <ng-include src="'partials/graphs/view-inset-' + dataset.Datastore.TablePrefix + '.html'"></ng-include>
+    </div>

@@ -1,5 +1,36 @@
-//Chart Services
+
+//Chart Services - charting for different datasets.
+
 var cmod = angular.module('ChartServices', []);
+
+
+/*
+		Each dataset type that you want to provide a generated graph needs to live here.
+		You can do your graphing however you like for the particular kind of chart.
+*/
+cmod.service('ChartService', ['AdultWeir_ChartService','WaterTemp_ChartService',
+	function(AdultWeir_ChartService, WaterTemp_ChartService){
+		var service = {
+			buildChart: function(scope, data_in, dataset, config){
+
+    				if(dataset == "AdultWeir") 
+					{
+						scope.chartConfig = AdultWeir_ChartService.getChartConfig();
+    					//$scope.chartData = AdultWeir_ChartService.getDefaultChartData();
+		    			scope.chartData = AdultWeir_ChartService.getChartData(data_in);
+					}
+		    		else if(dataset == "WaterTemp")
+		    		{
+		    			WaterTemp_ChartService.buildChart(data_in, config);
+		    		}
+		    		//else
+		    		//	delete $scope.chartData; 
+		    },
+		};
+
+		return service;
+	}
+]);
 
 cmod.service('AdultWeir_ChartService',[ 
     function(){
@@ -97,11 +128,17 @@ cmod.service('WaterTemp_ChartService',[
 
         	dataset: "WaterTemp",
 
-			buildChart: function(scope)
+			buildChart: function(data_in, config)
 			{
+				if(data_in.length == 0)
+					return;
+
+				if(!config)
+					config = {width: 400, height: 200};
+
 					var margin = {top: 10, right: 10, bottom: 20, left: 30},
-					    width = 400 - margin.left - margin.right,
-					    height = 200 - margin.top - margin.bottom;
+					    width = config.width - margin.left - margin.right,
+					    height = config.height - margin.top - margin.bottom;
 
 					var x = d3.time.scale()
 					    .range([0, width]);
@@ -126,6 +163,8 @@ cmod.service('WaterTemp_ChartService',[
 					    .x(function(d) { return x(d.chart_date); })
 					    .y(function(d) { return y(d.chart_temp); });
 
+					    d3.select("#chart-div").selectAll("svg").remove();
+
 					var svg = d3.select("#chart-div").append("svg")
 					    .attr("width", width + margin.left + margin.right)
 					    .attr("height", height + margin.top + margin.bottom)
@@ -138,14 +177,19 @@ cmod.service('WaterTemp_ChartService',[
 
 					//color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
-					var data = scope.dataSheetDataset;
-					  data.forEach(function(d) {
+					var data = [];
+
+					data_in.forEach(function(d) {
 					  	//only show rows with default QA status (OK)
 					  	//if(d.QAStatusId == scope.dataset.DefaultRowQAStatusId)
 					  	//{
+					  	if(!isNaN(d.WaterTemperature))
+					  	{
 					  		d.chart_date = parseDate(d.ReadingDateTime);
 					    	d.chart_temp = +d.WaterTemperature;
 					    	d.chart_QAStatusId = d.QAStatusId;
+					    	data.push(d);
+					    }
 					    //}
 
 					    //console.dir(d);

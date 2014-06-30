@@ -28,8 +28,8 @@ mod_dv.controller('ModalQaUpdateCtrl', ['$scope','DataService', '$modalInstance'
 
 
 
-mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$modal','$location','DataSheet','$route','$rootScope','WaterTemp_ChartService','AdultWeir_ChartService',
-    	function($scope, $routeParams, DataService, $modal, $location, DataSheet, $route, $rootScope, WaterTemp_ChartService, AdultWeir_ChartService) {
+mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$modal','$location','DataSheet','$route','$rootScope','ChartService',
+    	function($scope, $routeParams, DataService, $modal, $location, DataSheet, $route, $rootScope, ChartService) {
     		$scope.grid = DataService.getActivityData($routeParams.Id); //activity data for a particular activityId
     		
     		$scope.headerFields = [];
@@ -73,7 +73,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     				$scope.project = DataService.getProject($scope.dataset.ProjectId);
 	    			$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
 
-	    			$scope.buildChart();
+	    			ChartService.buildChart($scope, $scope.grid.Details, $scope.dataset.Datastore.TablePrefix);
 
 	    			//if we have more than 1 row qa status then show them.
 		    		if($scope.dataset.RowQAStatuses.length > 1)
@@ -125,23 +125,6 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 
 	    	});
-
-			$scope.buildChart = function(){
-
-    				if($scope.dataset.Datastore.TablePrefix == "AdultWeir") 
-					{
-						$scope.chartConfig = AdultWeir_ChartService.getChartConfig();
-    					//$scope.chartData = AdultWeir_ChartService.getDefaultChartData();
-		    			$scope.chartData = AdultWeir_ChartService.getChartData($scope.grid.Details);
-					}
-		    		else if($scope.dataset.Datastore.TablePrefix == "WaterTemp")
-		    		{
-		    			WaterTemp_ChartService.buildChart($scope);
-		    		}
-		    		else
-		    			delete $scope.chartData; 
-
-			};
 
 			$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 

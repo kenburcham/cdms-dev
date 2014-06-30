@@ -11,8 +11,8 @@ var ACTIVITY_DATE = 1;
 
 var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
-mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal',
-    	function($scope, $routeParams, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal) {
+mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal','ChartService',
+    	function($scope, $routeParams, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal, ChartService) {
 //    		$scope.QAActivityStatuses = QAActivityStatuses;
     		$scope.dataset = DataService.getDataset($routeParams.Id);    			
 			$scope.mappedActivityFields = {};
@@ -615,8 +615,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
             	$scope.validateGrid($scope);
         		$scope.floatErrorsToTop();
-        
-				
+
+        		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {width: 800, height: 350});	
+        		        		
+        		
 
 			};
 
