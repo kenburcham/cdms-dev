@@ -1534,6 +1534,15 @@ function orderByAlpha(a,b)
      return 0 //default return value (no sorting)
 }
 
+function orderByAlphaName(a,b)
+{
+     var nameA=a.Name.toLowerCase(), nameB=b.Name.toLowerCase()
+     if (nameA < nameB) //sort string ascending
+      return -1 
+     if (nameA > nameB)
+      return 1
+     return 0 //default return value (no sorting)
+}
 
 function orderUserByAlpha(a,b)
 {

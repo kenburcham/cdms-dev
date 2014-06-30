@@ -23,6 +23,13 @@
 	  				</select>	
 			</div>
 
+			<div class="header-label">Purchasing Project</div>
+			<div class="header-value">
+	  				<select class="form-control" ng-model="row.PurchasingProgramProjectId">
+	  					<option ng-repeat="proj in Projects" ng-selected="proj.Id == row.PurchasingProgramProjectId" value="{{proj.Id}}">{{proj.Name}}</option>
+	  				</select>	
+			</div>
+
 	  		<div class="header-label">Serial Number</div>
   			<div class="header-value">
 	  			<input  class="form-control" type="text" ng-model="row.SerialNumber" />
@@ -33,6 +40,11 @@
 	  			<input  class="form-control" type="text" ng-model="row.Manufacturer" />
 	  		</div>
 
+	  		<div class="header-label">Model</div>
+  			<div class="header-value">
+	  			<input  class="form-control" type="text" ng-model="row.Model" />
+	  		</div>
+	  		
   			<div class="header-label">Instrument Type</div>
 	  		<div class="header-value">
 	  				<select class="form-control" ng-model="row.InstrumentTypeId" ng-options="t.Id as t.Name for t in InstrumentTypes">

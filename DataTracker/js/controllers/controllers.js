@@ -9,9 +9,8 @@ var mod_ds = angular.module('DatasetControllers', ['ui.bootstrap', 'angularFileU
 mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
 
-    $scope.ac_row = {};
+    $scope.ac_row = angular.copy($scope.ac_row);
 
-    
     $scope.save = function(){
       
       var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.ac_row);
@@ -94,9 +93,19 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
 
     $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
     $scope.Departments = DataService.getDepartments();
+    $scope.RawProjects = DataService.getProjects();
+
+    $scope.$watch('RawProjects', function(){
+      if($scope.RawProjects)
+        $scope.Projects = $scope.RawProjects.sort(orderByAlphaName);
+    },true);
 
     $scope.save = function(){      
-        var promise = DatastoreService.saveInstrument($scope.project.Id, $scope.row);
+        var saveRow = angular.copy($scope.row);
+        saveRow.AccuracyChecks = undefined;
+        saveRow.InstrumentType = undefined;
+        saveRow.OwningDepartment = undefined;
+        var promise = DatastoreService.saveInstrument($scope.project.Id, saveRow);
         promise.$promise.then(function(){
             $scope.reloadProject();  
             $modalInstance.dismiss();  
@@ -367,7 +376,12 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
         
 
 
-         scope.openAccuracyCheckForm = function(){
+         scope.openAccuracyCheckForm = function(ac_row){
+            if(ac_row)
+              scope.ac_row = ac_row;
+            else
+              scope.ac_row = {};
+
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
               controller: 'ModalAddAccuracyCheckCtrl',

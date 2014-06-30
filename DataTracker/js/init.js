@@ -81,3 +81,11 @@ var SystemTimezones = [
   //  "TimezoneOffset" : -4 * millis_per_h,
   //}
 ];
+
+var DataGradeMethods = [];
+DataGradeMethods.push(""); // 0
+DataGradeMethods.push("NIST check in BOTH warm and ice baths");
+DataGradeMethods.push("NIST check in ice bath only");
+DataGradeMethods.push("Manufacturer Calibration");
+DataGradeMethods.push("No Accuracy Check Conducted");
+DataGradeMethods.push("Unknown Accuracy Method");

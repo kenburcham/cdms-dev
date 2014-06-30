@@ -68,6 +68,7 @@ define([
 	  angular.rootScope = $rootScope; //just so we can get to it later. :)
 
 	  $rootScope.SystemTimezones = SystemTimezones; //defined in init.js
+	  $rootScope.DataGradeMethods = DataGradeMethods; //ditto
 
 	});
 

@@ -12,23 +12,20 @@
 		  	<form name="form" class="css-form" novalidate>
 		  			<div class="header-label">Check Date</div>
 		  			<div class="header-value">
-			  				<input  class="form-control" type="text" datepicker-popup="longDate" ng-model="ac_row.CheckDate" is-open="opened" min="'2000-01-01'" max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+			  				<input  class="form-control" type="text" datepicker-popup="longDate" ng-model="ac_row.CheckDate" is-open="opened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
 			  		</div>
 
 					<div class="header-label">Check Method</div>
 					<div class="header-value">
 			  				<select class="form-control" ng-model="ac_row.CheckMethod" >
-			  					<option value="1">NIST check in BOTH warm and ice baths</option>
-			  					<option value="2">NIST check in ice bath only</option>
-			  					<option value="3">Manufacturer Calibration</option>
-			  					<option value="4">No Accuracy</option>
-			  					<option value="5" selected="selected">Unknown Accuracy Method</option>
+			  					<option ng-repeat="method in DataGradeMethods" ng-selected="$index == 5" value="{{$index}}">{{method}}</option>
 			  				</select>
 			  		</div>
 
 			  		<div class="header-label">Bath 1 Grade</div>
 			  		<div class="header-value">
 			  				<select class="form-control" ng-model="ac_row.Bath1Grade">
+			  					<option value="">&nbsp;</option>
 			  					<option value="A">A</option>
 			  					<option value="B">B</option>
 			  					<option value="C">C</option>
@@ -39,6 +36,7 @@
 					<div class="header-label">Bath 2 Grade</div>
 					<div class="header-value">
 			  				<select class="form-control" ng-model="ac_row.Bath2Grade">
+			  					<option value="">&nbsp;</option>
 			  					<option value="A">A</option>
 			  					<option value="B">B</option>
 			  					<option value="C">C</option>
@@ -53,8 +51,8 @@
 			  	
 			</form>
 
-            <button class="btn btn-primary right" style="margin: 10px;" ng-click="save()">Save</button>
-            <button class="btn btn-warning right" style="margin: 10px;" ng-click="cancel()">Cancel</button>
+            <button project-role="editor" class="btn btn-primary right" style="margin: 10px;" ng-click="save()">Save</button>
+            <button class="btn btn-warning right" style="margin: 10px;" ng-click="cancel()">Close</button>
 
 		
         </tab>

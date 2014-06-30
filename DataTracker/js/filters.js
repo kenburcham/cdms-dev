@@ -29,6 +29,11 @@ angular.module('DatasetFilters', [])
             return input;
         };
     })
+    .filter('DataGradeMethod', function($rootScope){
+        return function(input) {
+            return $rootScope.DataGradeMethods[input];
+        };
+    })
     .filter('arrayValues', function(){
         return function(input) {
             //console.log(">> input = " + input);
