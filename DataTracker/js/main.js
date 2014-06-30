@@ -18,6 +18,7 @@ define([
 	  'DatasetDetailsControllers',
 	  'MyDatasetsControllers',
 	  'ActivitiesController',
+	  'ChartServices',
 	  'DatasetServices',
 	  'angularFileUpload',
 	  'DatasetDirectives',

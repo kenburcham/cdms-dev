@@ -1688,57 +1688,6 @@ function is_empty(obj) {
     return true;
 }
 
-function getAdultWeirChartData(data)
-{
-    var dataCalc = {};
-
-    angular.forEach(data, function(row, key){
-        var num = (row.TotalFishRepresented) ? row.TotalFishRepresented : 1;
-        //console.log(row);
-
-        if(row.Species)
-        {
-
-            if(!dataCalc[row.Species])
-                dataCalc[row.Species] = { total: 0, males: 0, females: 0};
-
-            dataCalc[row.Species].total += num;
-
-            if(row.Sex == "M")
-                dataCalc[row.Species].males += num;
-            if(row.Sex == "F")
-                dataCalc[row.Species].females += num;
-            
-        }
-        
-        //console.log(row.Species + " = ");
-        //console.dir(dataCalc[row.Species]);
-        
-    });
-
-    var data = {
-              "series": [
-                "Total",
-                "Male",
-                "Female"
-              ],
-              "data": [
-              ]
-            };
-
-    angular.forEach(dataCalc, function(vals, species){
-        data['data'].push({
-          "x": species,
-          "y": [vals.total,vals.males,vals.females],
-        });
-    });
-
-//    console.log(data);
-
-    return data;
-
-}
-
 mod.service('Logger',[
     function(){
 
