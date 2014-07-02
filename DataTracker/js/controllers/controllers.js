@@ -356,6 +356,8 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                     addMetadataProperties(list, scope.metadataList, scope, DataService);
                 });
 
+                scope.project.Instruments = scope.project.Instruments.sort(orderByAlphaName);
+
             }
 
          });
