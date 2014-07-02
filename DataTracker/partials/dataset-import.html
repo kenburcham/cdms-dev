@@ -34,7 +34,7 @@
                     <div class="right" style="margin-right: 10px;">
                         <input type="text" size="3" ng-model="startOnLine" ng-init="startOnLine=1"/>
                     </div>
-                    <div>Column headers start on line:</div>
+                    <div>Column headers start on line (csv/tsv only): </div>
                 </div>
 
                 <br/>
@@ -43,8 +43,11 @@
                 <br/>
                 <div style="margin-top: 70px">
                     <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Column headers start on line: 1</a>
-                    <br/>
-                    <i>File types supported: .xls, .csv, .tsv</i>
+                </div>
+                <div class="" style="background-color: #EAF0F8; height: 40px; width: 315px; font-size: x-small; margin-left: -40px; padding-top:5px;">
+                    <center><i>File types supported: .csv, .tsv or .xlsx</i>
+                            <br/>Note: Older .xls files must be saved as .xlsx
+                    </center>
                 </div>
                 
             </div>
@@ -170,6 +173,7 @@
                             </div>                
                         </div>
 
+                    <div ng-show="ActivityFields.InstrumentId">
                         <div class="header-label">Pre-deploy Accuracy: </div>
                         <div class="right"><a href title="Accuracy Checks" ng-click="openAccuracyCheckModal()">manage</a></div>
                         <div class="header-value">
@@ -186,6 +190,7 @@
                         </div>
 
                     </div>
+                </div>
 
                 <form novalidate class="row-form">
                 <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
