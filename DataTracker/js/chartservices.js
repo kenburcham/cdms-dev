@@ -172,8 +172,8 @@ cmod.service('WaterTemp_ChartService',[
 					    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	
-					
-					var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+					//converting via new Date() seems to work better.
+					//var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
 
 					//color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
@@ -185,7 +185,7 @@ cmod.service('WaterTemp_ChartService',[
 					  	//{
 					  	if(!isNaN(d.WaterTemperature))
 					  	{
-					  		d.chart_date = parseDate(d.ReadingDateTime);
+					  		d.chart_date = new Date(d.ReadingDateTime);
 					    	d.chart_temp = +d.WaterTemperature;
 					    	d.chart_QAStatusId = d.QAStatusId;
 					    	data.push(d);
@@ -194,6 +194,8 @@ cmod.service('WaterTemp_ChartService',[
 
 					    //console.dir(d);
 					  });
+
+					//console.dir(data);
 
 					  //x.domain(d3.extent(data, function(d) { return d.date; }));
 					  //y.domain(d3.extent(data, function(d) { return d.close; }));
