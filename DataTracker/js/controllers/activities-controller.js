@@ -114,6 +114,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                                '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("Description") }}</a>' +
                                '</div>';
 
+            var allotmentTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+                               '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("headerdata.Allotment") }}</a>' +
+                               '</div>';
+
 
             var QATemplate = '<div class="ngCellText" ng-class="col.colIndex()">{{QAStatusList[row.getProperty("ActivityQAStatus.QAStatusId")]}}</div>';
 
@@ -124,13 +128,25 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.columnDefs = [
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px'},
+
+                        //for demo  
+                        {field:'headerdata.Allotment',displayName: 'Allotment', cellTemplate: allotmentTemplate, visible: false, width: '100px'},
+                        {field:'headerdata.AllotmentStatus',displayName: 'Status', visible: false, width: '120px'},
+
+
                         {field:'Location.Label',displayName: 'Location'},
                         {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
                         {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false, width: '120px'},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
+
+                        
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px'},
                         {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '40px'},
+
+
+
+
                     ];
 
             $scope.showFilter = false;
@@ -381,10 +397,21 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 {
                     console.log("showing fields");
                     $scope.columnDefs[0].visible = false;
-                    $scope.columnDefs[2].visible = true;
-                    $scope.columnDefs[3].visible = true;
                     $scope.columnDefs[4].visible = true;
+                    $scope.columnDefs[5].visible = true;
+                    $scope.columnDefs[6].visible = true;
                 }
+
+                if($scope.dataset.Datastore.Name == 'Appraisals')
+                {
+                    console.log("showing fields");
+                    $scope.columnDefs[0].visible = false;
+                    $scope.columnDefs[1].visible = true;
+                    $scope.columnDefs[2].visible = true;
+                    
+
+                }
+
 
             });
 
