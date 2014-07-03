@@ -28,32 +28,67 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
         $scope.waterbodies = DatastoreService.getWaterBodies();
 
         $scope.save = function(){
+
+            if(!$scope.row.GPSEasting || !$scope.row.GPSNorthing)
+            {
+                $scope.locationErrorMessage = "Please enter an Easting and a Northing for this point.";
+                return;
+            }
+
             $scope.locationErrorMessage = undefined;
             //OK -- if we are saving a NEW location then start off by adding the point to the featurelayer
             if(!$scope.row.Id)
             {
-                //add the graphic to the map and get SDE_ObjectId
-                $scope.map.locationLayer.applyEdits([$scope.newGraphic],null,null).then(function(results){
-                    if(results[0].success)
-                    {
-                        $scope.row.SdeObjectId = results[0].objectId;
-                        console.log("Created a new point! "+ $scope.row.SdeObjectId);
+                //OK so lets move their point to the Easting/Northing they entered.
 
-                        var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
-                        promise.$promise.then(function(){
-                            //console.log("done and success!");
-                            //reload the project -- this will cause the locations and locationlayer to be reloaded!  wow!  go AngularJS!  :)
-                            $scope.refreshProjectLocations();
-                            $modalInstance.dismiss(); 
-                        });
-                        
-                    }
-                    else
-                    {
-                        $scope.locationErrorMessage = "There was a problem saving that location.";
-                    }
+                //if they had already clicked somewhere, remove that point.
+                if($scope.newGraphic)
+                    $scope.map.graphics.remove($scope.newGraphic);
 
-                });
+                $scope.map.reposition(); //this is important or else we end up with our map points off somehow.
+
+                //nad83 zone 11...  might have to have this as alist somehwere...
+                var inSR = new esri.SpatialReference({ wkt:'PROJCS["NAD83(NSRS2007) / UTM zone 11N",GEOGCS["NAD83(NSRS2007)",DATUM["D_",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["Meter",1]]' });
+                var outSR = new esri.SpatialReference({wkid: 102100})
+                var geometryService = new esri.tasks.GeometryService("//restdata.ctuir.org/arcgis/rest/services/Utilities/Geometry/GeometryServer");
+                $scope.newPoint = new esri.geometry.Point($scope.row.GPSEasting, $scope.row.GPSNorthing, inSR);  
+
+                //convert spatial reference
+                var PrjParams = new esri.tasks.ProjectParameters();
+              
+                PrjParams.geometries = [ $scope.newPoint ];
+                PrjParams.outSR = outSR;     
+                  
+                //do the projection (conversion)
+                geometryService.project(PrjParams, function(outputpoint) {
+                  
+                    $scope.newPoint = new esri.geometry.Point(outputpoint[0], outSR);        
+                    $scope.newGraphic = new esri.Graphic($scope.newPoint, new esri.symbol.SimpleMarkerSymbol());
+                    $scope.map.graphics.add($scope.newGraphic);     
+
+                    //add the graphic to the map and get SDE_ObjectId
+                    $scope.map.locationLayer.applyEdits([$scope.newGraphic],null,null).then(function(results){
+                        if(results[0].success)
+                        {
+                            $scope.row.SdeObjectId = results[0].objectId;
+                            console.log("Created a new point! "+ $scope.row.SdeObjectId);
+
+                            var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, $scope.row);
+                            promise.$promise.then(function(){
+                                console.log("done and success!");
+                                //reload the project -- this will cause the locations and locationlayer to be reloaded!  wow!  go AngularJS!  :)
+                                $scope.refreshProjectLocations();
+                                $modalInstance.dismiss(); 
+                            });
+                            
+                        }
+                        else
+                        {
+                            $scope.locationErrorMessage = "There was a problem saving that location.";
+                        }
+
+                    });
+                 });
             }
             else //updating an existing...
             {

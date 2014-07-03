@@ -64,6 +64,12 @@ define([
           center: ($attrs.center) ? $attrs.center.split(",") : $scope.center,
           zoom: ($attrs.zoom) ? $attrs.zoom : $scope.zoom,
           basemap: 'streets', //($attrs.basemap) ? $attrs.basemap : $scope.basemap,
+          spatialReference: {
+              wkid:102100 //mercator
+              //wkid:26911 //nad_1983
+              //"wkt":'PROJCS["NAD83(NSRS2007) / UTM zone 11N",GEOGCS["NAD83(NSRS2007)",DATUM["D_",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["Meter",1]]'
+
+            }
         };
 
         // declare our map
@@ -119,7 +125,10 @@ define([
             x: center[0],
             y: center[1],
             spatialReference: {
-              wkid:102100
+              wkid:102100 //mercator
+              //wkid:26911 //nad_1983
+              //"wkt":'PROJCS["NAD83(NSRS2007) / UTM zone 11N",GEOGCS["NAD83(NSRS2007)",DATUM["D_",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["Meter",1]]'
+
             }
           });
 
