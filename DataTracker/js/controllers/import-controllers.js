@@ -505,17 +505,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									return;
 
 								//check for numeric or ignore as blank if it isn't.
-								if(field.ControlType == "number")
+								if(field.ControlType == "number" && !isNumber(data_row[col]) )
 								{
-									if(!isNumber(data_row[col]))
-									{
-										console.log("ignoring: " + field.DbColumnName + " is a number field but value is not a number: " + data_row[col]);
-										return; //don't set this as a value
-									}
-									//else
-									//	console.log("is numeric and value is too." + field.DbColumnName);
+									console.log("ignoring: " + field.DbColumnName + " is a number field but value is not a number: " + data_row[col]);
+									return; //don't set this as a value
 								}
-
+								
+								//handle control types 
 								if(field.ControlType == "multiselect")
 								{
 									//$scope.Logger.debug("is a multiselect");
@@ -540,6 +536,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 								    //new_row[field.DbColumnName] = angular.toJson(new_row[field.DbColumnName]);
 								    //$scope.Logger.debug("  AND our final multiselect value == ");
 								    //$scope.Logger.debug(new_row[field.DbColumnName]);
+								}
+								else if(field.ControlType == "datetime")
+								{
+									try
+									{
+										if(data_row[col])
+											new_row[field.DbColumnName] = new Date(data_row[col]).toISOString();
+									}
+									catch(e)
+									{
+										console.log("problem converting date: " + data_row[col]);
+									}
 								}
 								else //just add the value to the cell
 								{

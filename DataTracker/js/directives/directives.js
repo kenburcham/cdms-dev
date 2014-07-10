@@ -252,10 +252,23 @@ mod.directive('ctuirMultiselectField',
         var result = {
             templateUrl: 'partials/dataentry/field-multiselect.html',
             restrict: 'E',
+            controller: function($scope, $element, $attrs) {
+               $scope.selectOptions = makeObjectsFromValues($scope.dataset.DatastoreId+$scope.field.DbColumnName, $scope.field.Field.PossibleValues);
+            }
+        };
+        
+        return result;
+
+    });
+
+mod.directive('ctuirFileField',
+    function(){
+        var result = {
+            templateUrl: 'partials/dataentry/field-file.html',
+            restrict: 'E',
         };
 
         return result;
-
     });
 
 mod.directive('ctuirRadioField',

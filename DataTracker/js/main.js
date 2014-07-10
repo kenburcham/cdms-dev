@@ -16,6 +16,7 @@ define([
 	  'DataEntryControllers',
 	  'DataImportControllers',
 	  'DatasetDetailsControllers',
+	  'AppraisalControllers',
 	  'MyDatasetsControllers',
 	  'ActivitiesController',
 	  'ChartServices',
@@ -49,7 +50,10 @@ define([
 
 	        $routeProvider.when('/admin-master/:Id', {templateUrl: 'partials/admin/admin-master.html', controller: 'AdminEditMasterCtrl'});
 
+	        //custom routes for datasets that require custom controller+pages
+	        $routeProvider.when('/appraisals/:Id', {templateUrl: 'partials/appraisals/Appraisal-activities.html', controller: 'AppraisalCtrl'});
 
+	        //when all else fails...
 	        $routeProvider.otherwise({redirectTo: '/projects'});
 	    }]);
 

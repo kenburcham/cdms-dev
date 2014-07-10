@@ -702,10 +702,21 @@ mod.service('ActivityParser',[ 'Logger',
 
                 if(key)
                 {
-                    angular.forEach(tmpdata, function(data_row, index){
-                        //note we mash the heading fields into our row -- addActivity splits them out appropriately.
-                        service.addActivity(activities, key, angular.extend(data_row, heading), headerFields, detailFields);
-                    });
+                    
+                    if(tmpdata.length > 0)
+                    {
+                        angular.forEach(tmpdata, function(data_row, index){
+                            //note we mash the heading fields into our row -- addActivity splits them out appropriately.
+                            service.addActivity(activities, key, angular.extend(data_row, heading), headerFields, detailFields);
+                        });
+                    }
+                    else
+                    {
+                        //at least do a single.
+                        console.log("trying a single with no rows!");
+                        service.addActivity(activities, key, heading, headerFields, detailFields);
+                    }
+
                 }
                 else
                 {
@@ -807,6 +818,13 @@ mod.service('ActivityParser',[ 'Logger',
 
                     //copy the other header fields from this first row.
                     angular.forEach(headerFields, function(field){
+                     
+                        //flatten multiselect values into an json array string
+                        if(field.ControlType == "multiselect")
+                        {
+                            row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
+                        }
+                           
                         activities.activities[key].Header[field.DbColumnName] = row[field.DbColumnName];
                     });
 
@@ -1501,7 +1519,13 @@ function makeObjectsFromValues(key, valuesList)
         if(!valuesList)
             throw new Exception("No values provided.");
 
-        var selectOptions = angular.fromJson(valuesList);
+        var selectOptions = "";
+
+        try{
+            selectOptions = angular.fromJson(valuesList);
+        }catch(e){
+            console.log("problem parsing: " + valuesList + " for field: "+ key);
+        }
         
         //make array elements have same key/value
         if(angular.isArray(selectOptions))
@@ -1903,6 +1927,25 @@ function getMatchingByField(data, search, field)
     return newlist;  
 }
 
+//returns array with UN-matching field value
+function getUnMatchingByField(data, search, field)
+{
+    var newlist = [];
+    
+    for(var key in data)
+    {
+        if(data[key][field] != search)
+            newlist.push(data[key]);
+    }
+
+    //console.log("did a search on " + search + " for " + field);
+    //console.dir(newlist);
+
+    return newlist;  
+}
+
+
+
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
@@ -1998,9 +2041,17 @@ function toGMTDate(str_date, int_offset)
 {
     var orig_date = new Date(str_date);
     var d = new Date(orig_date.getTime() + int_offset);
+    
+    return formatDate(d_str);
+
+}
+
+//date to friendly format: "12/05/2014 04:35:44"
+function formatDate(d)
+{
     var d_str = 
         [d.getMonth()+1,d.getDate(), d.getFullYear()].join('/') + " " +
         [("00" + d.getHours()).slice(-2), ("00" + d.getMinutes()).slice(-2), ("00" + d.getSeconds()).slice(-2)].join(':');
-    return d_str;
 
+    return d_str;
 }

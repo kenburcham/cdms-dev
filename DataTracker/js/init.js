@@ -13,6 +13,7 @@ require([
   'app',
   'app/directives/Map',
   'app/directives/FeatureLayer',
+  'app/directives/AppraisalMap'
 
 
 ], function(angular,parser) {

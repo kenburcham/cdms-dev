@@ -45,12 +45,18 @@
                 </div>
 
 
-                <div ng-repeat="field in headerFields">
-                <div class="header-column">
-                    <div class="header-label">{{field.Label}}:</div>
-                    <div class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
+                <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
+                    <div ng-switch-when="multiselect" class="header-column">
+                        <div class="header-label">{{field.Label}}:</div>
+                        <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName] | arrayValues}}&nbsp;</div>
+                    </div>
+
+                    <div ng-switch-default class="header-column">
+                        <div class="header-label">{{field.Label}}:</div>
+                        <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
+                    </div>
                 </div>
-                </div>
+
 
                 <div class="header-label">QA Status:</div>
                 <div class="header-value" ng-show="grid.Header.Activity.ActivityQAStatus">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}} ({{grid.Header.Activity.ActivityQAStatus.User.Fullname}}) <button project-role="editor" class="btn btn-xs" ng-click="changeQa()">Change</button>

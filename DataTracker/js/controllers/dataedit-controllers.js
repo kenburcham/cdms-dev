@@ -4,6 +4,8 @@
 
 var mod_edit = angular.module('DataEditControllers', ['ui.bootstrap']);
 
+var PRIMARY_PROJECT_LOCATION_TYPEID = 3;
+
 //modal to bulk update RowQAStatus
 mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance', 
 
@@ -28,8 +30,8 @@ mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance',
 
 
 //Fieldsheet / form version of the dataentry page
-mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet',
-	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet){
+mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$upload',
+	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $upload){
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
@@ -76,7 +78,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 				$location.path("/unauthorized");
 			}
 
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 			$scope.selectInstrument(); 
 
         });
@@ -91,6 +93,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         	$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
 
         	//set the header field values 
+        	$scope.row['ActivityId'] = $scope.dataset_activities.Header.ActivityId;
         	$scope.row['activityDate'] = $scope.dataset_activities.Header.Activity.ActivityDate;
         	$scope.row['locationId'] = ""+$scope.dataset_activities.Header.Activity.LocationId; //note the conversion of this to a string!
         	$scope.row['InstrumentId'] = $scope.dataset_activities.Header.Activity.InstrumentId; 
@@ -134,7 +137,10 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 				{
 					$scope.headerFields.push(field);
 					//also copy the value to row
-					$scope.row[field.DbColumnName] = $scope.dataset_activities.Header[field.DbColumnName];
+					if(field.ControlType == "multiselect")
+						$scope.row[field.DbColumnName] = angular.fromJson($scope.dataset_activities.Header[field.DbColumnName]);	
+					else
+						$scope.row[field.DbColumnName] = $scope.dataset_activities.Header[field.DbColumnName];
 				}
 				else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
