@@ -210,7 +210,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
     scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
 
 		var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
-            				   '<a href="#/activities/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
+            				   '<a href="#/{{row.getProperty(\'activitiesRoute\')}}/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
             				   '</div>';
 
     var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
@@ -316,6 +316,21 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
         {
             scope.openNewFileModal();
         };
+
+        scope.$watch('datasets', function(){
+
+            console.dir(scope.datasets);
+
+            if(!scope.datasets.$resolved)
+              return;
+
+            //need to bump this since we are looking at a LIST of datasets...
+            angular.forEach(scope.datasets, function(dataset){
+                DataService.configureDataset(dataset);    
+            });
+            
+
+        },true);
 
          scope.users = [];
          scope.$watch('project.Id', function(){

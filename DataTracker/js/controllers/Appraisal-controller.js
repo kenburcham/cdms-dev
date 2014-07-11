@@ -2,11 +2,12 @@
 'use strict';
 
 var LOCATION_TYPE_APPRAISAL = 8;
+var SDE_FEATURECLASS_TAXLOTQUERY = 4;
 
 var mod_apr = angular.module('AppraisalControllers', ['ui.bootstrap']);
 
-var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope',
-    	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope) {
+var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope','DatastoreService',
+    	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope, DatastoreService) {
             $scope.dataset = DataService.getDataset($routeParams.Id);
             $scope.activities = DataService.getActivities($routeParams.Id);
             $scope.loading = true;
@@ -43,7 +44,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             $scope.columnDefs = [
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px', visible: false},
 
-                        {field:'headerdata.Allotment',displayName: 'Parcel Id', cellTemplate: allotmentTemplate, width: '100px'},
+                        {field:'headerdata.Allotment',displayName: 'Parcel Id', cellTemplate: allotmentTemplate, width: '140px'},
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', width: '200px'},
 
                         {field:'Location.Label',displayName: 'Location'},
@@ -73,6 +74,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
             };
 
+            //someone clicks search on the 
             $scope.parcelSearch = function()
             {
                 if(!$scope.parcelSearchText)
@@ -90,8 +92,6 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                     else
                     {
                         angular.forEach(features, function(feature){
-
-                            console.dir(feature);
                             $scope.map.searchResults.push(feature.attributes);
                         });
                     }
@@ -100,9 +100,10 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 });
             }
 
+            //when someone clicks an item in the returned list of parcels
             $scope.selectParcel = function(parcelObjectId)
             {
-                $scope.map.clearGraphics();
+                $scope.clearAll();
                 $scope.map.querySelectParcel(null,parcelObjectId, function(features){
                     if (features.length == 0) { 
                           alert('No parcel polygon found that matches that allotment.');
@@ -111,10 +112,18 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
                     $scope.map.addParcelToMap(features[0]);
                     $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic);
+
+                    //show the infowindow
+                    $scope.map.infoWindow.resize(250, 300);
+                    $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
+                    $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());
+                   
+                    $scope.$apply();
+                    
                 });
             };
 
-            $scope.removeFilter = function()
+            $scope.clearAll = function()
             {
                 $scope.activities = $scope.allActivities;
                 $scope.filteredActivities = undefined;
@@ -124,6 +133,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 $scope.filteringActivities = false;
             };
 
+            //when someone clicks an item in the grid, angular will add it to the selectedItems array, so we watch that.
             $scope.$watch('gridOptions.selectedItems', function(){
 
                 //if clicked on the already selected one, do nothing.
@@ -138,7 +148,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 console.log("clicked a grid item.  querying for: ");
                 console.dir($scope.gridOptions.selectedItems[0].Location.SdeObjectId);
                 var selectedAppraisal = $scope.gridOptions.selectedItems[0];
-                $scope.map.clearGraphics();
+                $scope.clearAll();
                 $scope.map.querySelectParcel(null,selectedAppraisal.Location.SdeObjectId, function(features){
                     if (features.length == 0) { 
                           //alert('No parcel polygon found that matches that appraisal.');
@@ -147,6 +157,12 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
                     $scope.map.addParcelToMap(features[0]);
                     $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic);
+
+                    //show the infowindow
+                    $scope.map.infoWindow.resize(250, 300);
+                    $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
+                    $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());
+
                     console.log("Found ObjectId: " + $scope.map.selectedFeature.attributes.OBJECTID);
                 });
             },true);
@@ -158,6 +174,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             // expose a method for handling clicks ON THE MAP - this is linked to from the Map.js directive
             $scope.click = function(e){
                 
+                $scope.clearAll();
                 $scope.map.reposition(); //this is important or else we end up with our map points off somehow.
 
                 $scope.map.querySelectParcel(e.mapPoint, null, function(features){
@@ -167,6 +184,12 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                     };
 
                     $scope.map.addParcelToMap(features[0]);
+
+                    //show the infowindow
+                    $scope.map.infoWindow.resize(250, 300);
+                    $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
+                    $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());
+
                     console.log("Found ObjectId: " + $scope.map.selectedFeature.attributes.OBJECTID);
 
                     var objectid = $scope.map.selectedFeature.attributes.OBJECTID;
@@ -191,14 +214,38 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
                 });
             };
-
-            //fires when a map parcel is selected -- filter the grid to show just matching allotments
-            $scope.$on("map.selectedFeature", function(event, args){
-                //console.dir(event);
-                console.log("boom we had a selectedfeature event!");
-            });
           
-         
+            //start a new appraisal record (really just an activity data entry for appraisal dataset)
+            $scope.newRecord = function()
+            {
+                //create a new location from the map feature selected
+                var new_location = {
+                    LocationTypeId: LOCATION_TYPE_APPRAISAL,
+                    SdeFeatureClassId: SDE_FEATURECLASS_TAXLOTQUERY,
+                    SdeObjectId: $scope.map.selectedFeature.attributes.OBJECTID,
+                    Label: $scope.map.selectedFeature.attributes.PARCELID,
+
+                };
+                
+
+                var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, new_location);
+                promise.$promise.then(function(){ 
+                   console.log("done and success!");
+
+                   //reload the project locations and spin through to grab our new locationId for the one we just created.
+                   $scope.refreshProjectLocations();
+                   $scope.project.$promise.then(function(){
+                        //grab our new locationId
+                        var location = getByField($scope.project.Locations, $scope.map.selectedFeature.attributes.OBJECTID,"SdeObjectId");
+                        
+                        //bounce the user to the data entry form with that location selected.
+                        $location.path("/dataentryform/"+$scope.dataset.Id).search({LocationId: location.Id, Allotment: location.Label});
+                   });
+                    
+                   
+                });
+
+            };
 
             $scope.toggleFavorite = function(){
                 $scope.isFavorite = !$scope.isFavorite; //make the visible change instantly.
@@ -334,43 +381,33 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
 			$scope.openDataEntry = function (p) { $location.path("/dataentry/"+$scope.dataset.Id);	};
 
-            //Ok -- this is pretty ugly and non-angular-ish.  This is because in the context of a dijit I'm not sure
-            //  how to get angular to process any content here... so we'll have to compose the content " by hand "
-            $scope.getInfoContent = function(graphic)
+            
+
+            //This is very specific to this appraisal page... might be nice to make this pluggable or something. --even just use a partial?
+            $scope.getInfoWindowContent = function(feature)
             {
-                var location = getByField($scope.locationsArray,graphic.attributes.OBJECTID,"SdeObjectId");
-                $scope.map.infoWindow.setTitle(location.Label);
+                var attributes = feature.attributes;
+                var location = getByField($scope.locationsArray,feature.attributes.OBJECTID,"SdeObjectId"); //is there already a location for this OBJECTID?
+
+                if(location)
+                    var allotment = getByField($scope.activities,location.Id,"LocationId"); //is there already an allotment associated with this location?
+
+                $scope.map.infoWindow.setTitle(feature.attributes.PARCELID);
 
                 var html = "";
                 
-                if(location.Description)
-                    html += "<i>" + location.Description + "</i><br/><br/>";
+                if(allotment && allotment.headerdata.CobellAppraisalWave)
+                    html += "<b>Wave: </b>" + allotment.headerdata.CobellAppraisalWave + "<br/>";
+                if(allotment && allotment.headerdata.AllotmentStatus)
+                    html += "<b>Appraisal Status: </b>" + allotment.headerdata.AllotmentStatus + "<hr/>";
 
-                html += "<b>Type: </b>" + location.LocationType.Name;
+                if(attributes.Address && attributes.Address.trim() != "")
+                    html += "<b>Address: </b>" + attributes.Address + "<br/>";
+                if(attributes.OWNERSHIPS)
+                    html += "<b>Ownership: </b>" + attributes.OWNERSHIPS + "<br/>";
+                if(attributes.ACRES_GIS)
+                    html += "<b>Acres (GIS): </b>" + attributes.ACRES_GIS;
                 
-                if(location.Elevation)
-                    html += "<br/><b>Elevation: </b>" + location.Elevation;
-                if(location.GPSEasting)
-                    html += "<br/><b>Easting: </b>" + location.GPSEasting;
-                if(location.GPSNorthing)
-                    html += "<br/><b>Northing: </b>" + location.GPSNorthing;
-                if(location.Latitude)
-                    html += "<br/><b>Latitude: </b>" + location.Latitude;
-                if(location.Longitude)
-                    html += "<br/><b>Longitude: </b>" + location.Longitude;
-                if(location.OtherAgencyId)
-                    html += "<br/><b>Other Agency Id: </b>" + location.OtherAgencyId;
-                if(location.WettedWidth)
-                    html += "<br/><b>Wetted Width: </b>" + location.WettedWidth;
-                if(location.WettedDepth)
-                    html += "<br/><b>Wetted Depth: </b>" + location.WettedDepth;
-                if(location.RiverMile)
-                    html += "<br/><b>River Mile: </b>" + location.RiverMile;
-                if(location.ImageLink)
-                    html += "<br/><br/><a href='"+location.ImageLink+"' target='_blank'><img width='200px' src='"+location.ImageLink+"'/></a>"
-
-                if($scope.Profile.isProjectOwner($scope.project) || $scope.Profile.isProjectEditor($scope.project))
-                    html += "<br/><div class='right'><a href='#/datasetimport/"+$scope.dataset.Id+"?LocationId="+location.Id+"'>Import data</a></div>";
                 
                 return html;
 

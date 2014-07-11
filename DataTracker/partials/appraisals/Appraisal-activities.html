@@ -39,9 +39,9 @@
             </appraisal-map>
             
             <h4>{{dataset.Name}}</h4>
-            <div ng-show="filteringActivities"><i>Filtering by map selection</i>  <button ng-click="removeFilter()" class="btn btn-xs">clear</button><br/><br/></div>
+            <div ng-show="filteringActivities"><i>Filtering by map selection</i>  <button ng-click="clearAll()" class="btn btn-xs">clear</button><br/><br/></div>
 
-            <button type="button" class="btn">New Record</button>
+            <button class="btn" ng-disabled="!map.selectedFeature" ng-click="newRecord()">Start Appraisal</button>
             <button class="btn" ng-click="openQueryWindow()">Query/Export data</button>
             <button class="btn" ng-click="showFilter= !showFilter">Filter</button>
             

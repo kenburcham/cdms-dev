@@ -4,7 +4,6 @@
 
 var mod_edit = angular.module('DataEditControllers', ['ui.bootstrap']);
 
-var PRIMARY_PROJECT_LOCATION_TYPEID = 3;
 
 //modal to bulk update RowQAStatus
 mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance', 
@@ -89,6 +88,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
         		return;
 
         	$scope.dataset = $scope.dataset_activities.Dataset;
+        	DataService.configureDataset($scope.dataset); //bump to load config since we are pulling it directly out of the activities
+
         	$scope.project = DataService.getProject($scope.dataset.ProjectId);
         	$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
 

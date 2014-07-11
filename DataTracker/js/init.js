@@ -3,6 +3,7 @@
 var profile = null; 
 var ALLOW_SUPERADMIN = true;
 var serviceUrl = '//data.ctuir.org/servicesSTAGE';
+var PRIMARY_PROJECT_LOCATION_TYPEID = 3;
 
 require([
   'angular',
@@ -71,6 +72,13 @@ var SystemTimezones = [
     "Description" : "(GMT-06:00) Mountain Daylight Time (US & Canada)",
     "TimezoneOffset" : -6 * millis_per_h,
   }, 
+
+  {
+    "Name" : "Greenwich Mean Time",
+    "Description" : "(GMT-00:00) Greenwich Mean Time",
+    "TimezoneOffset" : 0,
+  }, 
+
 
   //{
   //  "Name" : "Central Daylight Time",

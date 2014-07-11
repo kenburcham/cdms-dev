@@ -402,7 +402,30 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 return service.dataset;
             
             service.dataset = Datasets.query({id: datasetId});
+            
+            //load our configuration if there is one
+            service.dataset.$promise.then(function(){
+                service.configureDataset(service.dataset);
+            });
+
             return service.dataset;
+        },
+
+        configureDataset: function(dataset)
+        {
+            console.log("configuring dataset!" + dataset.Id);
+            //default page routes
+            dataset.activitiesRoute = "activities"; //default route -- when they click to go to "activities" this is the route they should use.
+
+            //objectify our dataset config for later use
+            if(dataset.Config)
+            {
+                dataset.Config = angular.fromJson(dataset.Config);
+
+                //if there are page routes in configuration, set them in our dataset
+                if(dataset.Config.ActivitiesPage)
+                    dataset.activitiesRoute = dataset.Config.ActivitiesPage.Route;
+            }
         },
 
         getHeadersDataForDataset: function(datasetId) {
@@ -2054,4 +2077,23 @@ function formatDate(d)
         [("00" + d.getHours()).slice(-2), ("00" + d.getMinutes()).slice(-2), ("00" + d.getSeconds()).slice(-2)].join(':');
 
     return d_str;
+}
+
+//if(somearray.contains("a"))...
+if(!Array.prototype.contains)
+{
+    Array.prototype.contains = function(searchElement)
+    {
+        if (this==null)
+            throw new TypeError('Array.contains: "this" is null or not defined');
+
+        if(this.length == 0)
+            return false;
+
+        if(this.indexOf(searchElement) == -1)
+            return false;
+
+        return true;
+
+    }
 }

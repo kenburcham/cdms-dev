@@ -2,7 +2,7 @@
 <ul class="breadcrumb">
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
-    <li><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
+    <li><a href="#/{{dataset.activitiesRoute}}/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
     <li class="active">Data entry form</li>
 </ul>
 <h4>Add new record: {{dataset.Name}}</h4>
@@ -27,14 +27,18 @@
     </div>
 
     <div class="header-box" style="margin-top: 20px; width: 500px;">
-            <div class="header-label">Location:</div>
-            <div class="header-value">
-                <select class="form-control" ng-model="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
-                </select>
+            <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('Location')">
+                <div class="header-label">Location:</div>
+                <div class="header-value">
+                    <select class="form-control" ng-model="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
+                    </select>
+                </div>
             </div>
-            <div class="header-label">Activity Date:</div>
-            <div class="header-value">
-                <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+            <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
+                <div class="header-label">Activity Date:</div>
+                <div class="header-value">
+                    <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+                </div>
             </div>
 
             <div ng-show="hasReadingDateTime">
@@ -73,7 +77,9 @@
             <ctuir-multiselect-field ng-switch-when="multiselect"></ctuir-multiselect-field>
             <ctuir-text-field ng-switch-default></ctuir-text-field>
         </div>
-        <div class="header-label">QA Status:</div>
+        
+        <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('QA')">
+            <div class="header-label">QA Status:</div>
             <div class="header-value">
                 <select class="form-control" ng-model="row.ActivityQAStatus['QAStatusId']" ng-input="row.ActivityQAStatus['QAStatusId']" ng-options="id as name for (id, name) in QAStatusOptions"></select>
             </div>  
@@ -82,6 +88,7 @@
             <div class="header-value">
                 <textarea class="form-control" ng-model="row.ActivityQAStatus['Comments']" ng-input="row.ActivityQAStatus['Comments']"></textarea>
             </div>  
+        </div>
 
         </form>
     </div>

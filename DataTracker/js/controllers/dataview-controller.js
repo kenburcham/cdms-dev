@@ -94,6 +94,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 			$scope.$watch('grid.Dataset', function() { 
 				if(!$scope.grid.Dataset) return; //not done cooking yet.
 				$scope.dataset = $scope.grid.Dataset;//DataService.getDataset($scope.grid.Dataset.Id);
+				DataService.configureDataset($scope.dataset);
 
 				if(!$scope.fieldsloaded)
 				{

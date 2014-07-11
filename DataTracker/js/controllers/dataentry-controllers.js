@@ -62,8 +62,8 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
-			
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
+
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
 			{
@@ -184,11 +184,18 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		//fire up our dataset
         $scope.dataset = DataService.getDataset($routeParams.Id);
 
+		//if ?LocationId=123 is passed in then lets set it to the given LocationId
+		if($routeParams.LocationId)
+		{
+			$scope.row['locationId'] = $routeParams.LocationId;
+		}
+
+
         //update our location options as soon as our project is loaded.
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
 			//if there is only one location, just set it to that location
 			if(array_count($scope.locationOptions)==1)
@@ -211,6 +218,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
          //setup a listener to populate column headers on the grid
 		$scope.$watch('dataset.Fields', function() { 
 			if(!$scope.dataset.Fields ) return;
+
 			//load our project based on the projectid we get back from the dataset
         	$scope.project = DataService.getProject($scope.dataset.ProjectId);
 			
@@ -246,8 +254,15 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			}
 
 			//set defaults for header fields
-			angular.forEach($scope.headerFields, function(headerfield){
-				$scope.row[headerfield.DbColumnName] = (headerfield.DefaultValue) ? headerfield.DefaultValue : null;
+			angular.forEach($scope.headerFields, function(field){
+				$scope.row[field.DbColumnName] = (field.DefaultValue) ? field.DefaultValue : null;
+
+				//FEATURE: any incoming parameter value that matches a header will get copied into that header value.
+				if($routeParams[field.DbColumnName])
+				{
+					$scope.row[field.DbColumnName] = $routeParams[field.DbColumnName];
+				}
+
 			});
 
 			$scope.row.ActivityQAStatus.QAStatusId = ""+$scope.dataset.DefaultActivityQAStatusId;
