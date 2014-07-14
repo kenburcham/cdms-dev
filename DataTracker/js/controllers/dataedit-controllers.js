@@ -171,6 +171,12 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 			angular.forEach($scope.gridDatasheetOptions.selectedItems, function(item, key){
 				//console.dir(item);
 				item.QAStatusId = rowQAId;
+
+				//mark the row as updated so it will get saved.
+				if($scope.updatedRows.indexOf(item.Id) == -1)
+                {
+                    $scope.updatedRows.push(item.Id);
+                }
 			});
 
 			$scope.clearSelections();

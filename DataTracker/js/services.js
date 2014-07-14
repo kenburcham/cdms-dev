@@ -788,12 +788,16 @@ mod.service('ActivityParser',[ 'Logger',
             },
 
             addActivity: function(activities, key, row, headerFields, detailFields){
+                if(row.Timezone)
+                    var currentTimezone = row.Timezone;
+
                 if(!activities.activities[key])
                 {
 
                     //console.dir(row.activityDate);
 
                     var a_date = new Date(row.activityDate).toISOString();
+
                     //setup the new activity object structure
                     activities.activities[key] = {
                         LocationId: row.locationId,
@@ -861,8 +865,12 @@ mod.service('ActivityParser',[ 'Logger',
                     {
                         //flatten multiselect values into an json array string
                         if(field.ControlType == "multiselect")
-                        {
                             row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
+
+                        //convert to a date string on client side for datetimes
+                        if(field.ControlType == "datetime" && row[field.DbColumnName])
+                        {
+                            row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
                         }
 
                         rowHasValue = true; //ok, we have a value in this row.
@@ -2013,6 +2021,23 @@ function getLocationObjectIdsByType(type, locations)
     return locationObjectIds;
 }
 
+function getLocationObjectIdsByInverseType(type, locations)
+{
+    //console.log("reloading project locations");
+    var locationsArray = getUnMatchingByField(locations,type,"LocationTypeId");
+    var locationObjectIdArray = [];
+
+    angular.forEach(locationsArray, function(item, key){
+        if(item.SdeObjectId)
+            locationObjectIdArray.push(item.SdeObjectId);
+    });
+
+    var locationObjectIds = locationObjectIdArray.join();
+    console.log("found project locations: " + locationObjectIds);
+
+    return locationObjectIds;
+}
+
 function fireRules(type, row, field, value, headers, errors)
 {
     var row_errors = errors; //older rules use "row_errors"
@@ -2060,13 +2085,16 @@ function dateToUTC(a_date)
 //give me a date string and offset (in ms) and I'll give you back a Date 
 //  with the offset applied. 
 //  used in rules.
-function toGMTDate(str_date, int_offset)
+function toDateOffset(str_date, int_offset)
 {
+    //console.log(int_offset);
+    //console.log(str_date);
     var orig_date = new Date(str_date);
+    //console.log(orig_date.toISOString());
     var d = new Date(orig_date.getTime() + int_offset);
+    //console.log(d.toISOString());
     
-    return formatDate(d_str);
-
+    return d;
 }
 
 //date to friendly format: "12/05/2014 04:35:44"

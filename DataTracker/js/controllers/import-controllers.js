@@ -542,11 +542,20 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									try
 									{
 										if(data_row[col])
-											new_row[field.DbColumnName] = new Date(data_row[col]).toISOString();
+										{
+											//var d = toDateOffset(data_row[col], $scope.ActivityFields.Timezone.TimezoneOffset);
+											var d = new Date(data_row[col]);
+											//TODO: better way to fix this?
+											if(d.getFullYear() < 1950)
+												d.setFullYear(d.getFullYear() + 100); 
+
+											new_row[field.DbColumnName] = d.toISOString();
+										}
 									}
 									catch(e)
 									{
 										console.log("problem converting date: " + data_row[col]);
+										console.dir(e);
 									}
 								}
 								else //just add the value to the cell

@@ -406,9 +406,9 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.reloadProjectLocations = function(){
 
-                $scope.locationsArray = getMatchingByField($scope.project.Locations,2,"LocationTypeId");
+                $scope.locationsArray = getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId");
 
-                $scope.locationObjectIds = getLocationObjectIdsByType(2,$scope.project.Locations);
+                $scope.locationObjectIds = getLocationObjectIdsByInverseType(PRIMARY_PROJECT_LOCATION_TYPEID,$scope.project.Locations);
 
                 if($scope.map && $scope.map.locationLayer && $scope.map.locationLayer.hasOwnProperty('showLocationsById'))
                     $scope.map.locationLayer.showLocationsById($scope.locationObjectIds); //bump and reload the locations.

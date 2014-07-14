@@ -43,17 +43,17 @@ var millis_per_h = 3600000;
 
 var SystemTimezones = [
   {
-    "Name" : "Pacific Standard Time",
+    "Name" : "Pacific Standard Time (GMT-08:00)",
     "Description" : "(GMT-08:00) Pacific Standard Time (US & Canada)",
     "TimezoneOffset" : -8 * millis_per_h,
   }, 
 {
-    "Name" : "Pacific Daylight Time",
+    "Name" : "Pacific Daylight Time (GMT-07:00)",
     "Description" : "(GMT-07:00) Pacific Daylight Time (US & Canada)",
     "TimezoneOffset" : -7 * millis_per_h,
   },
   {
-    "Name" : "Mountain Standard Time",
+    "Name" : "Mountain Standard Time (GMT-07:00)",
     "Description" : "(GMT-07:00) Mountain Standard Time (US & Canada)",
     "TimezoneOffset" : -7 * millis_per_h,
   },
@@ -68,13 +68,13 @@ var SystemTimezones = [
   //  "TimezoneOffset" : -5 * millis_per_h,
   //},
   {
-    "Name" : "Mountain Daylight Time",
+    "Name" : "Mountain Daylight Time (GMT-06:00)",
     "Description" : "(GMT-06:00) Mountain Daylight Time (US & Canada)",
     "TimezoneOffset" : -6 * millis_per_h,
   }, 
 
   {
-    "Name" : "Greenwich Mean Time",
+    "Name" : "Greenwich Mean Time (GMT-00:00)",
     "Description" : "(GMT-00:00) Greenwich Mean Time",
     "TimezoneOffset" : 0,
   }, 
