@@ -245,7 +245,7 @@ define([
         map.centerAndZoomToGraphic = function(graphic)
         {
             var centerPoint = graphic.geometry.getExtent().getCenter();
-            map.centerAndZoom(centerPoint, 15);
+            return map.centerAndZoom(centerPoint, 15);
         };
 
         // lets expose a version of centerAt that takes an array of [lng,lat]

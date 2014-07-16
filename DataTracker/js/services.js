@@ -1099,7 +1099,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 //fire rules - OnChange
                 
-                fireRules("OnChange", row, field, value, headers, errors);
+                fireRules("OnChange", row, field, value, headers, errors, scope);
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
 
@@ -1235,7 +1235,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 var headers = scope.row;
                 if(field && value)
                 {
-                    fireRules("OnChange",row, field, value, headers, []);
+                    fireRules("OnChange",row, field, value, headers, [], scope);
                 }
 
                 //this is expensive in that it runs every time a value is changed in the grid.
@@ -1417,6 +1417,10 @@ function makeFieldColDef(field, scope) {
                 coldef.editableCellTemplate = '<input type="checkbox" ng-checked="row.entity.'+field.DbColumnName+'==true" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 coldef.cellTemplate = coldef.editableCellTemplate; //checkbox for display and edit.
                 break;
+            case 'file': 
+                coldef.cellTemplate = '<button class="right btn btn-xs" ng-click="addFiles(row, col.field)">Add</button> <span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span>';
+                //<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
+                break;
 
         }
     }
@@ -1434,6 +1438,11 @@ function makeFieldColDef(field, scope) {
 
         case 'datetime':
             coldef.cellFilter = 'date: \'MM/dd/yyyy HH:mm:ss\'';
+            break;
+
+        case 'file':
+            if(!coldef.enableCellEdit)
+                coldef.cellTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span></div>';//<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
             break;
     }
 
@@ -1500,7 +1509,7 @@ function parseField(field, scope)
         console.dir(e);
     }
 
-    fireRules("DefaultValue", null, field, null, null, null);
+    fireRules("DefaultValue", null, field, null, null, null, null);
 
     field.parsed = true;
 
@@ -1641,8 +1650,17 @@ function validateField(field, row, key, scope, row_errors)
         case 'select':
             //is the value in our list of options?
             //console.log(scope.CellOptions[field.DbColumnName+'Options']);
-            if(Object.keys(scope.CellOptions[field.DbColumnName+'Options']).indexOf(value) == -1) //not found
-                row_errors.push("["+field.DbColumnName+"] Invalid selection");
+            if(scope.CellOptions[field.DbColumnName+'Options'])
+            {
+                if(Object.keys(scope.CellOptions[field.DbColumnName+'Options']).indexOf(value) == -1) //not found
+                    row_errors.push("["+field.DbColumnName+"] Invalid selection");
+            }
+            else
+            {
+                console.log("Error: no cellOptions for " + field.DbColumnName+'Options' );
+                console.dir(scope.CellOptions);
+                console.log("This might be because you're calling a rule wrong?");
+            }
             break;
 
         case 'multiselect':
@@ -1716,7 +1734,7 @@ if(field.DbColumnName == "FinClip")
 }
 */
 
-    fireRules("OnValidate",row,field,value,scope.row,row_errors);
+    fireRules("OnValidate",row,field,value,scope.row,row_errors, scope);
 
     
 }
@@ -2038,7 +2056,7 @@ function getLocationObjectIdsByInverseType(type, locations)
     return locationObjectIds;
 }
 
-function fireRules(type, row, field, value, headers, errors)
+function fireRules(type, row, field, value, headers, errors, scope)
 {
     var row_errors = errors; //older rules use "row_errors"
     try{

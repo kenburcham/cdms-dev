@@ -68,7 +68,28 @@ angular.module('DatasetFilters', [])
               return 'unknown';
             }
           };
-        })
+    })
+    .filter('fileNamesFromString', function($sce){
+        return function(input)
+        {
+            var retval = [];
+            if(input)
+            {
+                var files = angular.fromJson(input);
+                angular.forEach(files, function(file){
+                    retval.push("<a href='" + file.Link + "'>" + file.Name + "</a>");    
+                });
+            }
+
+            if(retval.length==0)
+                retval = "&nbsp;";
+            else
+                retval = retval.join(",");
+
+            return $sce.trustAsHtml(retval);
+            
+        };
+    })
 
 
 

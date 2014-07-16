@@ -81,7 +81,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
     		$scope.$watch('project.Name', function(){
     			if($scope.project){
-    				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+    				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
     				$scope.locationOptions["all"] = "- All -";
     				$scope.Criteria.LocationIds = ["all"]; //set the default
 				}

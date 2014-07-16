@@ -269,6 +269,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
     		$scope.$watch('dataset.Name', function(){
     			if($scope.dataset.Fields)
     			{
+    				//DataService.configureDataset($scope.dataset); //bump to load config since we are pulling it directly out of the activities
+
 					$scope.project = DataService.getProject($scope.dataset.ProjectId);
 
 					$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
@@ -300,9 +302,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							$scope.DetailColDefs.push(makeFieldColDef(field, $scope));
 						}
 
+						//convention: if you have a readingdatetime field then we turn on our timezone magic
 						if(field.DbColumnName == "ReadingDateTime")
 						{
-							$scope.hasReadingDateTime = true;
 							$scope.ActivityFields.Timezone = getByField($scope.SystemTimezones, new Date().getTimezoneOffset() * -60000, "TimezoneOffset"); //set default timezone
 						}
 

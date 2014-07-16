@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <div ng-show="hasReadingDateTime">
+            <div ng-show="dataset.Config && dataset.Config.DataEntryPage.ShowFields.contains('Timezone')">
                 <div class="header-label">Reading Timezone:</div>
                 <div class="header-value">
                     <select class="form-control" ng-model="row.Timezone" ng-options="zone.Name for zone in SystemTimezones">

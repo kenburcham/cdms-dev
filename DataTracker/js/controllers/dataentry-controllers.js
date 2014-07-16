@@ -241,7 +241,6 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
     				//a convention:  if your dataset has a ReadingDateTime field then we enable timezones for an activity.
     				if(field.DbColumnName == "ReadingDateTime")
     				{
-    					$scope.hasReadingDateTime = true;
     					$scope.row.Timezone = getByField($scope.SystemTimezones, new Date().getTimezoneOffset() * -60000, "TimezoneOffset"); //set default timezone
     				}
 				}

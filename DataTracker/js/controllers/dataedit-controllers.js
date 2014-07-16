@@ -29,14 +29,16 @@ mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance',
 
 
 //Fieldsheet / form version of the dataentry page
-mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$upload',
-	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $upload){
+mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$upload',
+	function($scope, $q, $sce, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $upload){
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
 		$scope.userId = $rootScope.Profile.Id;
 		$scope.headerFields = [];
 		$scope.detailFields = [];
+		$scope.filesToUpload = {};
+		$scope.errors = { heading: []};
 
 		$scope.cellInputEditableTemplate = '<input ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" />';
 		$scope.cellSelectEditableTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'QAStatusId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in RowQAStatuses"/>';
@@ -155,11 +157,23 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
             $scope.validateGrid($scope);
 
 		});
-        
-		$scope.selectTimezone = function()
+
+
+        //add a function that will enable file modal capability for all fields with controlType = file
+        $scope.openFileModal = function(row, field)
         {
-        	$scope.validateGrid($scope);
-        }
+        	//console.dir(row);
+        	//console.dir(field);
+            $scope.file_row = row;
+            $scope.file_field = field;
+            
+            var modalInstance = $modal.open({
+                templateUrl: 'partials/file/file-modal.html',
+                controller: 'FileModalCtrl',
+                scope: $scope, //scope to make a child of
+            });
+        };
+
 
 		$scope.clearSelections = function()
 		{
@@ -250,33 +264,156 @@ mod_edit.controller('DataEditCtrl', ['$scope','$routeParams','DataService','$mod
 			$scope.dataSheetDataset.push(row);
 		};
 
+		//field = DbColumnName
+		$scope.onFileSelect = function(field, files)
+		{
+			//console.log("file selected! " + field)
+			$scope.filesToUpload[field] = files;
+		};
+
+		$scope.uploadFiles = function()
+		{
+			$scope.uploadErrorMessage = undefined;
+
+			var promises = [];
+
+			angular.forEach($scope.filesToUpload, function(files, field){
+
+				console.log("handling files for: " + field)
+
+			      for(var i = 0; i < files.length; i++)
+			      {
+			          var file = files[i];
+			          //console.dir(file);
+
+			          if(file.success != "Success")
+			          {
+
+			          	var deferred = $q.defer();
+
+			            $upload.upload({
+			              url: serviceUrl + '/data/UploadProjectFile', 
+			              method: "POST",
+			              // headers: {'headerKey': 'headerValue'},
+			              // withCredential: true,
+			              data: {ProjectId: $scope.project.Id, Description: "Appraisal file for: "+$scope.row['Allotment'], Title: file.Name},
+			              file: file,
+
+			            }).progress(function(evt) {
+			                console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+
+			            }).success(function(data, status, headers, config) {
+			            	//console.dir(data);
+			                config.file.success = "Success";
+			                config.file.data = data;
+			                deferred.resolve(data);
+
+			            })
+			            .error(function(data, status, headers, config) {
+			                $scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
+			                console.log(" error.");
+			                config.file.success = "Failed";
+			                deferred.reject();
+
+			              });
+
+			            promises.push(deferred.promise);
+
+			          }
+
+			      }
+			});
+
+			return $q.all(promises);
+
+
+			
+		};
+
+		//this function gets called when a user clicks the "Add" button in a GRID file cell
+		$scope.addFiles = function(row, field_name)
+		{
+			var field = $scope.FieldLookup[field_name];
+
+			//console.dir(row);
+			//console.dir(field);
+			$scope.openFileModal(row.entity, field);
+
+			//go ahead and mark this row as being updated.
+			$scope.updatedRows.push(row.entity.Id);
+
+		}
 
 		$scope.saveData = function(){
 			
+			$scope.errors.heading = []; //reset errors if there are any.
+
 			if($scope.gridHasErrors)
 			{
 				if(!confirm("There are validation errors.  Are you sure you want to save anyway?"))
 					return;
 			}
 
-			$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.headerFields, $scope.detailFields);
+			var promise = $scope.uploadFiles();
+			promise.then(function(data){
+
+				//spin through the files that we uploaded
+				angular.forEach($scope.filesToUpload, function(files, field){
+					
+					var local_files = [];
+
+					for(var i = 0; i < files.length; i++)
+			      	{
+			          var file = files[i];
+			          
+			          if(file.data && file.data.length == 1) //since we only upload one at a time...
+			          {
+			          		//console.dir(file.data);
+			          		local_files.push(file.data[0]); //only ever going to be one if there is any...
+			          		//console.log("file id = "+file.data[0].Id);
+			          }
+			          else
+			          {
+			          	//console.log("no file id.");
+			          	$scope.errors.heading.push("There was a problem saving file: " + file.Name + " - Try a unique filename.");
+			          	throw "Problem saving file: " + file.Name;
+			          }
+			      	}
+
+			      	//if we already had actual files in this field, copy them in
+			      	if($scope.file_row[field])
+			      	{
+			      		var current_files = angular.fromJson($scope.file_row[field]);
+			      		angular.forEach(current_files, function(file){
+			      			if(file.Id) //our incoming files don't have an id, just actual files.
+			      				local_files.push(file);		
+			      		});
+			      	}
+
+					$scope.file_row[field] = angular.toJson(local_files);
+					//console.log("Ok our new list of files: "+$scope.row[field]);
+				});
+
+				$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.headerFields, $scope.detailFields);
 			
-			if(!$scope.activities.errors)
-			{
+				if(!$scope.activities.errors)
+				{
+					//add our updated list and deleted list to our payload
+					$scope.activities.deletedRowIds = $scope.getDeletedRowIds($scope.deletedRows);
+					$scope.activities.updatedRowIds = $scope.updatedRows;
 
-				//add our updated list and deleted list to our payload
-				$scope.activities.deletedRowIds = $scope.getDeletedRowIds($scope.deletedRows);
-				$scope.activities.updatedRowIds = $scope.updatedRows;
+					DataService.updateActivities($scope.userId, $scope.dataset.Id, $scope.activities);
 
-				DataService.updateActivities($scope.userId, $scope.dataset.Id, $scope.activities);
+				}
+			});
 
-			}
+			
 			
 		};		
 
 		$scope.doneButton = function(){
 			$scope.activities = undefined;
-		 	$location.path("/activities/"+$scope.dataset.Id);
+		 	$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		};
 
 		$scope.getDeletedRowIds = function(rows)

@@ -9,6 +9,7 @@
  
 
 <div ng-include="'partials/dataentry/messages.html'"/>
+<div ng-show="errors.heading.length>0" class="alert alert-danger"><div ng-repeat="error in errors.heading">{{error}}</div></div>
 
 <div class="row" ng-show="!activities.success">
     <div ng-show="dataset" class="error-table" style="width: 400px; margin-top: 10px; float: right; margin-right: 50px;" >
@@ -27,18 +28,22 @@
     </div>
 
     <div ng-show="dataset" class="header-box" style="margin-top: 20px; width: 500px;">
-            <div class="header-label">Location:</div>
-            <div class="header-value">
-                <select class="form-control" ng-model="row['locationId']" ng-input="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
-                </select>
-            </div>
-            <div class="header-label">Activity Date:</div>
-            <div class="header-value">
-                <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" min="'2000-01-01'" 
-                max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+            <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('Location')">
+                <div class="header-label">Location:</div>
+                <div class="header-value">
+                    <select class="form-control" ng-model="row['locationId']" ng-input="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
+                    </select>
+                </div>
             </div>
 
-            <div ng-show="dataset_activities.Header.Activity.Timezone">
+            <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
+                <div class="header-label">Activity Date:</div>
+                <div class="header-value">
+                    <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="row['activityDate']" is-open="opened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+                </div>
+            </div>
+
+            <div ng-show="dataset.Config && dataset.Config.DataEntryPage.ShowFields.contains('Timezone')">
                 <div class="header-label">Reading Timezone:</div>
                 <div class="header-value">
                     <select class="form-control" ng-model="row.Timezone" ng-options="zone.Name for zone in SystemTimezones">
@@ -84,6 +89,7 @@
         </div>
         </form>
 
+        <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('QA')">
             <div class="header-label">QA Status:</div>
             <div class="header-value" title="by {{dataset_activities.Header.Activity.ActivityQAStatus.User.Fullname}}">
                 <select class="form-control" ng-model="row.ActivityQAStatus['QAStatusId']" ng-input="row.ActivityQAStatus['QAStatusId']" ng-options="id as name for (id, name) in QAStatusOptions"></select>
@@ -93,10 +99,10 @@
             <div class="header-value">
                 <textarea class="form-control" ng-model="row.ActivityQAStatus['Comments']" ng-input="row.ActivityQAStatus['Comments']"></textarea>
             </div>  
-
+        </div>
 
     </div>
-<div class="right" style="margin-top: -25px;">
+<div class="right" style="margin-top: -25px;" ng-show="dataset.RowQAStatuses.length > 1">
     <button class="btn btn-sm" ng-click="clearSelections()">Clear selections</button>
     <button class="btn btn-sm" ng-click="openBulkQAChange()">Bulk Row QA Change</button>
 </div>

@@ -19,13 +19,14 @@ define([
 	  'AppraisalControllers',
 	  'MyDatasetsControllers',
 	  'ActivitiesController',
+	  'FileModalController',
 	  'ChartServices',
 	  'DatasetServices',
 	  'angularFileUpload',
 	  'DatasetDirectives',
 	  'AdminController',
 	  'angularCharts',
-	  'checklist-model'
+	  'checklist-model',
 	  ])
 	    .config(['$routeProvider', function($routeProvider) {
 	    	

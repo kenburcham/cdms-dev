@@ -149,7 +149,7 @@ mod_ds.controller('ModalNewFileCtrl', ['$scope','$modalInstance', 'DataService',
     $scope.onFileSelect = function($files)
     {
           $scope.uploadFiles = $files;              
-          console.dir($scope.uploadFiles);
+          //console.dir($scope.uploadFiles);
     };
       
     $scope.save = function(){      

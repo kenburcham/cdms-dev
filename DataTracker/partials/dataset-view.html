@@ -20,13 +20,17 @@
             </div>
 
             <div class="header-box">
-                <div class="header-label">Location:</div>
-                <div class="header-value">{{grid.Header.Activity.Location.Label}}&nbsp;</div>
+                <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('Location')">
+                    <div class="header-label">Location:</div>
+                    <div class="header-value">{{grid.Header.Activity.Location.Label}}&nbsp;</div>
+                </div>
 
-                <div class="header-label">Activity Date:</div>
-                <div class="header-value">{{grid.Header.Activity.ActivityDate | date: 'MM/dd/yyyy'}}&nbsp;</div>            
+                <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
+                    <div class="header-label">Activity Date:</div>
+                    <div class="header-value">{{grid.Header.Activity.ActivityDate | date: 'MM/dd/yyyy'}}&nbsp;</div>            
+                </div>
 
-                <div ng-show="grid.Header.Activity.Timezone">
+                <div ng-show="dataset.Config && dataset.Config.DataEntryPage.ShowFields.contains('Timezone')">
                     <div class="header-label">Reading Timezone:</div>
                     <div class="header-value">{{grid.Header.Activity.Timezone.Name}}&nbsp;</div>
                 </div>
@@ -51,6 +55,11 @@
                         <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName] | arrayValues}}&nbsp;</div>
                     </div>
 
+                    <div ng-switch-when="file" class="header-column" >
+                        <div class="header-label">{{field.Label}}:</div>
+                        <div style="min-height: 25px; margin-left: 200px;" ng-show="field.ControlType" class="header-value" ng-bind-html="grid.Header[field.DbColumnName] | fileNamesFromString">&nbsp;</div>
+                    </div>
+
                     <div ng-switch-default class="header-column">
                         <div class="header-label">{{field.Label}}:</div>
                         <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
@@ -58,13 +67,15 @@
                 </div>
 
 
-                <div class="header-label">QA Status:</div>
-                <div class="header-value" ng-show="grid.Header.Activity.ActivityQAStatus">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}} ({{grid.Header.Activity.ActivityQAStatus.User.Fullname}}) <button project-role="editor" class="btn btn-xs" ng-click="changeQa()">Change</button>
-                <div class="alert alert-danger" ng-show="QaSaveResults.failure">Failed to update.</div>
-                </div>            
+                <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('QA')">
+                    <div class="header-label">QA Status:</div>
+                    <div class="header-value" ng-show="grid.Header.Activity.ActivityQAStatus">{{grid.Header.Activity.ActivityQAStatus.QAStatus.Name}} ({{grid.Header.Activity.ActivityQAStatus.User.Fullname}}) <button project-role="editor" class="btn btn-xs" ng-click="changeQa()">Change</button>
+                    <div class="alert alert-danger" ng-show="QaSaveResults.failure">Failed to update.</div>
+                    </div>            
 
-                <div class="header-label">QA Comment:</div>
-                <div class="header-value">{{grid.Header.Activity.ActivityQAStatus.Comments}}</div>            
+                    <div class="header-label">QA Comment:</div>
+                    <div class="header-value">{{grid.Header.Activity.ActivityQAStatus.Comments}}</div>            
+                </div>
 
             
             </div>

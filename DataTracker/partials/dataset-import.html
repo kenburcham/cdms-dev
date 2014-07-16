@@ -75,14 +75,14 @@
                             <div class="mapped-activity-field" ng-show="mappedActivityFields['2']">Use: {{mappedActivityFields['2']}}</div>
                     </td>
                 </tr>
-                <tr>
+                <tr ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
                     <td>Activity Date:</td><td><input type="text" datepicker-popup="longDate" ng-model="ActivityFields.ActivityDate" is-open="copened" datepicker-options="dateOptions" ng-required="false" close-text="Close" ng-show="!mappedActivityFields['1']"/>
                     <div class="mapped-activity-field" ng-show="mappedActivityFields['1']">Use: {{mappedActivityFields['1']}}</div>
                     </td>
                 </tr>
 
 
-                <tr ng-show="hasReadingDateTime">
+                <tr ng-show="dataset.Config && dataset.Config.DataEntryPage.ShowFields.contains('Timezone')">
                     <td>Reading Timezone: </td>
                     <td>
                         <select class="form-control" ng-model="ActivityFields.Timezone" ng-options="zone.Name for zone in SystemTimezones"></select>  
@@ -100,7 +100,7 @@
                     </td>
                 </tr>
 
-                <tr class="hidden">
+                <tr ng-hide="true">
                     <td>QA Status:</td>
                     <td>
                     <select class="form-control" ng-model="ActivityFields.QAStatusId" ng-options="id as name for (id, name) in QAStatusOptions">
@@ -145,15 +145,20 @@
 
 
                 <div class="header-box" style="margin-top: 20px; width: 500px;" ng-show="showHeaderForm">
-                    <div class="header-label">Location:</div>
-                    <div class="header-value">
-                        <select class="form-control" ng-model="ActivityFields.LocationId" ng-options="id as name for (id, name) in locationOptions">
-                        </select>
+
+                    <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('Location')">
+                        <div class="header-label">Location:</div>
+                        <div class="header-value">
+                            <select class="form-control" ng-model="ActivityFields.LocationId" ng-options="id as name for (id, name) in locationOptions">
+                            </select>
+                        </div>
                     </div>
-                    <div class="header-label">Activity Date:</div>
-                    <div class="header-value">
-                        <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="ActivityFields.ActivityDate" is-open="dopened" min="'2000-01-01'" 
-                        max="'2015-06-22'" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+
+                    <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
+                        <div class="header-label">Activity Date:</div>
+                        <div class="header-value">
+                            <input  class="form-control" type="text" datepicker-popup="longDate" ng-model="ActivityFields.ActivityDate" is-open="dopened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+                        </div>
                     </div>
 
                     <div ng-show="project.Instruments.length > 0" >
@@ -165,7 +170,7 @@
 
                         </div>
 
-                        <div ng-show="hasReadingDateTime">
+                        <div ng-show="dataset.Config && dataset.Config.DataEntryPage.ShowFields.contains('Timezone')">
                             <div class="header-label">Reading Timezone:</div>
                             <div class="header-value">
                                 <select class="form-control" ng-model="ActivityFields.Timezone" ng-options="zone.Name for zone in SystemTimezones">
@@ -204,7 +209,9 @@
                     <ctuir-multiselect-field ng-switch-when="multiselect"></ctuir-multiselect-field>
                     <ctuir-text-field ng-switch-default></ctuir-text-field>
                 </div>
-                <div class="header-label">QA Status:</div>
+
+                <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('QA')">
+                    <div class="header-label">QA Status:</div>
                     <div class="header-value">
                         <select class="form-control" ng-model="ActivityFields.QAStatusId" ng-options="id as name for (id, name) in QAStatusOptions"></select>
                     </div>  
@@ -213,6 +220,7 @@
                     <div class="header-value">
                         <textarea class="form-control" ng-model="ActivityFields.QAComments"></textarea>
                     </div>  
+                </div>
 
                 </form>
             </div>

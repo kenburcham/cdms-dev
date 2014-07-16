@@ -46,6 +46,8 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
                         {field:'headerdata.Allotment',displayName: 'Parcel Id', cellTemplate: allotmentTemplate, width: '140px'},
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', width: '200px'},
+                        {field:'headerdata.CobellAppraisalWave',displayName: 'Wave', width: '200px'},
+
 
                         {field:'Location.Label',displayName: 'Location'},
                     
@@ -111,12 +113,14 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                     };
 
                     $scope.map.addParcelToMap(features[0]);
-                    $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic);
+                    $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic).then(function(){
+                        //show the infowindow
+                        $scope.map.infoWindow.resize(250, 300);
+                        $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
+                        $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());    
+                    });
 
-                    //show the infowindow
-                    $scope.map.infoWindow.resize(250, 300);
-                    $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
-                    $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());
+                    
                    
                     $scope.$apply();
                     
@@ -133,8 +137,12 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 $scope.filteringActivities = false;
             };
 
+
             //when someone clicks an item in the grid, angular will add it to the selectedItems array, so we watch that.
             $scope.$watch('gridOptions.selectedItems', function(){
+
+                if(!$scope.gridOptions.selectedItems || $scope.gridOptions.selectedItems.length == 0 )
+                    return;
 
                 //if clicked on the already selected one, do nothing.
                 if($scope.map.selectedFeature && 
@@ -145,8 +153,8 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
                 $scope.map.selectedFeature = undefined;
 
-                console.log("clicked a grid item.  querying for: ");
-                console.dir($scope.gridOptions.selectedItems[0].Location.SdeObjectId);
+  //              console.log("clicked a grid item.  querying for: ");
+//                console.dir($scope.gridOptions.selectedItems[0].Location.SdeObjectId);
                 var selectedAppraisal = $scope.gridOptions.selectedItems[0];
                 $scope.clearAll();
                 $scope.map.querySelectParcel(null,selectedAppraisal.Location.SdeObjectId, function(features){
@@ -156,12 +164,12 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                     };
 
                     $scope.map.addParcelToMap(features[0]);
-                    $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic);
-
-                    //show the infowindow
-                    $scope.map.infoWindow.resize(250, 300);
-                    $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
-                    $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());
+                    $scope.map.centerAndZoomToGraphic($scope.map.selectedGraphic).then(function(){
+                        //show the infowindow
+                        $scope.map.infoWindow.resize(250, 300);
+                        $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
+                        $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());    
+                    });
 
                     console.log("Found ObjectId: " + $scope.map.selectedFeature.attributes.OBJECTID);
                 });
@@ -351,11 +359,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             $scope.openDetailsWindow = function(p) {
             	$location.path("/dataset-details/"+$scope.dataset.Id);
             };
-
-            $scope.openImportWindow = function() {
-				$location.path("/datasetimport/"+$scope.dataset.Id);
-			};
-
+            
             $scope.deleteActivities = function() {
                 $scope.saveResults = {};
                 if(!confirm("Are you sure you want to delete " + $scope.gridOptions.selectedItems.length + " activities?  There is no undo for this operation."))
