@@ -62,6 +62,8 @@ define([
 	app.run(function($rootScope,$location) {
 	  $rootScope.config = {
 	      version: "1.0",
+	      CDMS_DOCUMENTATION_URL: "http://intranet.ctuir.org/adminstration/oit/gis/wiki/Pages/Project%20Tracker%20Documentation.aspx",
+
 	  };
 
 	  $rootScope.Cache = {};
