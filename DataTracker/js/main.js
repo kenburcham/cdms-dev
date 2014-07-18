@@ -19,7 +19,7 @@ define([
 	  'AppraisalControllers',
 	  'MyDatasetsControllers',
 	  'ActivitiesController',
-	  'FileModalController',
+	  'ModalsController',
 	  'ChartServices',
 	  'DatasetServices',
 	  'angularFileUpload',

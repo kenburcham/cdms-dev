@@ -123,7 +123,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 			 		return;
 			}
 
-		 	$location.path("/activities/"+$scope.dataset.Id);
+		 	$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		 };
 
 		//adds row to datasheet grid
@@ -184,13 +184,6 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		//fire up our dataset
         $scope.dataset = DataService.getDataset($routeParams.Id);
 
-		//if ?LocationId=123 is passed in then lets set it to the given LocationId
-		if($routeParams.LocationId)
-		{
-			$scope.row['locationId'] = $routeParams.LocationId;
-		}
-
-
         //update our location options as soon as our project is loaded.
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
@@ -213,6 +206,13 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			{
 				$location.path("/unauthorized");
 			}
+
+			//if ?LocationId=123 is passed in then lets set it to the given LocationId
+			if($routeParams.LocationId)
+			{
+				$scope.row['locationId'] = ""+$routeParams.LocationId;
+			}
+
         });
 
          //setup a listener to populate column headers on the grid
@@ -312,7 +312,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			 		return;
 			}
 
-		 	$location.path("/activities/"+$scope.dataset.Id);
+		 	$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		 };
 		
 

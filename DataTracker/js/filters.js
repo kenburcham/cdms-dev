@@ -36,9 +36,7 @@ angular.module('DatasetFilters', [])
     })
     .filter('arrayValues', function(){
         return function(input) {
-            //console.log(">> input = " + input);
             var result = '';
-            
             if(input)
             {
 
@@ -90,7 +88,6 @@ angular.module('DatasetFilters', [])
             
         };
     })
-
-
+    
 
 ;

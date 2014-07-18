@@ -271,6 +271,16 @@ mod.directive('ctuirFileField',
         return result;
     });
 
+mod.directive('ctuirLinkField',
+    function(){
+        var result = {
+            templateUrl: 'partials/dataentry/field-link.html',
+            restrict: 'E',
+        };
+
+        return result;
+    });
+
 mod.directive('ctuirRadioField',
     function(){
 

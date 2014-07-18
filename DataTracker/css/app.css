@@ -557,3 +557,26 @@ table.metadata td
  	margin-top: 15px; 
  	overflow-y: auto;	
 }
+
+#photoWrapper {
+	margin-left: -40px;
+	white-space: nowrap;
+	margin-bottom: 0px;
+
+}
+
+#photoWrapper li {
+	display: inline;
+	list-style-type: none;
+}
+
+#photoWrapper img
+{
+	border-radius: 5px;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	margin: 0px;
+	height: 250px;
+}

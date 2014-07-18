@@ -48,8 +48,9 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', width: '200px'},
                         {field:'headerdata.CobellAppraisalWave',displayName: 'Wave', width: '200px'},
 
+                        {field:'headerdata.LastAppraisalRequestDate',displayName: 'Request Date', width: '200px', cellFilter: 'date'},
 
-                        {field:'Location.Label',displayName: 'Location'},
+                        //{field:'Location.Label',displayName: 'Location'},
                     
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px', visible: false},

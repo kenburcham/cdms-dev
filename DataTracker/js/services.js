@@ -1381,6 +1381,7 @@ function makeFieldColDef(field, scope) {
         coldef.enableCellEdit = true;
 
         //setup column according to what type it is
+        //  the "coldef" options available here are "ColumnDefs Options" http://angular-ui.github.io/ng-grid/
         switch(field.ControlType)
         {
             case 'select':
@@ -1441,6 +1442,10 @@ function makeFieldColDef(field, scope) {
             break;
 
         case 'file':
+            //override the defaul width for files...
+            coldef.minWidth = '200';
+            coldef.maxWidth = '400';
+            coldef.width = '200';
             if(!coldef.enableCellEdit)
                 coldef.cellTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span></div>';//<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
             break;

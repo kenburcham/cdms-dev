@@ -1,7 +1,7 @@
 //file modal controller
-var mod_fmc = angular.module('FileModalController', ['ui.bootstrap']);
+var mod_fmc = angular.module('ModalsController', ['ui.bootstrap']);
 
-//modal that handles both saving and editing locations
+//handles managing file controltypes
 mod_fmc.controller('FileModalCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
     function($scope,  $modalInstance, DataService, DatastoreService){
 
@@ -70,3 +70,48 @@ mod_fmc.controller('FileModalCtrl', ['$scope','$modalInstance', 'DataService','D
     }
 ]);
 
+//handles modifying link control types
+
+mod_fmc.controller('LinkModalCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+    function($scope,  $modalInstance, DataService, DatastoreService){
+
+        //note: file selected for upload are managed by onFileSelect from parent scope (dataeditcontroller, most likely)
+
+        $scope.makeNewLink = function(){$scope.newLink = {Name: "", Link: "http://"}}; 
+        $scope.makeNewLink();
+
+        $scope.currentLinks = $scope.link_row[$scope.link_field.DbColumnName];
+        if($scope.currentLinks)
+            $scope.currentLinks = angular.fromJson($scope.currentLinks);
+        else
+            $scope.currentLinks = [];
+
+        console.dir($scope.currentLinks);
+
+        $scope.removeLink = function(link)
+        {
+            angular.forEach($scope.currentLinks, function(existing_link, key){
+                if(existing_link.Link == link.Link)
+                    $scope.currentLinks.splice(key,1);
+            });
+        }
+
+        $scope.addLink = function()
+        {
+            $scope.currentLinks.push($scope.newLink);   
+            $scope.makeNewLink();
+        }
+
+        $scope.save = function(){
+
+            //copy back to the actual row field
+            $scope.link_row[$scope.link_field.DbColumnName] = angular.toJson($scope.currentLinks);
+            $modalInstance.dismiss();
+        };
+
+        $scope.cancel = function(){
+            $modalInstance.dismiss();
+        };
+
+    }
+]);

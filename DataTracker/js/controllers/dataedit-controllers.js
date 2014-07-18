@@ -168,12 +168,25 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
             $scope.file_field = field;
             
             var modalInstance = $modal.open({
-                templateUrl: 'partials/file/file-modal.html',
+                templateUrl: 'partials/modals/file-modal.html',
                 controller: 'FileModalCtrl',
                 scope: $scope, //scope to make a child of
             });
         };
 
+		$scope.openLinkModal = function(row, field)
+        {
+        	//console.dir(row);
+        	//console.dir(field);
+            $scope.link_row = row;
+            $scope.link_field = field;
+            
+            var modalInstance = $modal.open({
+                templateUrl: 'partials/modals/link-modal.html',
+                controller: 'LinkModalCtrl',
+                scope: $scope, //scope to make a child of
+            });
+        };
 
 		$scope.clearSelections = function()
 		{
@@ -252,7 +265,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 			 		return;
 			}
 
-		 	$location.path("/activities/"+$scope.dataset.Id);
+		 	$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		 };
 		
 

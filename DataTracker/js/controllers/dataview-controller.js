@@ -176,6 +176,11 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 				nextActivity($scope.activities, $routeParams.Id, $location);
 			}
 
+			$scope.fromJson = function(field)
+			{
+				return angular.fromJson($scope.grid.Header[field]);
+			}
+
 
     }]);
 

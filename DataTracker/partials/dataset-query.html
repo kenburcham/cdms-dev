@@ -2,7 +2,7 @@
     <li><a href="#/projects">Projects</a> <span class="divider"></span> </li>
     <li ng-show="project.Name"><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
     <li ng-show="datastore.Name">{{datastore.Name}} (All) <span class="divider"></span></li>
-    <li ng-show="dataset.Name"><a href="#/activities/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
+    <li ng-show="dataset.Name"><a href="#/{{dataset.activitiesRoute}}/{{dataset.Id}}">{{dataset.Name}} Activities</a> <span class="divider"></span></li>
     
     <li class="active">Query</li>
 </ul>

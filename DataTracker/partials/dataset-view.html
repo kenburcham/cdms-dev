@@ -60,6 +60,16 @@
                         <div style="min-height: 25px; margin-left: 200px;" ng-show="field.ControlType" class="header-value" ng-bind-html="grid.Header[field.DbColumnName] | fileNamesFromString">&nbsp;</div>
                     </div>
 
+                    <div ng-switch-when="link" class="header-column" >
+                        <div class="header-label">{{field.Label}}:</div>
+                        <div style="min-height: 25px; margin-left: 200px;" ng-show="field.ControlType" class="header-value" ng-bind-html="grid.Header[field.DbColumnName] | fileNamesFromString">&nbsp;</div>
+                    </div>
+
+                    <div ng-switch-when="date" class="header-column">
+                        <div class="header-label">{{field.Label}}:</div>
+                        <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName] | date}}&nbsp;</div>
+                    </div>
+
                     <div ng-switch-default class="header-column">
                         <div class="header-label">{{field.Label}}:</div>
                         <div ng-show="field.ControlType" class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>

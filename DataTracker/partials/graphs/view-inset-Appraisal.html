@@ -1,0 +1,11 @@
+<style>
+#chart-div {
+	overflow-y: hidden;
+	overflow-x: auto;
+	height: 252px;
+}
+</style>
+
+<ul id="photoWrapper" ng-init="currentPhotos = fromJson('AllotmentPhotoFiles')">
+	<li ng-repeat="photo in currentPhotos"><img ng-src="{{photo.Link}}" /></li>
+</ul>
