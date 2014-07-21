@@ -888,9 +888,70 @@ mod.service('ActivityParser',[ 'Logger',
     }]);
 
 
+mod.service('FileUploadService',['$q','$upload',function($q, $upload){
+        var service = {
+            uploadFiles: function(filesToUpload, $scope){
+                
+                    $scope.uploadErrorMessage = undefined;
+
+                    var promises = [];
+
+                    angular.forEach(filesToUpload, function(files, field){
+
+                        console.log("handling files for: " + field)
+
+                          for(var i = 0; i < files.length; i++)
+                          {
+                              var file = files[i];
+                              //console.dir(file);
+
+                              if(file.success != "Success")
+                              {
+
+                                var deferred = $q.defer();
+
+                                $upload.upload({
+                                  url: serviceUrl + '/data/UploadProjectFile', 
+                                  method: "POST",
+                                  // headers: {'headerKey': 'headerValue'},
+                                  // withCredential: true,
+                                  data: {ProjectId: $scope.project.Id, Description: "Uploaded file for: "+file.Name, Title: file.Name},
+                                  file: file,
+
+                                }).progress(function(evt) {
+                                    console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+
+                                }).success(function(data, status, headers, config) {
+                                    //console.dir(data);
+                                    config.file.success = "Success";
+                                    config.file.data = data;
+                                    deferred.resolve(data);
+
+                                })
+                                .error(function(data, status, headers, config) {
+                                    $scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
+                                    console.log(" error.");
+                                    config.file.success = "Failed";
+                                    deferred.reject();
+
+                                  });
+
+                                promises.push(deferred.promise);
+
+                              }
+
+                          }
+                    });
+
+                    return $q.all(promises);
+                },
+            };
+            return service;
+}]);
+
 //gridDatasheetOptions needs to be set to your datasheet grid
 mod.service('DataSheet',[ 'Logger', '$window', '$route',
-    function(Logger,$window, $route){
+    function(Logger,$window, $route, $q){
         //var LocationCellTemplate = '<input ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />';
 
         var LocationCellEditTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'locationId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in locationOptions"/>';
@@ -1348,6 +1409,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
               return stats;  
             },
 
+           
 
 
         } //end service

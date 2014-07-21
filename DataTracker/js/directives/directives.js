@@ -261,8 +261,9 @@ mod.directive('ctuirMultiselectField',
 
     });
 
+
 mod.directive('ctuirFileField',
-    function(){
+    function($modal){
         var result = {
             templateUrl: 'partials/dataentry/field-file.html',
             restrict: 'E',
@@ -272,10 +273,27 @@ mod.directive('ctuirFileField',
     });
 
 mod.directive('ctuirLinkField',
-    function(){
+    function($modal){
         var result = {
             templateUrl: 'partials/dataentry/field-link.html',
             restrict: 'E',
+            controller: function($scope, $element, $attrs)
+            {
+                //add a function that will enable file modal capability for all fields with controlType = link
+                $scope.openLinkModal = function(row, field)
+                {
+                    //console.dir(row);
+                    //console.dir(field);
+                    $scope.link_row = row;
+                    $scope.link_field = field;
+                    
+                    var modalInstance = $modal.open({
+                        templateUrl: 'partials/modals/link-modal.html',
+                        controller: 'LinkModalCtrl',
+                        scope: $scope, //scope to make a child of
+                    });
+                };
+            }
         };
 
         return result;

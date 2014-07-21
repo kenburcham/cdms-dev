@@ -153,8 +153,8 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 
 
 //Fieldsheet / form version of the dataentry page
-mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$route',
-	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $route){
+mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$modal','$location','$rootScope','ActivityParser','DataSheet','$route','FileUploadService',
+	function($scope, $routeParams, DataService, $modal, $location, $rootScope, ActivityParser, DataSheet, $route, UploadService){
 
 		initEdit(); // stop backspace from ditching in the wrong place.
 
@@ -163,6 +163,8 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		$scope.detailFields = [];
 		$scope.datasheetColDefs = [];
         
+		$scope.filesToUpload = {};
+
         $scope.dataSheetDataset = [];
         $scope.row = {ActivityQAStatus: {}, activityDate: new Date()}; //header field values get attached here by dbcolumnname
         
@@ -339,14 +341,105 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			//DataSheet.initScope($scope);		
 		}
 
+		/* -- these functions are for uploading - */
+		$scope.openFileModal = function(row, field)
+        {
+            //console.dir(row);
+            //console.dir(field);
+            $scope.file_row = row;
+            $scope.file_field = field;
+            
+            var modalInstance = $modal.open({
+                templateUrl: 'partials/modals/file-modal.html',
+                controller: 'FileModalCtrl',
+                scope: $scope, //scope to make a child of
+            });
+        };
+
+        //field = DbColumnName
+        $scope.onFileSelect = function(field, files)
+        {
+            //console.log("file selected! " + field)
+            $scope.filesToUpload[field] = files;
+        };
+
+        //this function gets called when a user clicks the "Add" button in a GRID file cell
+        $scope.addFiles = function(row, field_name)
+        {
+            var field = $scope.FieldLookup[field_name];
+
+            //console.dir(row);
+            //console.dir(field);
+            $scope.openFileModal(row.entity, field);
+
+            //go ahead and mark this row as being updated.
+            if($scope.updatedRows)
+                $scope.updatedRows.push(row.entity.Id);
+
+        }
+        /*  -- */
+
 		$scope.saveData = function(){
 			console.log("save!");
-			$scope.activities = ActivityParser.parseSingleActivity($scope.row, $scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
-			if(!$scope.activities.errors)
-			{
-				DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
-			}
-		};		
+
+			var promise = UploadService.uploadFiles($scope.filesToUpload, $scope);
+			promise.then(function(data){
+
+				//spin through the files that we uploaded
+				angular.forEach($scope.filesToUpload, function(files, field){
+					
+					var local_files = [];
+
+					for(var i = 0; i < files.length; i++)
+			      	{
+			          var file = files[i];
+			          
+			          if(file.data && file.data.length == 1) //since we only upload one at a time...
+			          {
+			          		//console.dir(file.data);
+			          		local_files.push(file.data[0]); //only ever going to be one if there is any...
+			          		//console.log("file id = "+file.data[0].Id);
+			          }
+			          else
+			          {
+			          	//console.log("no file id.");
+			          	$scope.errors.heading.push("There was a problem saving file: " + file.Name + " - Try a unique filename.");
+			          	throw "Problem saving file: " + file.Name;
+			          }
+			      	}
+
+			      	//if we already had actual files in this field, copy them in
+			      	if($scope.file_row[field])
+			      	{
+			      		var current_files = angular.fromJson($scope.file_row[field]);
+			      		angular.forEach(current_files, function(file){
+			      			if(file.Id) //our incoming files don't have an id, just actual files.
+			      				local_files.push(file);		
+			      		});
+			      	}
+
+					$scope.file_row[field] = angular.toJson(local_files);
+					//console.log("Ok our new list of files: "+$scope.row[field]);
+				});
+
+				$scope.activities = ActivityParser.parseSingleActivity($scope.row, $scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+				if(!$scope.activities.errors)
+				{
+					DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
+				}
+			});
+		};
+
+		//this function gets called when a user clicks the "Add" button in a GRID file cell
+		$scope.addFiles = function(row, field_name)
+		{
+			var field = $scope.FieldLookup[field_name];
+
+			//console.dir(row);
+			//console.dir(field);
+			$scope.openFileModal(row.entity, field);
+
+		}		
 	}
 ]);
 

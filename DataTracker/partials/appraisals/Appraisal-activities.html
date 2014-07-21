@@ -14,18 +14,22 @@
 
 <div style="height: 66px; width: 100%;">
     <div style="padding: 8px; width: 330px; float: right;">
-        <img style="margin-top: 1px;" src="images/search-sm.png"/>
-        <button type="button" class="btn right" ng-click="parcelSearch()">Search</button>
-        <input class="form-control right" ng-model="parcelSearchText" placeholder="Find Parcel/Allotment/Address" type="text"/>
-        <div ng-if="hasResults" class="parcel-sidebar-box">
-            <table ng-show="map.searchResults.length > 0" class="table table-striped table-hover table-bordered">
-                <tr><th>Parcel Id</th><th>Address</th></tr>
-                <tr ng-repeat="parcel in map.searchResults">
-                    <td><a href ng-click="selectParcel(parcel.OBJECTID)">{{parcel.PARCELID}}</a></td>
-                    <td><a href ng-click="selectParcel(parcel.OBJECTID)">{{parcel.Address}}</a></td>
-            </table>
-            <div ng-show="map.searchResults.length == 0">{{map.searchMessage}}</div>
-        </div>
+        <form ng-submit="parcelSearch()">
+            <img style="margin-top: 1px;" src="images/search-sm.png"/>
+            <button type="button" class="btn right" ng-click="parcelSearch()">Search</button>
+            <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+            <input class="form-control right" ng-model="parcelSearchText" placeholder="Find Parcel/Allotment/Address" type="text"/>
+            <div ng-if="hasResults" class="parcel-sidebar-box">
+                <table ng-show="map.searchResults.length > 0" class="table table-striped table-hover table-bordered">
+                    <tr><th>Parcel Id</th><th>Address</th></tr>
+                    <tr ng-repeat="parcel in map.searchResults">
+                        <td><a href ng-click="selectParcel(parcel.OBJECTID)">{{parcel.PARCELID}}</a></td>
+                        <td><a href ng-click="selectParcel(parcel.OBJECTID)">{{parcel.Address}}</a></td>
+                    </tr>
+                </table>
+                <div ng-show="map.searchResults.length == 0">{{map.searchMessage}}</div>
+            </div>
+        </form>
     </div>
 
 </div>
