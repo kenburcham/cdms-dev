@@ -23,8 +23,8 @@
 	background-image: linear-gradient(#49567F, #1E2B52 60%);
 }
 
-html { 
-  background: url(../images/eobg.jpg) no-repeat center center fixed; 
+html {
+  background: url(../images/eobg.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -38,7 +38,7 @@ body { background-color: transparent !important; height: 100%;}
 	min-height: 200px;
 }
 
-.nav, .pagination, .carousel a { cursor: pointer; } 
+.nav, .pagination, .carousel a { cursor: pointer; }
 
 .gridWrapper {
 	margin-right: 50px;
@@ -47,7 +47,7 @@ body { background-color: transparent !important; height: 100%;}
 
 .gridStyle {
     border: 1px solid rgb(212,212,212);
-    width: 2000px; 
+    width: 2000px;
     height: 400px;
     margin-right: 20px;
 }
@@ -55,21 +55,21 @@ body { background-color: transparent !important; height: 100%;}
 .duplicateGridStyle
 {
 	border: 1px solid rgb(212,212,212);
-    width: 550px; 
+    width: 550px;
     height: 300px;
-    margin-right: 20px;	
+    margin-right: 20px;
 }
 
 .gridStyle-small {
     border: 1px solid rgb(212,212,212);
-    width: 900px; 
+    width: 900px;
     height: 400px;
 }
 
 .datasheet-grid
 {
 	border: 1px solid rgb(212,212,212);
-    width: 2000px; 
+    width: 2000px;
     height: 400px;
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     font-size: 12px;
@@ -78,7 +78,7 @@ body { background-color: transparent !important; height: 100%;}
 
 .gridActivities {
 	border: 1px solid rgb(212,212,212);
-    height: 300px	
+    height: 300px
 }
 
 .gridStyleWide {
@@ -100,7 +100,7 @@ body { background-color: transparent !important; height: 100%;}
 	display: block;
 }
 
-.right { 
+.right {
 	float: right;
 }
 
@@ -157,7 +157,7 @@ input.form-control-checkbox { width: 30px;}
 	height: 280px;
 }
 
-.query-header-text 
+.query-header-text
 {
 	padding-bottom: 4px;
 	font-weight: bold;
@@ -170,10 +170,10 @@ input.form-control-checkbox { width: 30px;}
 	margin-top: 5px;
 	padding-top: 4px;
 	font-weight: bold;
-	border-top: dashed 1px lightgray;	
+	border-top: dashed 1px lightgray;
 }
 
-.query-form-control 
+.query-form-control
 {
 	width: 160px;
 }
@@ -191,7 +191,7 @@ ul.dropdown-menu .btn {
 	margin: 1px;
 }
 
-.sumField 
+.sumField
 {
 	display: inline-block;
 	text-align: left;
@@ -235,7 +235,7 @@ ul.dropdown-menu .btn {
 
 .options-panel
 {
-	background-color: #CEF6D3; height: 300px; border-radius:6px; 
+	background-color: #CEF6D3; height: 300px; border-radius:6px;
 }
 
 .has-validation-error
@@ -264,13 +264,13 @@ ul.dropdown-menu .btn {
 	border: 1px solid lightgrey;
 	background-color: #f2dede;
 	border-radius: 6px;
-	
+
 }
 
 .small-graph-box {
-	width: 400px; 
-	height: 200px; 
-	
+	width: 400px;
+	height: 200px;
+
 }
 
 .chart {
@@ -282,10 +282,10 @@ ul.dropdown-menu .btn {
 }
 
 .large-graph-box {
-	width: 800px; 
-	height: 380px; 
+	width: 800px;
+	height: 380px;
 	border: 1px solid lightgrey;
-	border-radius: 6px;	
+	border-radius: 6px;
 	margin: 50px auto 0 auto;
 }
 
@@ -298,7 +298,7 @@ ul.dropdown-menu .btn {
 .map
 {
 	border: 1px solid lightgrey;
-	border-radius: 6px;	
+	border-radius: 6px;
 	margin-top: -10px;
 }
 
@@ -347,7 +347,7 @@ table.metadata td
 }
 
 .metadata-value{
-	border: solid 1px lightgray;	
+	border: solid 1px lightgray;
 }
 
 .nav-buttons{
@@ -357,13 +357,13 @@ table.metadata td
 
 .fav-dataset { float: right; }
 
-.grid-bar-info { 
+.grid-bar-info {
 	background-color: lightgray;
 	font-size: small;
 	border-bottom: solid 1px gray;
 }
 
-.grid-bar-stats { 
+.grid-bar-stats {
 	background-color: lightgray;
 	font-size: small;
 	border-bottom: solid 1px gray;
@@ -404,7 +404,7 @@ table.metadata td
 	background-color: #F2F2F2;
 	padding: 5px 15px 15px 15px;
 	border-radius: 3px;
-	
+
 }
 .admin-criteria-list-box
 {
@@ -412,7 +412,7 @@ table.metadata td
 	padding: 5px 15px 15px 15px;
 	border-radius: 3px;
 	height: 100%;
-	
+
 }
 
 .inherited-properties tr
@@ -459,7 +459,7 @@ table.metadata td
 
 .quad-images
 {
-	border: lightgray 1px solid;	
+	border: lightgray 1px solid;
 	padding: 7px;
 	margin-top: 10px;
 	margin-bottom: 20px;
@@ -526,14 +526,14 @@ table.metadata td
 
 .dijitMenuItemSelected, .digitMenuItemHover
 {
-	background-color: #157ab5 !important;	
+	background-color: #157ab5 !important;
 }
 
 #overlay {
     position: absolute; /* makes the div go into a position that’s absolute to the browser viewing area */
     left: 40%; /* positions the div half way horizontally */
     top: 25%; /* positions the div half way vertically */
-    padding: 25px; 
+    padding: 25px;
     width: 50%;
     height: 50%;
     z-index: 100; /* makes the div the top layer, so it’ll lay on top of the other content */
@@ -556,13 +556,13 @@ table.metadata td
 
 .parcel-sidebar-box
 {
-	height: 400px; 
-	width: 330px; 
-	border: 1px solid black; 
+	height: 400px;
+	width: 330px;
+	border: 1px solid black;
 	padding: 7px;
- 	border-radius: 3px;  
- 	margin-top: 15px; 
- 	overflow-y: auto;	
+ 	border-radius: 3px;
+ 	margin-top: 15px;
+ 	overflow-y: auto;
 }
 
 #photoWrapper {
@@ -586,4 +586,10 @@ table.metadata td
 	padding-bottom: 0px;
 	margin: 0px;
 	height: 250px;
+}
+
+.example-text {
+  color: grey;
+  font-style: italic;
+  font-size: small;
 }

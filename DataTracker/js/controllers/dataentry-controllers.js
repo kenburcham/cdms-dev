@@ -116,6 +116,11 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		 	//DataSheet.initScope($scope); //needed?
 		}
 
+		$scope.viewButton = function()
+		{
+			$location.path("/dataview/"+$scope.new_activity[0].Id);
+		}
+
 		 $scope.cancel = function(){
 		 	if($scope.dataChanged)
 		 	{	
@@ -142,7 +147,10 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
             
             if(!$scope.activities.errors)
             {
-                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
+                var promise = DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
+                promise.$promise.then(function(){
+                	$scope.new_activity = $scope.activities.new_records;
+                });
             }
 
 		};

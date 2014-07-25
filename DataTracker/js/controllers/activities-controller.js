@@ -15,7 +15,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
         }
         else
         {
-            $scope.headingMessage = "Create new location for a project"; //default mode = 
+            $scope.headingMessage = "Create new location for a project"; //default mode =
             $scope.row = {
                 Projection: "NAD83",
                 UTMZone: "11",
@@ -23,7 +23,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
         }
 
 
-        $scope.project = DataService.getProject($scope.dataset.ProjectId); 
+        $scope.project = DataService.getProject($scope.dataset.ProjectId);
         $scope.locationTypes = DatastoreService.getLocationTypes();
         $scope.waterbodies = DatastoreService.getWaterBodies();
 
@@ -51,20 +51,20 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
                 var inSR = new esri.SpatialReference({ wkt: NAD83_SPATIAL_REFERENCE });
                 var outSR = new esri.SpatialReference({wkid: 102100})
                 var geometryService = new esri.tasks.GeometryService(GEOMETRY_SERVICE_URL);
-                $scope.newPoint = new esri.geometry.Point($scope.row.GPSEasting, $scope.row.GPSNorthing, inSR);  
+                $scope.newPoint = new esri.geometry.Point($scope.row.GPSEasting, $scope.row.GPSNorthing, inSR);
 
                 //convert spatial reference
                 var PrjParams = new esri.tasks.ProjectParameters();
-              
+
                 PrjParams.geometries = [ $scope.newPoint ];
-                PrjParams.outSR = outSR;     
-                  
+                PrjParams.outSR = outSR;
+
                 //do the projection (conversion)
                 geometryService.project(PrjParams, function(outputpoint) {
-                  
-                    $scope.newPoint = new esri.geometry.Point(outputpoint[0], outSR);        
+
+                    $scope.newPoint = new esri.geometry.Point(outputpoint[0], outSR);
                     $scope.newGraphic = new esri.Graphic($scope.newPoint, new esri.symbol.SimpleMarkerSymbol());
-                    $scope.map.graphics.add($scope.newGraphic);     
+                    $scope.map.graphics.add($scope.newGraphic);
 
                     //add the graphic to the map and get SDE_ObjectId
                     $scope.map.locationLayer.applyEdits([$scope.newGraphic],null,null).then(function(results){
@@ -78,9 +78,9 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
                                 console.log("done and success!");
                                 //reload the project -- this will cause the locations and locationlayer to be reloaded!  wow!  go AngularJS!  :)
                                 $scope.refreshProjectLocations();
-                                $modalInstance.dismiss(); 
+                                $modalInstance.dismiss();
                             });
-                            
+
                         }
                         else
                         {
@@ -101,7 +101,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
                 promise.$promise.then(function(){
                     //success
                     $scope.reloadActivities();
-                    $modalInstance.dismiss();                 
+                    $modalInstance.dismiss();
                 },
                 function(){
                     //failed
@@ -113,7 +113,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
             if($scope.newGraphic)
                 $scope.map.graphics.remove($scope.newGraphic);
 
-            
+
         };
 
         $scope.cancel = function(){
@@ -141,15 +141,15 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             //console.log("Profile = ");
             //console.dir($rootScope.Profile);
 
-            var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+            var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
             				   '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("ActivityDate") | date:\'MM/dd/yyyy\'}}</a>' +
             				   '</div>';
 
-            var desclinkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+            var desclinkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
                                '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("Description") }}</a>' +
                                '</div>';
 
-            var allotmentTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+            var allotmentTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
                                '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("headerdata.Allotment") }}</a>' +
                                '</div>';
 
@@ -157,14 +157,14 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             var QATemplate = '<div class="ngCellText" ng-class="col.colIndex()">{{QAStatusList[row.getProperty("ActivityQAStatus.QAStatusId")]}}</div>';
 
             //performance idea: if project-role evaluation ends up being slow, you can conditionally include here...
-          	var editButtonTemplate = '<div project-role="editor" class="ngCellText" ng-class="col.colIndex()">' + 
+          	var editButtonTemplate = '<div project-role="editor" class="ngCellText" ng-class="col.colIndex()">' +
             				   '<a href="#/edit/{{row.getProperty(\'Id\')}}">Edit</a>' +
             				   '</div>';
 
             $scope.columnDefs = [
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px'},
 
-                        //for demo  
+                        //for demo
                         {field:'headerdata.Allotment',displayName: 'Allotment', cellTemplate: allotmentTemplate, visible: false, width: '100px'},
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', visible: false, width: '120px'},
 
@@ -174,7 +174,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false, width: '120px'},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
 
-                        
+
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px'},
                         {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '40px'},
@@ -210,7 +210,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 var modalInstance = $modal.open({
                     templateUrl: 'partials/modal-addlocation.html',
                     controller: 'ModalAddLocationCtrl',
-                    scope: $scope, //very important to pass the scope along... 
+                    scope: $scope, //very important to pass the scope along...
                 });
             };
 
@@ -229,7 +229,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     $scope.map.graphics.remove($scope.newGraphic);
                     $scope.newGraphic = null;
                 }
-  
+
             };
 
             $scope.removeLocation = function(){
@@ -242,10 +242,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 var modalInstance = $modal.open({
                     templateUrl: 'partials/modal-addlocation.html',
                     controller: 'ModalAddLocationCtrl',
-                    scope: $scope, //very important to pass the scope along... 
+                    scope: $scope, //very important to pass the scope along...
                 });
             };
-           
+
             $scope.selectedLocation = null;
             $scope.newPoint = null;
             $scope.newGraphic = null;
@@ -255,7 +255,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 return "Click button above to create a new location here.";
             };
 
-            
+
             // expose a method for handling clicks ON THE MAP - this is linked to from the Map.js directive
             $scope.click = function(e){
 
@@ -267,13 +267,13 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     console.log("graphics layer infotemplate defined.");
                 }
 
-  
+
                 $scope.map.infoWindow.resize(250, 300);
-                
+
                 //show the infowindow
                 if(e.graphic)
                 {
-                    $scope.map.infoWindow.setContent($scope.getInfoContent(e.graphic));    
+                    $scope.map.infoWindow.setContent($scope.getInfoContent(e.graphic));
                 }
                 else
                 {
@@ -282,7 +282,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 }
 
                 $scope.map.infoWindow.show(e.mapPoint);
-                
+
 
 
                 //now... did they click an existing map point?
@@ -298,21 +298,21 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                       });
 
                       $scope.activities = filterActivities;
-                      
+
                       $scope.selectedLocation = location;
                       if($scope.newGraphic)
                       {
                            $scope.map.graphics.remove($scope.newGraphic);
                            $scope.newGraphic = null; // just to clear the buttons on the UI.
                       }
-                       
+
 
                       //$scope.center = [e.mapPoint.x,e.mapPoint.y];
                 }
                 else // no -- maybe they are making a new point?
                 {
                     $scope.selectedLocation = null; //since we didn't select an existing one.
-        
+
                     $scope.map.reposition(); //this is important or else we end up with our map points off somehow.
 
                       $scope.newPoint = e.mapPoint;
@@ -320,14 +320,14 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                       //if they had already clicked somewhere, remove that point.
                       if($scope.newGraphic)
                           $scope.map.graphics.remove($scope.newGraphic);
-  
+
                       $scope.newGraphic = new esri.Graphic(
                           e.mapPoint,
                           new esri.symbol.SimpleMarkerSymbol()
                       );
 
                       $scope.map.graphics.add($scope.newGraphic);
-                  
+
                 }
 
             }catch(e)
@@ -357,23 +357,23 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 else
                 {
                     $scope.ShowMap.Display = true;
-                    $scope.ShowMap.Message = $scope.ShowMap.MessageToClose;                    
-                    
+                    $scope.ShowMap.Message = $scope.ShowMap.MessageToClose;
+
                     setTimeout(function(){
                         $scope.map.reposition();
-                        console.log("repositioned");    
+                        console.log("repositioned");
                     }, 400);
-                    
+
                 }
             };
 
             $scope.toggleFavorite = function(){
                 $scope.isFavorite = !$scope.isFavorite; //make the visible change instantly.
-                
+
                 $scope.results = {};
 
                 $rootScope.Profile.toggleDatasetFavorite($scope.dataset);
-                
+
                 DataService.saveUserPreference("Datasets", $rootScope.Profile.favoriteDatasets.join(), $scope.results);
 
                 var watcher = $scope.$watch('results', function(){
@@ -382,13 +382,13 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         //if something goes wrong, roll it back.
                         if($scope.results.failure)
                         {
-                            $scope.isFavorite = !$scope.isFavorite; 
+                            $scope.isFavorite = !$scope.isFavorite;
                             $rootScope.Profile.toggleDatasetFavorite($scope.dataset);
                         }
                         watcher();
                     }
                 },true);
-                
+
 
             }
 
@@ -396,7 +396,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 if($scope.project && $scope.project.$resolved){
                     $scope.reloadProjectLocations();
                 }
-            });      
+            });
 
             $scope.refreshProjectLocations = function(){
                 DataService.clearProject();
@@ -413,15 +413,16 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 if($scope.map && $scope.map.locationLayer && $scope.map.locationLayer.hasOwnProperty('showLocationsById'))
                     $scope.map.locationLayer.showLocationsById($scope.locationObjectIds); //bump and reload the locations.
 
-                //console.log("Project locations loaded!");
+                console.log("Project locations loaded!");
+                console.dir($scope.locationsArray);
 
-            };      
+            };
 
             $scope.reloadActivities = function(){
                 $scope.activities = DataService.getActivities($routeParams.Id);
             }
 
-            $scope.$watch('dataset.Fields', function() { 
+            $scope.$watch('dataset.Fields', function() {
                 if(!$scope.dataset.Fields ) return;
                 //load our project based on the projectid we get back from the dataset
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
@@ -443,14 +444,14 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                     $scope.columnDefs[0].visible = false;
                     $scope.columnDefs[1].visible = true;
                     $scope.columnDefs[2].visible = true;
-                    
+
 
                 }
 
 
             });
 
-            $scope.$watch('activities.$resolved', function(){ 
+            $scope.$watch('activities.$resolved', function(){
                 $scope.loading = true;
                 if($scope.activities && $scope.activities.$resolved)
                 {
@@ -459,7 +460,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                        $scope.allActivities = $scope.activities;
 
                     $scope.loading = false;
-                    
+
                     if($scope.activities.length > 0)
                     {
                         $scope.gridOptions.ngGrid.data.$promise.then(function(){
@@ -472,7 +473,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 //turn off the wheel of fishies
                 if(typeof $scope.activities.$resolved == "undefined")
                     $scope.loading = false;
-                
+
             });
 
             //Maybe there is a better way?!
@@ -530,12 +531,12 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 $scope.map.infoWindow.setTitle(location.Label);
 
                 var html = "";
-                
+
                 if(location.Description)
                     html += "<i>" + location.Description + "</i><br/><br/>";
 
                 html += "<b>Type: </b>" + location.LocationType.Name;
-                
+
                 if(location.Elevation)
                     html += "<br/><b>Elevation: </b>" + location.Elevation;
                 if(location.GPSEasting)
@@ -559,7 +560,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
                 if($scope.Profile.isProjectOwner($scope.project) || $scope.Profile.isProjectEditor($scope.project))
                     html += "<br/><div class='right'><a href='#/datasetimport/"+$scope.dataset.Id+"?LocationId="+location.Id+"'>Import data</a></div>";
-                
+
                 return html;
 
             };

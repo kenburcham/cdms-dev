@@ -1,9 +1,6 @@
 //appraisal controller
 'use strict';
 
-var LOCATION_TYPE_APPRAISAL = 8;
-var SDE_FEATURECLASS_TAXLOTQUERY = 4;
-
 var mod_apr = angular.module('AppraisalControllers', ['ui.bootstrap']);
 
 var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope','DatastoreService',
@@ -45,7 +42,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                         {field:'ActivityDate', displayName:'Activity Date', cellTemplate: linkTemplate, width:'100px', visible: false},
 
                         {field:'headerdata.Allotment',displayName: 'Parcel Id', cellTemplate: allotmentTemplate, width: '140px'},
-                        {field:'headerdata.AllotmentStatus',displayName: 'Status', width: '200px'},
+                        {field:'headerdata.AllotmentStatus',displayName: 'Status'},
                         {field:'headerdata.CobellAppraisalWave',displayName: 'Wave', width: '200px'},
 
                         {field:'headerdata.LastAppraisalRequestDate',displayName: 'Request Date', width: '200px', cellFilter: 'date'},
@@ -413,6 +410,8 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 if(attributes.ACRES_GIS)
                     html += "<b>Acres (GIS): </b>" + attributes.ACRES_GIS;
                 
+                if(allotment && allotment.Id)
+                    html += "<br/><div class='right'><a href='#dataview/"+allotment.Id+"'>View</a></div>";
                 
                 return html;
 

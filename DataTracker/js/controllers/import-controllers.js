@@ -8,13 +8,14 @@ var mod_di = angular.module('DataImportControllers', ['ui.bootstrap']);
 // note: we did have to hard-code these on the dataset-import.html page in ng-disabled attrbutes
 var DO_NOT_MAP = 0;
 var ACTIVITY_DATE = 1;
+var INDEX_FIELD = 2;
 
 var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
-mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal','ChartService',
-    	function($scope, $routeParams, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal, ChartService) {
+mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreService','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal','ChartService',
+    	function($scope, $routeParams, DatastoreService, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal, ChartService) {
 //    		$scope.QAActivityStatuses = QAActivityStatuses;
-    		$scope.dataset = DataService.getDataset($routeParams.Id);    			
+    	$scope.dataset = DataService.getDataset($routeParams.Id);
 			$scope.mappedActivityFields = {};
 			$scope.userId = $rootScope.Profile.Id;
 			$scope.headerFields = [];
@@ -27,7 +28,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.HeaderColDefs = []; //inserted into grid if wide-sheet view
 			$scope.DetailColDefs = []; //fields always present in the grid
 			$scope.RowQAColDef = [];
-			
+
 			$scope.existingActivitiesLoad = DataService.getActivities($routeParams.Id);
 			$scope.existingActivities = [];
 
@@ -46,19 +47,21 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				{
 					Label: "[-- Activity Date --]"
 				},
-				
+				{
+					Label: "[-- Index Field --]"
+				},
 				/*
 				{
 					Label: "[-- Location Id --]"
 				},
-				
+
 				{
 					Label: "[-- QA Row Status Id --]"
 				},
 				*/
 			];
-			
-			
+
+
 			$scope.$watch('project.Name', function(){
 	        	if(!$scope.project) return;
 	        	//Logger.debug($scope.project);
@@ -70,9 +73,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				}
 
 	        	//setup locationOptions dropdown
-				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getMatchingByField($scope.project.Locations,2,"LocationTypeId"), 'Id','Label') ;
+				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
-				//setup location field to participate in validation 
+				//setup location field to participate in validation
 				$scope.FieldLookup['locationId'] = { DbColumnName: 'locationId', ControlType: "select" };
 				$scope.CellOptions['locationIdOptions'] = $scope.locationOptions;
 
@@ -82,16 +85,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	    			$scope.setLocation();
 
 	    		//single location?  go ahead and set it to the default.
-	    		}else if(array_count($scope.locationOptions) == 1){ 
+	    		}else if(array_count($scope.locationOptions) == 1){
 	    			angular.forEach(Object.keys($scope.locationOptions), function(key){
-	    				$scope.ActivityFields.LocationId = key;	
+	    				$scope.ActivityFields.LocationId = key;
 	    				$scope.setLocation();
 	    			});
 	    		}
 
 
 
-					
+
 	        });
 
 			$scope.setLocation = function()
@@ -112,7 +115,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	        			ealoadwatcher();
 	        		});
 	        	}
-	        	
+
 	        });
 
 			//to be able to show only the invalid records.
@@ -124,10 +127,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
                 DataService.clearProject();
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
                 var watcher = $scope.$watch('project.Id', function(){
-                	$scope.selectInstrument();	
+                	$scope.selectInstrument();
                 	watcher();
                 });
-                
+
 	         };
 
 			$scope.clearSelections = function()
@@ -150,8 +153,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	            var modalInstance = $modal.open({
 	              templateUrl: 'partials/dataentry/modal-rowqaupdate.html',
 	              controller: 'ModalBulkRowQAChangeCtrl',
-	              scope: $scope, //very important to pass the scope along... 
-	        
+	              scope: $scope, //very important to pass the scope along...
+
 	            });
 
 			};
@@ -162,8 +165,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	            var modalInstance = $modal.open({
 	              templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
 	              controller: 'ModalQuickAddAccuracyCheckCtrl',
-	              scope: $scope, //very important to pass the scope along... 
-	        
+	              scope: $scope, //very important to pass the scope along...
+
 	            });
 
 			};
@@ -215,7 +218,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 		        {
 		        	console.dir(e);
 		        }
-				
+
 			};
 
 			$scope.floatErrorsToTop = function(){
@@ -234,7 +237,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				//set the grid to be just the errors.
 				$scope.dataSheetDataset = $scope.TempRecordsBucket;
 				$scope.TempRecordsBucket = [];
-			
+
 				//bring all the valid records back in below the errors
 				angular.forEach($scope.ValidRecordsBucket, function(row, key){
 					$scope.dataSheetDataset.push(row);
@@ -255,7 +258,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 		        columnDefs: 'datasheetColDefs',
 		        enableColumnResize: true,
 		        selectedItems: $scope.selectedItems
- 				
+
 			};
 
             //config the fields for the preview datasheet - include mandatory location and activityDate fields
@@ -282,7 +285,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					$scope.FieldLookup['activityDate'] = { DbColumnName: 'activityDate', ControlType: "date" };
 					$scope.FieldLookup['QAStatusId'] = 	 { DbColumnName: 'QAStatusId', ControlType: "select" };
 					$scope.CellOptions['QAStatusIdOptions'] = 	 $scope.QAStatusOptions;
-					
+
 					//iterate fields and set 'em up
     				angular.forEach($scope.dataset.Fields.sort(orderByAlpha), function(field){
 						parseField(field, $scope);
@@ -294,7 +297,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						if(field.FieldRoleId == FIELD_ROLE_HEADER)
 						{
 							$scope.headerFields.push(field);
-							$scope.HeaderColDefs.push(makeFieldColDef(field, $scope)); 
+							$scope.HeaderColDefs.push(makeFieldColDef(field, $scope));
 						}
 						else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 						{
@@ -323,7 +326,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 		    				field: "RowQAStatusId", //QARowStatus
 		    				displayName: "Row QA",
 		 					cellFilter: 'RowQAStatusFilter',
-		 					enableCellEditOnFocus: true, 
+		 					enableCellEditOnFocus: true,
         					editableCellTemplate: $scope.cellRowQATemplate
 		    			});
 		    		}
@@ -332,7 +335,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
     		});
 
-    		
+
     		//$scope.$watch('UploadResults.activities', function(){
     		//	$scope.activity_count = array_count($scope.UploadResults.activities.activities);
     		//});
@@ -362,7 +365,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						};
 
 						//only reaches here if we didn't find a label match
-						$scope.mapping[field_in] = $scope.mappableFields[DO_NOT_MAP]; 
+						$scope.mapping[field_in] = $scope.mappableFields[DO_NOT_MAP];
 
 					});
 				}
@@ -372,16 +375,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			$scope.updateSpecialFields = function(field_name){
 				console.log(">> "+field_name);
 
-				//this is pretty ripe for refactoring.				
+				//this is pretty ripe for refactoring.
 				if($scope.mapping[field_name])
 				{
 					if($scope.mapping[field_name].Label === $scope.mappableFields[ACTIVITY_DATE].Label)
 						$scope.mappedActivityFields[ACTIVITY_DATE] = field_name;
-					
+
+					else if($scope.mapping[field_name].Label === $scope.mappableFields[INDEX_FIELD].Label)
+						$scope.mappedActivityFields[INDEX_FIELD] = field_name;
 					/*
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[LOCATION_ID].Label)
 						$scope.mappedActivityFields[LOCATION_ID] = field_name;
-					
+
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[QA_STATUS_ID].Label)
 						$scope.mappedActivityFields[QA_STATUS_ID] = field_name;
 					*/
@@ -390,7 +395,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						//undisable corresponding speical field if this had been one
 						if($scope.mappedActivityFields[ACTIVITY_DATE] === field_name)
 							$scope.mappedActivityFields[ACTIVITY_DATE] = false;
-					
+
+						if($scope.mappedActivityFields[INDEX_FIELD] === field_name)
+							$scope.mappedActivityFields[INDEX_FIELD] = false;
+
 					/*
 						if($scope.mappedActivityFields[LOCATION_ID] === field_name)
 							$scope.mappedActivityFields[LOCATION_ID] = false;
@@ -401,7 +409,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 
 				}
 
-				 
+
 			};
 
 			$scope.Logger = Logger;
@@ -453,11 +461,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			//iterates the import data rows according to mappings and copies into the grid datasheet
 			$scope.displayImportPreview = function()
 			{
-				
+
 				//decide if we are going to show the headerForm.  we DO if they entered an activity date, DO NOT if they mapped it.
-				if($scope.mappedActivityFields[ACTIVITY_DATE])
+				if($scope.mappedActivityFields[ACTIVITY_DATE] || $scope.mappedActivityFields[INDEX_FIELD])
 				{
-					$scope.showHeaderForm = false; //because we have mapped the activity date field to our datafile, meaning multiple activity dates needs the wide sheet.	
+					$scope.showHeaderForm = false; //because we have mapped the activity date field to our datafile, meaning multiple activity dates needs the wide sheet.
 					$scope.datasheetColDefs =$scope.RowQAColDef.concat($scope.datasheetColDefs,$scope.HeaderColDefs, $scope.DetailColDefs);
 				}
 				else
@@ -465,7 +473,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					$scope.showHeaderForm = true; //single activity, use the headerform.
 					$scope.datasheetColDefs = $scope.RowQAColDef.concat($scope.DetailColDefs);
 				}
-				
+
 				$scope.recalculateGridWidth($scope.datasheetColDefs.length);
 
 				angular.forEach($scope.UploadResults.Data.rows, function(data_row){
@@ -483,7 +491,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						new_row.locationId = data_row[$scope.ActivityFields.LocationId];
 					else
 						new_row.locationId = $scope.ActivityFields.LocationId;
-					
+
 					if($scope.mapping[$scope.ActivityFields.ActivityDate])
 						new_row.activityDate = data_row[$scope.ActivityFields.ActivityDate];
 					else
@@ -493,6 +501,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 						new_row.QAStatusId = data_row[$scope.ActivityFields.QAStatusId];
 					else
 						new_row.QAStatusId = $scope.ActivityFields.QAStatusId;
+
+					if($scope.mappedActivityFields[INDEX_FIELD])
+						new_row.activityIndex = data_row[$scope.mappedActivityFields[INDEX_FIELD]];
 
 
 
@@ -512,12 +523,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 									console.log("ignoring: " + field.DbColumnName + " is a number field but value is not a number: " + data_row[col]);
 									return; //don't set this as a value
 								}
-								
-								//handle control types 
+
+								//handle control types
 								if(field.ControlType == "multiselect")
 								{
 									//$scope.Logger.debug("is a multiselect");
-									//will create an array if needed 
+									//will create an array if needed
 								    if(!Array.isArray(new_row[field.DbColumnName]))
 								        new_row[field.DbColumnName] = [];
 
@@ -525,7 +536,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 								    var row_items = data_row[col].trim().split(",");
 
 								    for(var a = 0; a < row_items.length; a++)
-								    {        
+								    {
 								        var row_item = row_items[a].trim().toUpperCase();
 
 								        //$scope.Logger.debug(" on --> "+row_item);
@@ -549,7 +560,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 											var d = new Date(data_row[col]);
 											//TODO: better way to fix this?
 											if(d.getFullYear() < 1950)
-												d.setFullYear(d.getFullYear() + 100); 
+												d.setFullYear(d.getFullYear() + 100);
 
 											new_row[field.DbColumnName] = d.toISOString();
 										}
@@ -575,7 +586,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 										//if(typeof data_row == "string") //might otherwise be a number or something...
 										new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....
 									}
-									
+
 								}
 
 							}//if
@@ -583,15 +594,21 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 							console.dir(e);
 						}
 					});
-
+console.log("here");
+					//Appraisal special importer case
+					if($scope.dataset.Id == 1193)
+					{
+						$scope.importAppraisalLine(new_row);
+					}
+console.log("here2");
 					//now that the row is populated with import values, lets spin through each filed again and fire any rules
 					//* ---- Run the rules for each field on this row ---- *//
 					var row = new_row;
 					//console.log("Ok, now we'll run the rules for each column in this row");
 					angular.forEach($scope.mapping, function(field, col){
-						
+
 						var value = row[field.DbColumnName];
-						
+
 						 try{
 	                        //fire Field rule if it exists -- OnChange
 	                        if(field.Field && field.Field.Rule && field.Field.Rule.OnChange){
@@ -608,7 +625,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	                        //so we don't die if the rule fails....
 	                        console.dir(e);
 	                    }
-						
+
 					});
 
 
@@ -618,7 +635,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 					//add imported row to datasheet.
 					if(new_row.activityDate)
 						$scope.dataSheetDataset.push(new_row);
-					
+
 					}
 					catch(e)
 					{
@@ -629,17 +646,19 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 		 		});
 
 				$scope.UploadResults.showPreview = true;
-				
+
 				$scope.toggleDuplicates();
 
             	$scope.validateGrid($scope);
         		$scope.floatErrorsToTop();
 
-        		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {width: 800, height: 350});	
-        		        		
-        		
+        		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {width: 800, height: 350});
+
+
 
 			};
+
+
 
 			$scope.uploadFile = function()
 			{
@@ -655,12 +674,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			        /* set file formData name for 'Content-Desposition' header. Default: 'file' */
 			        //fileFormDataName: myFile, //OR for HTML5 multiple upload only a list: ['name1', 'name2', ...]
 			        /* customize how data is added to formData. See #40#issuecomment-28612000 for example */
-			        //formDataAppender: function(formData, key, val){} 
+			        //formDataAppender: function(formData, key, val){}
 			      }).progress(function(evt) {
 			        Logger.debug('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
 			      }).success(function(data) {
 			        // file is uploaded successfully
-			        
+
 			        $scope.UploadResults.Data = angular.fromJson(data);
 			        $scope.fileFields = $scope.UploadResults.Data.columns;
 			        $scope.loading=false;
@@ -671,21 +690,21 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 			      		$scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
 			      		$scope.loading=false;
 			      	});
-			      //.then(success, error, progress); 
+			      //.then(success, error, progress);
 			};
-			
+
 
 			$scope.onFileSelect = function($files) {
 			    //$files: an array of files selected, each file has name, size, and type.
 
 			    $scope.files = $files;
-			    $scope.file = $files[0]; 
+			    $scope.file = $files[0];
 
 			 };
 
 			 $scope.cancel = function(){
 			 	if($scope.UploadResults.showPreview)
-			 	{	
+			 	{
 				 	if(!confirm("Looks like you've made changes.  Are you sure you want to leave this page?"))
 				 		return;
 				 }
@@ -719,7 +738,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 	        			Comments: row.QAComments
 	        		};
 
-	        		row.QAStatusId = row.RowQAStatusId; 
+	        		row.QAStatusId = row.RowQAStatusId;
 
 				}
 
@@ -740,6 +759,66 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 				});
 	    	};
 
+	    	//this is for custom import of appraisals
+	    	$scope.importAppraisalLine = function(row){
+	    		//console.dir(row);
+	    		//console.log('starting: '+row['Allotment']);
+				//1) create location query and lookup TSR and SDEOBJECTID by parcelid
+				$scope.map.queryMatchParcel(row['Allotment'], function(features){
+					//console.log("back from query!");
+					if(features.length == 0)
+                    {
+                        console.log("didn't find parcelid: "+row['Allotment']);
+                    }
+                    else
+                    {
+                    	//console.dir(features[0].attributes['OBJECTID']);
+                    	//console.dir(features[0].attributes['TSR']);
+                    	var tsr = features[0].attributes['TSR'];
+                    	if(tsr)
+                    		tsr = tsr.replace("adminstration","admin");
+                    	row.TSRFiles = '[{"Name":"View TSR","Link":"'+tsr+'"}]';
+
+                    	//set some specific defaults -- this is a one-time thing (famous last words)
+                    	row.AppraisalYear = '2014';
+                    	row.AppraisalStatus = 'Not Started';
+                    	//row.AppraisalStatus = 'Complete';
+                    	row.AppraisalType = 'Land Buy Back';
+
+                    	row.AllotmentStatus = 'Requested';
+                    	//row.AllotmentStatus = 'Ready for review by DECD';
+                    	var map_loc = 'http://gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
+                    	row.MapFiles = '[{"Name":"Imagery","Link":"'+map_loc+'Imagery_'+row['Allotment']+'.pdf"},{"Name":"Plat","Link":"'+map_loc+'Plat_'+row['Allotment']+'.pdf"},{"Name":"Soils","Link":"'+map_loc+'Soils_'+row['Allotment']+'.pdf"},{"Name":"Topo","Link":"'+map_loc+'Topo_'+row['Allotment']+'.pdf"},{"Name":"Zoning","Link":"'+map_loc+'Zoning_'+row['Allotment']+'.pdf"}]';
+                    	row.CobellAppraisalWave = 'Wave 3';
+                    	row.LastAppraisalRequestDate = new Date();
+
+
+
+                    	//create a new location from the map feature selected
+		                var new_location = {
+		                    LocationTypeId: LOCATION_TYPE_APPRAISAL,
+		                    SdeFeatureClassId: SDE_FEATURECLASS_TAXLOTQUERY,
+		                    SdeObjectId: features[0].attributes['OBJECTID'],
+		                    Label: features[0].attributes['PARCELID'],
+		                };
+
+		                var promise = DatastoreService.saveNewProjectLocation($scope.project.Id, new_location);
+		                promise.$promise.then(function(location_data){
+		                   //console.log("done and success!");
+		                   //console.dir(location_data);
+		                   row.locationId = location_data.Id;
+		               });
+                    }
+				});
+				//2) create new location (with sdeobjectid)
+
+
+				//3) set new location in row
+				//4) set tsr in row
+				//5) create map links in row
+
+			}
+
 	    }
 ]);
 
@@ -747,15 +826,15 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DataService','$
 mod_di.controller('ModalDuplicatesViewCtrl', ['$scope','$modalInstance',
 	function($scope, $modalInstance){
 
-		$scope.gridDuplicates = { 
+		$scope.gridDuplicates = {
 			data: 'DuplicateRecordsBucket',
 			columnDefs: [{
-				   field: 'locationId', 
-                    displayName: 'Location', 
+				   field: 'locationId',
+                    displayName: 'Location',
                     cellFilter: 'locationNameFilter'
                 },
                 {
-                    field: 'activityDate', 
+                    field: 'activityDate',
                     displayName: 'Activity Date',
                     cellFilter: 'date: \'MM/dd/yyyy\'',
                 }],
@@ -767,4 +846,3 @@ mod_di.controller('ModalDuplicatesViewCtrl', ['$scope','$modalInstance',
 
 	}
 ]);
-

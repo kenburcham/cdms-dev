@@ -626,9 +626,10 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
             activities.saving = true; //tell everyone we are saving
             activities.UserId = userId;
             activities.DatasetId = datasetId;
-            SaveActivitiesAction.save(activities, function(data){
+            return SaveActivitiesAction.save(activities, function(data){
                 activities.success = "Save successful.";
                 activities.errors = false;
+                activities.new_records = data;
                 console.log("Success!");
                 activities.saving = false; //and... we're done.
             }, function(data){
@@ -847,7 +848,7 @@ mod.service('ActivityParser',[ 'Logger',
                     angular.forEach(headerFields, function(field){
                      
                         //flatten multiselect values into an json array string
-                        if(field.ControlType == "multiselect")
+                        if(field.ControlType == "multiselect" & row[field.DbColumnName])
                         {
                             row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
                         }
@@ -1432,7 +1433,6 @@ function makeFieldColDef(field, scope) {
         field: field.DbColumnName, 
         displayName: field.Label, 
         minWidth: 70, 
-        maxWidth: 180,
         defaultValue: field.DefaultValue
     };
 
@@ -1503,6 +1503,7 @@ function makeFieldColDef(field, scope) {
             coldef.cellFilter = 'date: \'MM/dd/yyyy HH:mm:ss\'';
             break;
 
+        case 'link':
         case 'file':
             //override the defaul width for files...
             coldef.minWidth = '200';

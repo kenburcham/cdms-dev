@@ -34,7 +34,7 @@ var parcelLayerConfig =
         isAddressSearchService: true,
         //ParcelQuery: "PARCELID LIKE '%${0}%' ",
         ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
-        LocateParcelQuery: "PARCELID = '${0}'",
+        LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
         DisplayFields: ["PARCELID", "Address"],
         UseColor: true,
         objectIDField: "PARCELID",
@@ -178,6 +178,26 @@ define([
               console.dir(query);
           });            
         };
+
+        //use this for selecting a specific parcel/allotment by id (no geometry)
+        map.queryMatchParcel = function(searchParam, callback)
+        {
+          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig.ServiceURL);
+          var query = new esri.tasks.Query();
+          query.where = dojo.string.substitute(parcelLayerConfig.LocateParcelQuery, [searchParam]);
+          query.returnGeometry = false;
+          query.outSpatialReference = this.spatialReference;
+          query.outFields = ["*"];
+        
+          queryTask.execute(query, function (result) {
+              callback(result.features); //give back the parcel features we found...
+          }, function(err){
+              console.log("Failure executing query!");
+              console.dir(err);
+              console.dir(query);
+          });            
+        };
+
 
         //use this to select a particular parcel either by objectid (like after a search) or x,y mapPoint
         map.querySelectParcel = function(mapPoint, objectId, callback){
