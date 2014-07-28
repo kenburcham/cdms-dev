@@ -68,13 +68,13 @@ mod.factory('UpdateActivitiesAction', ['$resource', function($resource){
 
 mod.factory('QueryActivitiesAction',  ['$resource', function($resource){
         return $resource(serviceUrl+'/data/QueryDatasetActivities', {}, {
-           save: {method: 'POST', isArray: true} 
+           save: {method: 'POST', isArray: true}
         });
 }]);
 
 mod.factory('ExportActivitiesAction',  ['$resource', function($resource){
         return $resource(serviceUrl+'/data/DownloadDatasetActivities', {}, {
-           save: {method: 'POST', isArray: false} 
+           save: {method: 'POST', isArray: false}
         });
 }]);
 
@@ -195,7 +195,7 @@ mod.factory('RemoveProjectInstrument', ['$resource', function($resource){
 
 mod.factory('GetMetadataFor',['$resource', function($resource){
         return $resource(serviceUrl+'/data/GetMetadataFor', {}, {
-           save: {method: 'POST', isArray: true} 
+           save: {method: 'POST', isArray: true}
         });
 }]);
 
@@ -222,11 +222,11 @@ mod.factory('DeleteFile', ['$resource', function($resource){
 
 mod.factory('GetTimeZones', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/GetTimeZones');
-}]);     
+}]);
 
 mod.factory('GetDepartments', ['$resource', function($resource){
         return $resource(serviceUrl+'/api/Department');
-}]);     
+}]);
 
 
 
@@ -268,7 +268,7 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             {
                 return GetWaterBodies.query();
             },
-            
+
             getDatasets: function(id)
             {
                 return GetDatastoreDatasets.query({id: id});
@@ -292,7 +292,7 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             saveDatasetField: function(field, saveResults)
             {
                 saveResults.saving = true;
-                
+
                 SaveDatasetField.save(field, function(data){
                     saveResults.saving = false;
                     saveResults.success = true;
@@ -300,12 +300,12 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
                     saveResults.saving = false;
                     saveResults.failure = true;
                 });
-                    
+
             },
             saveMasterField: function(field, saveResults)
             {
                 saveResults.saving = true;
-                
+
                 SaveMasterField.save(field, function(data){
                     saveResults.saving = false;
                     saveResults.success = true;
@@ -313,7 +313,7 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
                     saveResults.saving = false;
                     saveResults.failure = true;
                 });
-                    
+
             },
             saveNewProjectLocation: function(projectId, location)
             {
@@ -347,11 +347,11 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             },
             updateFile: function(projectId, file)
             {
-                return UpdateFile.save({ProjectId: projectId, File: file});  
+                return UpdateFile.save({ProjectId: projectId, File: file});
             },
             deleteFile: function(projectId, file)
             {
-                return DeleteFile.save({ProjectId: projectId, File: file});  
+                return DeleteFile.save({ProjectId: projectId, File: file});
             },
             getTimeZones: function()
             {
@@ -369,7 +369,7 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
 mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset','GetDepartments',
     function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset, GetDepartments){
     var service = {
-        
+
         //our "singleton cache" kinda thing
         project: null,
         dataset: null,
@@ -385,7 +385,7 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
             service.project = null;
         },
 
-        getProject: function(id) { 
+        getProject: function(id) {
             if(service.project && service.project.Id == id)
                 return service.project;
 
@@ -400,9 +400,9 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
         getDataset: function(datasetId) {
             if(service.dataset && service.dataset.Id == datasetId)
                 return service.dataset;
-            
+
             service.dataset = Datasets.query({id: datasetId});
-            
+
             //load our configuration if there is one
             service.dataset.$promise.then(function(){
                 service.configureDataset(service.dataset);
@@ -462,12 +462,12 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
             if(!service.metadataProperties)
             {
                 this._loadMetadataProperties().$promise.then(function(){
-                   return service.metadataProperties["ID_"+propertyId]; 
+                   return service.metadataProperties["ID_"+propertyId];
                });
             }
             else
             {
-                return service.metadataProperties["ID_"+propertyId];                
+                return service.metadataProperties["ID_"+propertyId];
             }
         },
 
@@ -524,7 +524,7 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
         //this should give you the possible QA Statuses for this dataset's rows
         getPossibleRowQAStatuses: function(id){
             //for now we fake it:
-            return 
+            return
             [{
                 id: 1,
                 name: "ok",
@@ -533,7 +533,7 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 name: "error",
             }
             ]
-        
+
         },
 
         queryActivities: function(query)
@@ -551,7 +551,7 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 console.dir(data);
                 query.loading = false;
             });
-   
+
         },
 
         exportActivities: function(query)
@@ -700,9 +700,9 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
 
 //ActivityParser
 // Works with a wide datasheet that includes both headers and details that might represent multiple locations/days of activity
-//  This full sheet idea makes it easier for data entry and importing, but we need to use this function to break 
+//  This full sheet idea makes it easier for data entry and importing, but we need to use this function to break
 //  them out into individual activities.
-/* when we're done our data will look like this: 
+/* when we're done our data will look like this:
 
 { "activities":{"76_10/1/2013":{"LocationId":"76","ActivityDate":"2013-10-01T07:00:00.000Z","Header":{"WaterTemperature":4,"TimeStart":"","TimeEnd":"","WaterFlow":"","AirTemperature":""},"Details":[{"locationId":"76","activityDate":"10/1/2013","WaterTemperature":4,"Species":"CHS","Sex":"M","Origin":"HAT","Mark":"[\"None\"]","Disposition":"PA","ForkLength":488,"Weight":"","TotalLength":"","GeneticSampleId":"","RadioTagId":"","FishComments":"","TimeStart":"","TimeEnd":"","WaterFlow":"","AirTemperature":"","Solution":"","SolutionDosage":""}]}},
   "errors":false,
@@ -726,7 +726,7 @@ mod.service('ActivityParser',[ 'Logger',
 
                 if(key)
                 {
-                    
+
                     if(tmpdata.length > 0)
                     {
                         angular.forEach(tmpdata, function(data_row, index){
@@ -762,11 +762,11 @@ mod.service('ActivityParser',[ 'Logger',
                     var key = service.makeKey(row);
 
                     if(key)
-                        service.addActivity(activities, key, row, headerFields, detailFields); 
+                        service.addActivity(activities, key, row, headerFields, detailFields);
                     else
                         service.addError(activities, index, "Both a Location and ActivityDate are required to save a new Activity.");
 
-                });    
+                });
 
                 return activities;
             },
@@ -824,7 +824,7 @@ mod.service('ActivityParser',[ 'Logger',
                     if(!row.ActivityQAStatus)
                     {
                         //datasheet case
-                        row.ActivityQAStatus = 
+                        row.ActivityQAStatus =
                             {
                                 QAStatusId: row.QAStatusId,
                                 Comments: ''
@@ -832,7 +832,7 @@ mod.service('ActivityParser',[ 'Logger',
                         row.QAStatusId = row.RowQAStatusId; // and then set QA status for this row...
                     }
 
-                    activities.activities[key].ActivityQAStatus = 
+                    activities.activities[key].ActivityQAStatus =
                     {
                         QAStatusID: row.ActivityQAStatus.QAStatusId,
                         Comments: row.ActivityQAStatus.Comments,
@@ -846,13 +846,13 @@ mod.service('ActivityParser',[ 'Logger',
 
                     //copy the other header fields from this first row.
                     angular.forEach(headerFields, function(field){
-                     
+
                         //flatten multiselect values into an json array string
-                        if(field.ControlType == "multiselect" & row[field.DbColumnName])
+                        if(field.ControlType == "multiselect" && row[field.DbColumnName])
                         {
                             row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
                         }
-                           
+
                         activities.activities[key].Header[field.DbColumnName] = row[field.DbColumnName];
                     });
 
@@ -877,13 +877,13 @@ mod.service('ActivityParser',[ 'Logger',
                         rowHasValue = true; //ok, we have a value in this row.
                     }
                 });
-                
+
                 //only save the detail row if we have a value in at least one of the fields.
                 if(rowHasValue)
                     activities.activities[key].Details.push(row);
             },
 
-        };        
+        };
 
         return service;
     }]);
@@ -892,7 +892,7 @@ mod.service('ActivityParser',[ 'Logger',
 mod.service('FileUploadService',['$q','$upload',function($q, $upload){
         var service = {
             uploadFiles: function(filesToUpload, $scope){
-                
+
                     $scope.uploadErrorMessage = undefined;
 
                     var promises = [];
@@ -912,7 +912,7 @@ mod.service('FileUploadService',['$q','$upload',function($q, $upload){
                                 var deferred = $q.defer();
 
                                 $upload.upload({
-                                  url: serviceUrl + '/data/UploadProjectFile', 
+                                  url: serviceUrl + '/data/UploadProjectFile',
                                   method: "POST",
                                   // headers: {'headerKey': 'headerValue'},
                                   // withCredential: true,
@@ -970,12 +970,12 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 scope.onRow = undefined;
                 scope.onField = undefined;
                 scope.autoUpdateUndone = [];
-                scope.deletedRows = []; 
+                scope.deletedRows = [];
                 scope.updatedRows = [];
-                scope.autoUpdateFeatureDisabled = true; 
+                scope.autoUpdateFeatureDisabled = true;
                 scope.headerFieldErrors= {};
                 scope.dataChanged = false; //any changes to the grid yet?
-                scope.gridWidth = { width: '2000' }; //will set below based on number of fields 
+                scope.gridWidth = { width: '2000' }; //will set below based on number of fields
 
                 //scope wrapper functions
                 scope.undoAutoUpdate = function() { service.undoAutoUpdate(scope)};
@@ -986,8 +986,8 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 scope.removeRow = function() { service.removeOnRow(scope)};
                 scope.undoRemoveRow = function() {service.undoRemoveOnRow(scope)};
                 scope.getFieldStats = function() {return service.getFieldStats(scope)};
-                
-                scope.onNumberField = function() { 
+
+                scope.onNumberField = function() {
                     if(!scope.onField)
                         return false;
 
@@ -1021,7 +1021,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     //console.log("select cell!");
                     scope.onField = scope.FieldLookup[field];
                 };
-                
+
                 //dynamically set the width of the grids.
                 /*
                 var grid_width_watcher = scope.$watch('FieldLookup', function(){
@@ -1033,7 +1033,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     //  currently that is only for import, full datasheet and query.
                     if($route.current.controller == 'DatasetImportCtrl' || $route.current.controller == 'DataQueryCtrl' || $route.current.controller == 'DataEntryDatasheetCtrl')
                         length = array_count(scope.FieldLookup);
-                    
+
                     console.log("calling with length: "+ length);
 
                     scope.recalculateGridWidth(length);
@@ -1066,15 +1066,15 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
             getColDefs: function(){
                 var coldefs = [{
-                                        field: 'locationId', 
+                                        field: 'locationId',
                                         Label: 'Location',
-                                        displayName: 'Location', 
+                                        displayName: 'Location',
                                         editableCellTemplate: LocationCellEditTemplate,
                                         cellFilter: 'locationNameFilter',
                                         Field: { Description: "What location is this record related to?"}
                                     },
                                     {
-                                        field: 'activityDate', 
+                                        field: 'activityDate',
                                         Label: 'Activity Date',
                                         displayName: 'Activity Date',
                                         cellFilter: 'date: \'MM/dd/yyyy\'',
@@ -1096,7 +1096,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
             },
 
 
-            //in order to call validate, you'll need to have your FieldLookup and CellOptions set 
+            //in order to call validate, you'll need to have your FieldLookup and CellOptions set
             //  on the controller (and obviously previously populated by the DataSheet service.)
             validate: function(row, scope)
             {
@@ -1107,25 +1107,25 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                     //console.log("Validating a row with " + array_count(scope.FieldLookup) + " rows.");
                     var row_num = 0;
-                    
+
                     angular.forEach(scope.FieldLookup, function(field, key){
                          //TODO: first check if there is no value but one is required.
 
-                        //if not value, ditch. 
+                        //if not value, ditch.
                         if(!row[key])
                             return;
 
-                        
+
                         validateField(field, row, key, scope, row_errors);
                         //row_num++;
                         //console.log("  >>incrementing!");
-                        
+
                     });
                     //console.log(row_num + " --------------- is our rownum");
                     if(row_errors.length > 0)
                     {
                         row.isValid = false;
-                        row.errors = row_errors; 
+                        row.errors = row_errors;
                         scope.gridHasErrors = true;
                     }
                     else
@@ -1136,7 +1136,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 }
             },
-        
+
             updateHeaderField: function(field_name, scope)
             {
                 scope.dataChanged = true;
@@ -1146,9 +1146,9 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 var errors = [];
                 var row = scope.row;
                 var headers = []; //there are none; our row is the headers.
-             
+
                 validateField(field, scope.row, field_name, scope, errors);
-             
+
                 if(errors.length > 0)
                 {
                     scope.headerFieldErrors[field_name] = errors;
@@ -1160,7 +1160,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
 
                 //fire rules - OnChange
-                
+
                 fireRules("OnChange", row, field, value, headers, errors, scope);
 
                 scope.headerHasErrors = (array_count(scope.headerFieldErrors) > 0);
@@ -1178,9 +1178,9 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     scope.gridDatasheetOptions.$gridScope.renderedRows[i].entity[scope.autoUpdate.field] = scope.autoUpdate.from;
                 }
 
-                //set the originally changed one to still be TO 
+                //set the originally changed one to still be TO
                 scope.gridDatasheetOptions.$gridScope.renderedRows[scope.autoUpdate.origRowIndex].entity[scope.autoUpdate.field] = scope.autoUpdate.to;
-                
+
                 scope.autoUpdateUndone.push(scope.autoUpdate.field); // mark this so we don't do it again.
                 scope.autoUpdate = undefined;
 
@@ -1222,9 +1222,9 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 //set value of multiselect back to an array
 
-                
+
                 //row.entity[field] = angular.toJson(toValue).toString();
-                
+
 
                 /*
 
@@ -1264,7 +1264,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     }
                 });
                 */
-            
+
                 var value = row.entity[field_name];
                 var field = scope.FieldLookup[field_name];
 
@@ -1283,7 +1283,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 if(field_name == "Disposition")
                 {
                     console.log("Disposition value: " + value);
-                    var testRule = 
+                    var testRule =
                     {
                         "OnChange":
                         ""
@@ -1355,13 +1355,13 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 var num_recs = 0;
                 var max = undefined;
                 var min = undefined;
-                
+
                 //calculate total (for mean), max, min
                 angular.forEach(scope.dataSheetDataset, function(item, key){
 
                     try{
-                        var num = new Number(item[scope.onField.DbColumnName]); 
-                        
+                        var num = new Number(item[scope.onField.DbColumnName]);
+
                         if(!isNaN(num)) //just skip if it is not a number (NaN)
                         {
                             total += num;
@@ -1390,7 +1390,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 });
 
                 var mean = total / num_recs;
-                
+
                 var std_total = 0;
 
                 //now do standard deviation
@@ -1406,15 +1406,15 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                 stats += " / Min: " + min;
                 stats += " / Std Dev: " + std_dev.toFixed(2);
                 stats += " / Total: " + total;
-              
-              return stats;  
+
+              return stats;
             },
 
-           
+
 
 
         } //end service
-    
+
 
 
         return service;
@@ -1428,11 +1428,11 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 // makes a field colulm definition
 function makeFieldColDef(field, scope) {
 
-    var coldef = 
-    { 
-        field: field.DbColumnName, 
-        displayName: field.Label, 
-        minWidth: 70, 
+    var coldef =
+    {
+        field: field.DbColumnName,
+        displayName: field.Label,
+        minWidth: 70,
         defaultValue: field.DefaultValue
     };
 
@@ -1462,17 +1462,17 @@ function makeFieldColDef(field, scope) {
                 editableCellTemplate: '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 break;
             case 'datetime':
-                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';          
-                break;                
+                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
+                break;
             case 'text':
-                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';          
+                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 break;
             case 'textarea':
-                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';          
-                break;            
+                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
+                break;
             case 'number':
                 //var maxmin = field.Field.Validation ? 'max="'+field.Field.Validation[1]+'" min="'+field.Field.Validation[0]+'"' : ''; //either returns our min/max setup for a numeric field or empty string.
-                coldef.editableCellTemplate = '<input type="text" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-input="COL_FIELD" />';            
+                coldef.editableCellTemplate = '<input type="text" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-input="COL_FIELD" />';
                 //coldef.cellTemplate = '<div class="ngCellText colt{{$index}}">{{row.getProperty(col.field)}}</div>';
                 break;
             case 'checkbox':
@@ -1480,7 +1480,7 @@ function makeFieldColDef(field, scope) {
                 coldef.editableCellTemplate = '<input type="checkbox" ng-checked="row.entity.'+field.DbColumnName+'==true" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 coldef.cellTemplate = coldef.editableCellTemplate; //checkbox for display and edit.
                 break;
-            case 'file': 
+            case 'file':
                 coldef.cellTemplate = '<button class="right btn btn-xs" ng-click="addFiles(row, col.field)">Add</button> <span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span>';
                 //<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
                 break;
@@ -1492,9 +1492,9 @@ function makeFieldColDef(field, scope) {
     switch(field.ControlType)
     {
         case 'multiselect':
-            coldef.cellFilter = 'arrayValues';        
+            coldef.cellFilter = 'arrayValues';
             break;
-            
+
         case 'date':
             coldef.cellFilter = 'date: \'MM/dd/yyyy\'';
             break;
@@ -1527,7 +1527,7 @@ function parseField(field, scope)
 
     //are we already parsed?
     if(field.parsed === true)
-        return; 
+        return;
 
     var displayName = "";
 
@@ -1590,7 +1590,7 @@ function makeNewRow(coldefs)
 
     //sets to default value of this field if one is specified as a "DefaultValue" rule; otherwise null
     angular.forEach(coldefs, function(col){
-        obj[col.field] = (col.defaultValue) ?  col.defaultValue : null; 
+        obj[col.field] = (col.defaultValue) ?  col.defaultValue : null;
     });
 
     obj.isValid=true;
@@ -1634,7 +1634,7 @@ function makeObjectsFromValues(key, valuesList)
         }catch(e){
             console.log("problem parsing: " + valuesList + " for field: "+ key);
         }
-        
+
         //make array elements have same key/value
         if(angular.isArray(selectOptions))
         {
@@ -1648,7 +1648,7 @@ function makeObjectsFromValues(key, valuesList)
             {
                 objects[idx] = selectOptions[idx];
             }
-            
+
         }
         angular.rootScope.Cache[key] = objects; //save into our cache
     }
@@ -1660,7 +1660,7 @@ function orderByAlpha(a,b)
 {
      var nameA=a.Label.toLowerCase(), nameB=b.Label.toLowerCase()
      if (nameA < nameB) //sort string ascending
-      return -1 
+      return -1
      if (nameA > nameB)
       return 1
      return 0 //default return value (no sorting)
@@ -1670,7 +1670,7 @@ function orderByAlphaName(a,b)
 {
      var nameA=a.Name.toLowerCase(), nameB=b.Name.toLowerCase()
      if (nameA < nameB) //sort string ascending
-      return -1 
+      return -1
      if (nameA > nameB)
       return 1
      return 0 //default return value (no sorting)
@@ -1680,7 +1680,7 @@ function orderUserByAlpha(a,b)
 {
      var nameA=a.Fullname.toLowerCase(), nameB=b.Fullname.toLowerCase()
      if (nameA < nameB) //sort string ascending
-      return -1 
+      return -1
      if (nameA > nameB)
       return 1
      return 0 //default return value (no sorting)
@@ -1740,7 +1740,7 @@ function validateField(field, row, key, scope, row_errors)
             {
                 var a_value = values[a];
                 if(Object.keys(scope.CellOptions[field.DbColumnName+'Options']).indexOf(a_value) == -1) //not found
-                    row_errors.push("["+field.DbColumnName+"] Invalid selection ("+a_value+")");  
+                    row_errors.push("["+field.DbColumnName+"] Invalid selection ("+a_value+")");
             }
             break;
         case 'date':
@@ -1778,7 +1778,7 @@ function validateField(field, row, key, scope, row_errors)
 if(field.DbColumnName == "Disposition")
 {
     console.log("Disposition value: " + value);
-    var testRule = 
+    var testRule =
     {
         "OnValidate":
         "if((value == 'O' || value == 'T') && (scope.FieldLookup['ReleaseSite'] && !row['ReleaseSite'])) row_errors.push('[ReleaseSite] Disposition choice requires ReleaseSite');"
@@ -1792,7 +1792,7 @@ console.log(field.DbColumnName);
 if(field.DbColumnName == "FinClip")
 {
     console.log("Origin value: " + value);
-    var testRule = 
+    var testRule =
     {
         "OnValidate":
         "row['Origin'] = 'NAT';if(!(!row['FinClip'] || (row['FinClip'] == 'NONE' || row['FinClip'] == 'NA')) || ( row['Tag'] == 'WIRE')) row['Origin'] = 'HAT';"
@@ -1804,9 +1804,9 @@ if(field.DbColumnName == "FinClip")
 
     fireRules("OnValidate",row,field,value,scope.row,row_errors, scope);
 
-    
+
 }
-   
+
 function stringIsNumber(s) {
     return !isNaN(parseFloat(s)) && isFinite(s);
 }
@@ -1844,7 +1844,7 @@ mod.service('Logger',[
                         var arrayArg = arguments[i];
                         this.log.apply(this, arrayArg);
                     }
-                    
+
                 }
             },
 
@@ -1866,7 +1866,7 @@ mod.service('Logger',[
         return service;
 
     }]);
- 
+
 //from : http://stackoverflow.com/questions/17547399/angularjs-arcgis
 mod.service('wish', function () {
 
@@ -1896,10 +1896,10 @@ mod.service('wish', function () {
 
             }catch(e){
                 console.dir(e);
-            
+
             }
         }
-        
+
         return {
             loadDependencies: function (deps, next) {
                 _loadDependencies(deps, next);
@@ -1929,7 +1929,7 @@ function convertCtoF(cels){
 
 function previousActivity(activities, routeId, $location){
     var previousId;
-    
+
     //spin through the activities - when we get to the one we're on, send the one before
     //  (unless we are on the first one, then do nothing)
 
@@ -1955,7 +1955,7 @@ function previousActivity(activities, routeId, $location){
 function nextActivity(activities, routeId, $location){
     var nextId;
     var found = false;
-    
+
     for (var i = 0; i < activities.length; i++) {
         var activity = activities[i];
 
@@ -1984,7 +1984,7 @@ function initEdit(){
         var doPrevent = false;
         if (event.keyCode === 8) {
             var d = event.srcElement || event.target;
-            if ((d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
+            if ((d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE'))
                  || d.tagName.toUpperCase() === 'TEXTAREA') {
                 doPrevent = d.readOnly || d.disabled;
             }
@@ -2024,14 +2024,14 @@ function getByField(list, search, field)
             return pref;
     };
 
-    return null;   
+    return null;
 }
 
 //returns array with matching field value
 function getMatchingByField(data, search, field)
 {
     var newlist = [];
-    
+
     for(var key in data)
     {
         if(data[key][field] == search)
@@ -2041,14 +2041,14 @@ function getMatchingByField(data, search, field)
     //console.log("did a search on " + search + " for " + field);
     //console.dir(newlist);
 
-    return newlist;  
+    return newlist;
 }
 
 //returns array with UN-matching field value
 function getUnMatchingByField(data, search, field)
 {
     var newlist = [];
-    
+
     for(var key in data)
     {
         if(data[key][field] != search)
@@ -2058,7 +2058,7 @@ function getUnMatchingByField(data, search, field)
     //console.log("did a search on " + search + " for " + field);
     //console.dir(newlist);
 
-    return newlist;  
+    return newlist;
 }
 
 
@@ -2168,8 +2168,8 @@ function dateToUTC(a_date)
     return utc;
 }
 
-//give me a date string and offset (in ms) and I'll give you back a Date 
-//  with the offset applied. 
+//give me a date string and offset (in ms) and I'll give you back a Date
+//  with the offset applied.
 //  used in rules.
 function toDateOffset(str_date, int_offset)
 {
@@ -2179,14 +2179,14 @@ function toDateOffset(str_date, int_offset)
     //console.log(orig_date.toISOString());
     var d = new Date(orig_date.getTime() + int_offset);
     //console.log(d.toISOString());
-    
+
     return d;
 }
 
 //date to friendly format: "12/05/2014 04:35:44"
 function formatDate(d)
 {
-    var d_str = 
+    var d_str =
         [d.getMonth()+1,d.getDate(), d.getFullYear()].join('/') + " " +
         [("00" + d.getHours()).slice(-2), ("00" + d.getMinutes()).slice(-2), ("00" + d.getSeconds()).slice(-2)].join(':');
 

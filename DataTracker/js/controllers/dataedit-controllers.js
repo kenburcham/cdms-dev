@@ -6,7 +6,7 @@ var mod_edit = angular.module('DataEditControllers', ['ui.bootstrap']);
 
 
 //modal to bulk update RowQAStatus
-mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance', 
+mod_edit.controller('ModalBulkRowQAChangeCtrl', ['$scope','$modalInstance',
 
 	function($scope,  $modalInstance){
 
@@ -49,9 +49,9 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		$scope.cellSelectEditableTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'QAStatusId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in RowQAStatuses"/>';
 
 		$scope.datasheetColDefs = [];
-		
+
 		$scope.option = { enableMultiselect: false };
-		
+
 		$scope.dataset_activities = DataService.getActivityData($routeParams.Id);
 
         $scope.dataSheetDataset = [];
@@ -68,7 +68,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 	        columnDefs: 'datasheetColDefs',
 	        enableColumnResize: true,
 	        selectedItems: $scope.selectedItems
-        
+
 		};
 
         //config the fields for the datasheet - include mandatory location and activityDate fields
@@ -77,7 +77,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		//update our location options as soon as our project is loaded.
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
-        	
+
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
 			{
@@ -85,7 +85,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 			}
 
 			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
-			$scope.selectInstrument(); 
+			$scope.selectInstrument();
 
         });
 
@@ -100,13 +100,13 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
         	$scope.project = DataService.getProject($scope.dataset.ProjectId);
         	$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
 
-        	//set the header field values 
+        	//set the header field values
         	$scope.row['ActivityId'] = $scope.dataset_activities.Header.ActivityId;
         	$scope.row['activityDate'] = $scope.dataset_activities.Header.Activity.ActivityDate;
         	$scope.row['locationId'] = ""+$scope.dataset_activities.Header.Activity.LocationId; //note the conversion of this to a string!
-        	$scope.row['InstrumentId'] = $scope.dataset_activities.Header.Activity.InstrumentId; 
-        	$scope.row['AccuracyCheckId'] = $scope.dataset_activities.Header.Activity.AccuracyCheckId; 
-        	$scope.row['PostAccuracyCheckId'] = $scope.dataset_activities.Header.Activity.PostAccuracyCheckId; 
+        	$scope.row['InstrumentId'] = $scope.dataset_activities.Header.Activity.InstrumentId;
+        	$scope.row['AccuracyCheckId'] = $scope.dataset_activities.Header.Activity.AccuracyCheckId;
+        	$scope.row['PostAccuracyCheckId'] = $scope.dataset_activities.Header.Activity.PostAccuracyCheckId;
 
         	if($scope.dataset_activities.Header.Activity.ActivityQAStatus)
         	{
@@ -114,57 +114,60 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
         			QAStatusId: ""+$scope.dataset_activities.Header.Activity.ActivityQAStatus.QAStatusId,
         			Comments: $scope.dataset_activities.Header.Activity.ActivityQAStatus.Comments,
         		}
-			}
+					}
 
-			if($scope.dataset_activities.Header.Activity.Timezone)
-				$scope.row.Timezone = getByField($scope.SystemTimezones, angular.fromJson($scope.dataset_activities.Header.Activity.Timezone).Name, "Name"); //set default timezone
-			
-			$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
-		
-			if($scope.dataset.RowQAStatuses.length > 1)
-			{
-				$scope.datasheetColDefs.push(
-						{
-		    				field: "QAStatusId", //QARowStatus
-		    				displayName: "QA",
-		    				minWidth: 50, maxWidth: 180,
-		    				enableCellEditOnFocus: true, 
-		        			editableCellTemplate: $scope.cellSelectEditableTemplate,
-		 					cellFilter: 'RowQAStatusFilter'
-		    			});
-			}
+					if($scope.dataset_activities.Header.Activity.Timezone)
+						$scope.row.Timezone = getByField($scope.SystemTimezones, angular.fromJson($scope.dataset_activities.Header.Activity.Timezone).Name, "Name"); //set default timezone
+
+					$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+
+					if($scope.dataset.RowQAStatuses.length > 1)
+					{
+						$scope.datasheetColDefs.push(
+								{
+				    				field: "QAStatusId", //QARowStatus
+				    				displayName: "QA",
+				    				minWidth: 50, maxWidth: 180,
+				    				enableCellEditOnFocus: true,
+				        			editableCellTemplate: $scope.cellSelectEditableTemplate,
+				 					cellFilter: 'RowQAStatusFilter'
+				    			});
+					}
 
 
-			//set the detail (grid) values.
+					//set the detail (grid) values.
         	$scope.dataSheetDataset = $scope.dataset_activities.Details;
 
         	//setup our header/detail field structure
-			angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
-				parseField(field, $scope);
-				if(field.FieldRoleId == FIELD_ROLE_HEADER)
-				{
-					$scope.headerFields.push(field);
-					//also copy the value to row
-					if(field.ControlType == "multiselect")
-						$scope.row[field.DbColumnName] = angular.fromJson($scope.dataset_activities.Header[field.DbColumnName]);	
-					else
-						$scope.row[field.DbColumnName] = $scope.dataset_activities.Header[field.DbColumnName];
-				}
-				else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
-				{
-					$scope.detailFields.push(field);
-    				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
-				}
+					angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
+						parseField(field, $scope);
+						if(field.FieldRoleId == FIELD_ROLE_HEADER)
+						{
+							$scope.headerFields.push(field);
+							//also copy the value to row
+							if(field.ControlType == "multiselect")
+							{
+								console.dir($scope.dataset_activities.Header[field.DbColumnName]);
+								$scope.row[field.DbColumnName] = angular.fromJson($scope.dataset_activities.Header[field.DbColumnName]);
+							}
+							else
+								$scope.row[field.DbColumnName] = $scope.dataset_activities.Header[field.DbColumnName];
+						}
+						else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
+						{
+							$scope.detailFields.push(field);
+		    				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
+						}
 
-			});
+					});
 
-			$scope.recalculateGridWidth($scope.detailFields.length);
-            $scope.validateGrid($scope);
+				$scope.recalculateGridWidth($scope.detailFields.length);
+	      $scope.validateGrid($scope);
 
 		});
 
 
-        
+
 
 		$scope.clearSelections = function()
 		{
@@ -192,8 +195,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
             var modalInstance = $modal.open({
               templateUrl: 'partials/dataentry/modal-rowqaupdate.html',
               controller: 'ModalBulkRowQAChangeCtrl',
-              scope: $scope, //very important to pass the scope along... 
-        
+              scope: $scope, //very important to pass the scope along...
+
             });
 
 		};
@@ -205,10 +208,10 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
                 DataService.clearProject();
                 $scope.project = DataService.getProject($scope.dataset.ProjectId);
                 var watcher = $scope.$watch('project.Id', function(){
-                	$scope.selectInstrument();	
+                	$scope.selectInstrument();
                 	watcher();
                 });
-                
+
          };
 
 		$scope.openAccuracyCheckModal = function(){
@@ -216,8 +219,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
               controller: 'ModalQuickAddAccuracyCheckCtrl',
-              scope: $scope, //very important to pass the scope along... 
-        
+              scope: $scope, //very important to pass the scope along...
+
             });
 
 		};
@@ -238,14 +241,14 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 
 		 $scope.cancel = function(){
 		 	if($scope.dataChanged)
-		 	{	
+		 	{
 			 	if(!confirm("Looks like you've made changes.  Are you sure you want to leave this page?"))
 			 		return;
 			}
 
 		 	$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		 };
-		
+
 
 		//adds row to datasheet grid
 		$scope.addNewRow = function()
@@ -263,7 +266,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
             //console.dir(field);
             $scope.file_row = row;
             $scope.file_field = field;
-            
+
             var modalInstance = $modal.open({
                 templateUrl: 'partials/modals/file-modal.html',
                 controller: 'FileModalCtrl',
@@ -295,7 +298,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
         /*  -- */
 
 		$scope.saveData = function(){
-			
+
 			$scope.errors.heading = []; //reset errors if there are any.
 
 			if($scope.gridHasErrors)
@@ -309,13 +312,13 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 
 				//spin through the files that we uploaded
 				angular.forEach($scope.filesToUpload, function(files, field){
-					
+
 					var local_files = [];
 
 					for(var i = 0; i < files.length; i++)
 			      	{
 			          var file = files[i];
-			          
+
 			          if(file.data && file.data.length == 1) //since we only upload one at a time...
 			          {
 			          		//console.dir(file.data);
@@ -336,7 +339,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 			      		var current_files = angular.fromJson($scope.file_row[field]);
 			      		angular.forEach(current_files, function(file){
 			      			if(file.Id) //our incoming files don't have an id, just actual files.
-			      				local_files.push(file);		
+			      				local_files.push(file);
 			      		});
 			      	}
 
@@ -345,7 +348,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 				});
 
 				$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.headerFields, $scope.detailFields);
-			
+
 				if(!$scope.activities.errors)
 				{
 					//add our updated list and deleted list to our payload
@@ -357,9 +360,9 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 				}
 			});
 
-			
-			
-		};		
+
+
+		};
 
 		$scope.doneButton = function(){
 			$scope.activities = undefined;
@@ -381,5 +384,3 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		}
 	}
 ]);
-
-

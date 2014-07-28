@@ -12,13 +12,13 @@ mod_ds.controller('ModalAddAccuracyCheckCtrl', ['$scope','$modalInstance', 'Data
     $scope.ac_row = angular.copy($scope.ac_row);
 
     $scope.save = function(){
-      
+
       var promise = DatastoreService.saveInstrumentAccuracyCheck($scope.viewInstrument.Id, $scope.ac_row);
       promise.$promise.then(function(){
-          $scope.reloadProject();  
-          $modalInstance.dismiss();  
+          $scope.reloadProject();
+          $modalInstance.dismiss();
       });
-      
+
 
     };
 
@@ -34,16 +34,16 @@ mod_ds.controller('ModalProjectEditorCtrl', ['$scope','$modalInstance', 'DataSer
 
     if($scope.row && $scope.row.Id)
     {
-        $scope.header_message = "Edit project: " + $scope.project.Name;  
+        $scope.header_message = "Edit project: " + $scope.project.Name;
     }
     else
     {
         $scope.header_message = "Create new project";
         $scope.row = {};
     }
-    
+
     $scope.save = function(){
-      
+
        $scope.row.Metadata = [];
 
        //need to make multi-selects into json objects
@@ -60,8 +60,8 @@ mod_ds.controller('ModalProjectEditorCtrl', ['$scope','$modalInstance', 'DataSer
 
         var promise = DataService.saveProject($scope.row);
         promise.$promise.then(function(){
-            $scope.reloadProject();  
-            $modalInstance.dismiss();  
+            $scope.reloadProject();
+            $modalInstance.dismiss();
         });
 
     };
@@ -82,7 +82,7 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
     $scope.row = {
         StatusId: 0,
         OwningDepartmentId: 1,
-    };      
+    };
 
     if($scope.viewInstrument)
     {
@@ -100,15 +100,15 @@ mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Data
         $scope.Projects = $scope.RawProjects.sort(orderByAlphaName);
     },true);
 
-    $scope.save = function(){      
+    $scope.save = function(){
         var saveRow = angular.copy($scope.row);
         saveRow.AccuracyChecks = undefined;
         saveRow.InstrumentType = undefined;
         saveRow.OwningDepartment = undefined;
         var promise = DatastoreService.saveInstrument($scope.project.Id, saveRow);
         promise.$promise.then(function(){
-            $scope.reloadProject();  
-            $modalInstance.dismiss();  
+            $scope.reloadProject();
+            $modalInstance.dismiss();
         });
     };
 
@@ -125,11 +125,11 @@ mod_ds.controller('ModalEditFileCtrl', ['$scope','$modalInstance', 'DataService'
 
     $scope.header_message = "Edit file";
 
-    $scope.save = function(){      
+    $scope.save = function(){
         var promise = DatastoreService.updateFile($scope.project.Id, $scope.row);
         promise.$promise.then(function(){
-            $scope.reloadProject();  
-            $modalInstance.dismiss();  
+            $scope.reloadProject();
+            $modalInstance.dismiss();
         });
     };
 
@@ -148,22 +148,22 @@ mod_ds.controller('ModalNewFileCtrl', ['$scope','$modalInstance', 'DataService',
 
     $scope.onFileSelect = function($files)
     {
-          $scope.uploadFiles = $files;              
+          $scope.uploadFiles = $files;
           //console.dir($scope.uploadFiles);
     };
-      
-    $scope.save = function(){      
+
+    $scope.save = function(){
 
       $scope.uploadErrorMessage = undefined;
 
       for(var i = 0; i < $scope.uploadFiles.length; i++)
       {
           var file = $scope.uploadFiles[i];
-          
+
           if(file.success != "Success")
           {
             $scope.upload = $upload.upload({
-              url: serviceUrl + '/data/UploadProjectFile', 
+              url: serviceUrl + '/data/UploadProjectFile',
               method: "POST",
               // headers: {'headerKey': 'headerValue'},
               // withCredential: true,
@@ -182,12 +182,12 @@ mod_ds.controller('ModalNewFileCtrl', ['$scope','$modalInstance', 'DataService',
               });
           }
       }
-         
+
     };
 
     $scope.cancel = function(){
       if($scope.uploadFiles)
-        $scope.reloadProject();  
+        $scope.reloadProject();
 
       $modalInstance.dismiss();
     };
@@ -204,39 +204,39 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
     scope.filteredUsers = false;
     scope.allInstruments = DatastoreService.getAllInstruments();
     scope.CellOptions = {}; //for metadata dropdown options
-    
-    scope.metadataList = {}; 
-    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID); 
-    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
 
-		var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+    scope.metadataList = {};
+    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID);
+    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID);
+
+		var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
             				   '<a href="#/{{row.getProperty(\'activitiesRoute\')}}/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
             				   '</div>';
 
-    var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+    var activityTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
             				   'PLACEHOLDER' +
             				   '</div>';
 
 		scope.gridOptions = {
             	data: 'datasets',
-            	columnDefs: 
+            	columnDefs:
             		[
             			{field:'Name', displayName:'Dataset Name', cellTemplate: linkTemplate},
-            			{field:'Description',displayName: 'Description'},    
+            			{field:'Description',displayName: 'Description'},
             			{field:'CreateDate',displayName: 'Last Activity', cellTemplate: activityTemplate}
-            		]	
+            		]
             };
 
         var fileLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
-                                '<img src="images/file_image.png" width="100px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                                '<img src="images/file_image.png" width="100px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' +
                                '</a>' +
                                '</div>';
 
-        var uploadedBy = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+        var uploadedBy = '<div class="ngCellText" ng-class="col.colIndex()">' +
                                '{{row.getProperty("UploadDate")|date}} by {{row.getProperty("User.Fullname")}}' +
-                               '</div>';                               
-        
-        scope.fileSelection = []; 
+                               '</div>';
+
+        scope.fileSelection = [];
         scope.FileFilterOptions = {};
         scope.gridFiles = {
             data: 'project.Docs',
@@ -257,7 +257,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
 
         var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
-                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' + 
+                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' +
                                '</a>' +
                                '</div>';
         scope.galleryFileSelection = [];
@@ -277,14 +277,14 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             selectedItems: scope.galleryFileSelection
 
         };
-         
+
         scope.openEditFileModal = function(selection)
         {
             scope.row = selection;
             var modalInstance = $modal.open({
               templateUrl: 'partials/project/modal-edit-file.html',
               controller: 'ModalEditFileCtrl',
-              scope: scope, //very important to pass the scope along... 
+              scope: scope, //very important to pass the scope along...
             });
         };
 
@@ -293,7 +293,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             var modalInstance = $modal.open({
               templateUrl: 'partials/project/modal-upload-files.html',
               controller: 'ModalNewFileCtrl',
-              scope: scope, //very important to pass the scope along... 
+              scope: scope, //very important to pass the scope along...
             });
         };
 
@@ -326,9 +326,9 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
             //need to bump this since we are looking at a LIST of datasets...
             angular.forEach(scope.datasets, function(dataset){
-                DataService.configureDataset(dataset);    
+                DataService.configureDataset(dataset);
             });
-            
+
 
         },true);
 
@@ -342,25 +342,25 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 scope.project.MetadataValue = {};
                 scope.project.Images = [];
                 scope.project.Docs = [];
-                
+
                 //split out the images and other files.
-                
+
                 angular.forEach(scope.project.Files, function(file, key){
                     if(file.FileType.Name=="Image")
                         scope.project.Images.push(file);
                     else
                         scope.project.Docs.push(file);
                 });
-                
+
                 //reload if it is already selected
                 if(scope.viewInstrument)
                 {
-                    scope.viewInstrument = getMatchingByField(scope.project.Instruments, scope.viewInstrument.Id, 'Id')[0]; 
+                    scope.viewInstrument = getMatchingByField(scope.project.Instruments, scope.viewInstrument.Id, 'Id')[0];
                 }
 
                 //add in the metadata to our metadataList that came with this dataset
                 addMetadataProperties(scope.project.Metadata, scope.metadataList, scope, DataService);
-                
+
                 scope.mapHtml = $sce.trustAsHtml(scope.project.MetadataValue[25]);
                 scope.imagesHtml = $sce.trustAsHtml(scope.project.MetadataValue[13]);
 
@@ -389,8 +389,8 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
         scope.habitatPropertiesPromise.promise.then(function(list){
             addMetadataProperties(list, scope.metadataList, scope, DataService);
         });
-          
-        
+
+
 
 
          scope.openAccuracyCheckForm = function(ac_row){
@@ -402,17 +402,17 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-new-accuracycheck.html',
               controller: 'ModalAddAccuracyCheckCtrl',
-              scope: scope, //very important to pass the scope along... 
-        
+              scope: scope, //very important to pass the scope along...
+
             });
          };
 
          scope.createInstrument = function(){
-            scope.viewInstrument = null; 
+            scope.viewInstrument = null;
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-create-instrument.html',
               controller: 'ModalCreateInstrumentCtrl',
-              scope: scope, //very important to pass the scope along... 
+              scope: scope, //very important to pass the scope along...
             });
          };
 
@@ -420,7 +420,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             var modalInstance = $modal.open({
               templateUrl: 'partials/instruments/modal-create-instrument.html',
               controller: 'ModalCreateInstrumentCtrl',
-              scope: scope, //very important to pass the scope along... 
+              scope: scope, //very important to pass the scope along...
             });
          };
 
@@ -429,8 +429,8 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             var modalInstance = $modal.open({
               templateUrl: 'partials/project/modal-edit-project.html',
               controller: 'ModalProjectEditorCtrl',
-              scope: scope, //very important to pass the scope along... 
-        
+              scope: scope, //very important to pass the scope along...
+
             });
          };
 
@@ -454,7 +454,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                 return;
 
             var Instruments = getMatchingByField(scope.allInstruments, scope.selectedInstrument, 'Id');
-            
+
             var promise = DatastoreService.saveProjectInstrument(scope.project.Id, Instruments[0]);
 
             promise.$promise.then(function(){
@@ -464,16 +464,19 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
          };
 
+
+
+
          scope.removeViewInstrument = function(){
             if(!scope.viewInstrument)
                 return;
 
             var promise = DatastoreService.removeProjectInstrument(scope.project.Id, scope.viewInstrument.Id);
-            
+
             promise.$promise.then(function(){
                 scope.reloadProject();
             });
-              
+
 
          };
 
@@ -502,7 +505,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             console.log("filterusers starting with " + scope.users.length);
 
             var newusers = [];
-            
+
             for (var a = 0; a < scope.users.length; a++) {
                 var user = scope.users[a];
                 var filterOut = false;
@@ -514,11 +517,11 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
                         filterOut = true;
                         break;
                     }
-                }  
+                }
 
                 if(!filterOut)
                     newusers.push(user);
-                   
+
 
             };
 
@@ -562,7 +565,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
          scope.cancel = function()
          {
-           // scope.users = 
+           // scope.users =
          };
 
 	}
@@ -572,11 +575,11 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 var projectsController = ['$scope', 'DataService', '$modal',
   function(scope, DataService, $modal){
     scope.projects = DataService.getProjects();
-    
+
     scope.CellOptions = {}; //for metadata dropdown options
-    scope.metadataList = {}; 
-    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID); 
-    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID); 
+    scope.metadataList = {};
+    scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID);
+    scope.habitatPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_HABITATTYPEID);
 
     scope.metadataPropertiesPromise.promise.then(function(list){
         addMetadataProperties(list, scope.metadataList, scope, DataService);
@@ -586,7 +589,7 @@ var projectsController = ['$scope', 'DataService', '$modal',
         addMetadataProperties(list, scope.metadataList, scope, DataService);
     });
 
-        var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' + 
+        var linkTemplate = '<div class="ngCellText" ng-class="col.colIndex()">' +
                                '<a title="{{row.getProperty(\'Description\')}}" href="#/projects/{{row.getProperty(\'Id\')}}">{{row.getProperty("Name")}}</a>' +
                                '</div>';
 
@@ -617,10 +620,75 @@ var projectsController = ['$scope', 'DataService', '$modal',
             var modalInstance = $modal.open({
               templateUrl: 'partials/project/modal-edit-project.html',
               controller: 'ModalProjectEditorCtrl',
-              scope: scope, //very important to pass the scope along... 
-        
-            });  
+              scope: scope, //very important to pass the scope along...
+
+            });
         };
+
+        scope.click = function(e){
+
+          try{
+
+              if(!scope.map.graphics.infoTemplate)
+              {
+                  scope.map.graphics.infoTemplate = scope.template;
+                  console.log("graphics layer infotemplate defined.");
+              }
+
+              scope.map.infoWindow.resize(250, 300);
+
+              //show the infowindow
+              if(e.graphic)
+              {
+                  scope.map.infoWindow.setContent(scope.getInfoContent(e.graphic));
+                  scope.map.infoWindow.show(e.mapPoint);
+              }
+
+          }catch(e)
+          {
+              console.dir(e);
+          }
+
+
+        };
+
+        scope.getInfoContent = function(graphic)
+        {
+
+          var matchingProjects = [];
+          var html = "";
+
+          //spin through projects and find the ones with this objectid (at this location)
+          angular.forEach(scope.projects, function(project){
+            var proj_loc = getByField(project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId");
+            if(proj_loc && proj_loc.SdeObjectId == graphic.attributes.OBJECTID){
+              matchingProjects.push(project);
+            }
+          });
+
+          if(matchingProjects.length == 1)
+          {
+            scope.map.infoWindow.setTitle("Project at location");
+            html += matchingProjects[0].Name;
+            html += "<br/><div class='right'><a href='#/projects/"+matchingProjects[0].Id+"'>View</a></div>"
+          }
+          else if (matchingProjects.length > 1)
+          {
+            scope.map.infoWindow.setTitle("Projects at location");
+            html += "<ul>";
+            angular.forEach(matchingProjects, function(p){
+              html += "<li><a href='#/projects/"+p.Id+"'>"+ p.Name + "</a></li>";
+            })
+            html += "</ul>";
+          }
+          else
+          {
+            scope.map.infoWindow.setTitle("No project found");
+            html += "Not found: " + graphic.attributes.OBJECTID;
+          }
+          return html;
+
+        }
 
         scope.$watch('projects',function(){
             if(scope.projects)
@@ -629,7 +697,7 @@ var projectsController = ['$scope', 'DataService', '$modal',
                 angular.forEach(scope.projects, function(project, key){
                     var program = getByField(project.Metadata,'23','MetadataPropertyId');
                     var subprogram = getByField(project.Metadata,'24','MetadataPropertyId');
-                  
+
                     if(program) project.Program = program.Values;
 
                     if(subprogram && subprogram.Values != "(None)")
@@ -653,13 +721,13 @@ var projectsController = ['$scope', 'DataService', '$modal',
             }
         },true);
 
-        
+
   }
 ];
 
 var loginController = ['$scope','DataService',
   function(scope, DataService){
-    
+
   }
 ];
 
@@ -670,7 +738,7 @@ mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
 function addMetadataProperties(metadata_list, all_metadata, scope, DataService)
 {
     angular.forEach(metadata_list, function(i_property, key){
-      
+
         var property = i_property;
         if(i_property.MetadataPropertyId) //is it a value from project.Metadata? if so then grab the property.
             property = DataService.getMetadataProperty(i_property.MetadataPropertyId);
@@ -702,14 +770,14 @@ function addMetadataProperties(metadata_list, all_metadata, scope, DataService)
               {
                 values = i_property.Values.split(",")
               }
-                
+
               all_metadata[property.Name].Values = values;
           }
           else
           {
               all_metadata[property.Name].Values = i_property.Values;
           }
-        
+
           if(scope.project)
               scope.project.MetadataValue[property.Id] = all_metadata[property.Name].Values; //make it easy to get values by metadata id.
         }
@@ -721,9 +789,9 @@ function addMetadataProperties(metadata_list, all_metadata, scope, DataService)
         if(property.PossibleValues)
         {
           populateMetadataDropdowns(scope,property); //setup the dropdown
-          all_metadata[property.Name].options = scope.CellOptions[property.Id+"_Options"];      
+          all_metadata[property.Name].options = scope.CellOptions[property.Id+"_Options"];
         }
 
-        
+
     });
 };
