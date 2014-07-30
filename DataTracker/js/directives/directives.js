@@ -100,13 +100,13 @@ mod.directive('projectRole', function($rootScope){
 
                 if(role == 'owner' && $rootScope.Profile.isProjectOwner(scope.project))
                 {
-                    //console.log("Showing role 'owner' because user is owner.");
+                    console.log("Showing role 'owner' because user is owner.");
                     show = true;
                 }
 
                 if(role == 'editor' && ($rootScope.Profile.isProjectOwner(scope.project) || $rootScope.Profile.isProjectEditor(scope.project)))
                 {
-                    //console.log("Showing role 'editor' because user is owner or editor.");
+                    console.log("Showing role 'editor' because user is owner or editor.");
                      show = true;
                 }
 
@@ -158,10 +158,10 @@ mod.directive('hasRole', function($rootScope){
             //console.dir($rootScope.Profile.Fullname);
 
             if(!$rootScope.Profile.Roles)
-                $rootScope.Profile.Roles = {};
-            else
-                if(!Array.isArray($rootScope.Profile.Roles))
-                    $rootScope.Profile.Roles = angular.fromJson($rootScope.Profile.Roles);
+                $rootScope.Profile.Roles = [];
+            //else
+                //if(!Array.isArray($rootScope.Profile.Roles))
+                //    $rootScope.Profile.Roles = angular.fromJson($rootScope.Profile.Roles);
 
             //console.dir($rootScope.Profile.Roles);
 

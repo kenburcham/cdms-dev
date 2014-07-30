@@ -53,6 +53,7 @@ define([
 
 	        //custom routes for datasets that require custom controller+pages
 	        $routeProvider.when('/appraisals/:Id', {templateUrl: 'partials/appraisals/Appraisal-activities.html', controller: 'AppraisalCtrl'});
+	        $routeProvider.when('/unauthorized', {templateUrl: 'partials/errors/unauthorized.html',controller: 'ErrorCtrl'});
 
 	        //when all else fails...
 	        $routeProvider.otherwise({redirectTo: '/projects'});
@@ -77,7 +78,6 @@ define([
 
 	  $rootScope.SystemTimezones = SystemTimezones; //defined in init.js
 	  $rootScope.DataGradeMethods = DataGradeMethods; //ditto
-
 	});
 
 	return app;
@@ -95,19 +95,33 @@ function configureProfile(profile)
 	else
 		profile.favoriteDatasets = [];
 
+	if(profile.Roles)
+		profile.Roles = angular.fromJson(profile.Roles);
 	
 	profile.isAdmin = function()
 	{
-		return (ALLOW_SUPERADMIN && (profile.Id == 1 || profile.Id == 2 || profile.Id == 1028));
+		return (profile.hasRole("Admin"));
+	};
+
+	profile.hasRole = function(role)
+	{
+		if(profile.Roles)
+			return profile.Roles.contains(role);
+
+		return false;
+	}
+
+	profile.canEdit = function(project)
+	{
+		return (profile.isProjectOwner(project) || profile.isProjectEditor(project));
 	};
 
 	//is the profile owner of the given project?
 	profile.isProjectOwner = function(project){
-		//console.dir(project);
 		if(project && project.OwnerId == profile.Id)
 			return true;
 		
-		if(profile.isAdmin)
+		if(profile.isAdmin())
 			return true;
 
 		//console.log(profile.Id + " is not owner: " + project.OwnerId);

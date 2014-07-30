@@ -1,15 +1,5 @@
 'use strict';
 
-var NUM_FLOAT_DIGITS = 3;
-var FIELD_ROLE_HEADER = 1;
-var FIELD_ROLE_DETAIL = 2;
-var FIELD_ROLE_SUMMARY = 3;
-var FIELD_ROLE_CALCULATED = 4;
-var FIELD_ROLE_VIRTUAL = 5;
-var METADATA_ENTITY_PROJECTTYPEID = 1;
-var METADATA_ENTITY_HABITATTYPEID = 2;
-var METADATA_ENTITY_DATASETTYPEID = 5;
-
 var mod = angular.module('DatasetServices', ['ngResource']);
 
 var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
@@ -425,7 +415,26 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 //if there are page routes in configuration, set them in our dataset
                 if(dataset.Config.ActivitiesPage)
                     dataset.activitiesRoute = dataset.Config.ActivitiesPage.Route;
+
+                //part of configuration is authorization.  If the user isn't authorized
+                //  for this dataset, bump them to error
+                if(dataset.Config.RestrictRoles)
+                {   
+                    var authorized = false;
+                    for (var i = dataset.Config.RestrictRoles.length - 1; i >= 0; i--) {
+                        if(angular.rootScope.Profile.hasRole(dataset.Config.RestrictRoles[i]))
+                            authorized = true;
+                    };
+
+                    if(!authorized)
+                        angular.rootScope.go('/unauthorized');
+                    
+                    //console.dir(angular.rootScope.Profile);
+                    //console.dir(dataset.Config.RestrictRoles);
+                }
+
             }
+
         },
 
         getHeadersDataForDataset: function(datasetId) {

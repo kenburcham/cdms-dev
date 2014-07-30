@@ -28,6 +28,11 @@ mod_dv.controller('ModalAddProjectDatasetCtrl', ['$scope','$modalInstance', 'Dat
 
 mod_ac.controller('AdminCtrl', ['$scope','DatastoreService','$modal','DataService',
 	function($scope, DatastoreService, $modal, DataService){
+
+		//TODO: a nicer global route authorization scheme...
+		if(!$scope.Profile.isAdmin())
+			angular.rootScope.go("/unauthorized");
+
 		$scope.datastores = DatastoreService.getDatastores();
 		$scope.projects = DataService.getProjects();
 

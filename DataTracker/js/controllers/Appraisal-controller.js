@@ -5,6 +5,7 @@ var mod_apr = angular.module('AppraisalControllers', ['ui.bootstrap']);
 
 var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope','DatastoreService',
     	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope, DatastoreService) {
+
             $scope.dataset = DataService.getDataset($routeParams.Id);
             $scope.activities = DataService.getActivities($routeParams.Id);
             $scope.loading = true;
@@ -52,9 +53,6 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                         {field:'User.Fullname',displayName: 'By User', width: '120px'},
                         {field:'QAStatus', displayName: 'QA Status', cellTemplate: QATemplate, width: '100px', visible: false},
                         {field:'Actions',displayName: '', cellTemplate: editButtonTemplate, width: '40px'},
-
-
-
 
                     ];
 

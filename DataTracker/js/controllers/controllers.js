@@ -725,14 +725,17 @@ var projectsController = ['$scope', 'DataService', '$modal',
   }
 ];
 
-var loginController = ['$scope','DataService',
-  function(scope, DataService){
 
+var errController = ['$scope', 
+  function(scope)
+  {
+    //nothing so far!
   }
 ];
 
 mod_ds.controller('ProjectsCtrl', projectsController);
 mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
+mod_ds.controller('ErrorCtrl', errController);
 
 //might be a list of metadata values from project.Metadata or a list of actual properties.
 function addMetadataProperties(metadata_list, all_metadata, scope, DataService)
