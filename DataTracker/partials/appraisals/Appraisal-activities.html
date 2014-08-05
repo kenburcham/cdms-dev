@@ -1,4 +1,4 @@
-﻿<div id="overlay" ng-show="map.loading">Loading...</div>
+﻿<div id="overlay" ng-show="map.loading">Searching...</div>
 <div id="fade" ng-show="map.loading"></div>
 <div title="Toggle 'Favorite' status" class="fav-dataset">
     <a href='' ng-click="toggleFavorite()">
@@ -11,6 +11,16 @@
     <li><a href="#/projects/{{project.Id}}">{{project.Name}}</a> <span class="divider"></span></li>
     <li class="active">{{dataset.Name}}</li>  
 </ul>
+
+<div style="margin-right:40px; margin-bottom: -44px;" id="basemapDropdown">
+    <img src="images/imgBaseMap.png" width="35px"/>
+    <select class="form-control" style="display: inline" ng-options="b.name as b.label for b in map.basemaps" ng-model="map.selectedBasemap" ng-change="map.updateLayers()"></select>
+
+    <img src="images/Layers-icon.png" width="35px" style="margin-left: 20px;" />
+    <select ui-select2="select2Options" multiple="true" data-placeholder="Map layers" ng-model="map.selectedServiceLayers" style="width: 200px;" ng-change="map.updateLayers()">
+          <option ng-repeat="item in map.serviceLayers" value="{{item.name}}">{{item.label}}</option>
+    </select>
+</div>
 
 <div style="height: 66px; width: 100%;">
     <div style="padding: 8px; width: 330px; float: right;">
@@ -51,6 +61,15 @@
             
             <div ng-show="showFilter" style="padding: 8px; width: 260px;">
                 <input class="form-control" ng-model="gridOptionsFilter.filterText" placeholder="Filter By" type="text"/><img class="right" style="margin-top: -30px;" src="images/search-sm.png"/>
+            </div>
+
+            <div class="right" project-role="editor" style="margin-top: -40px;">
+                <div ng-show="saveResults" style="float: left;">
+                    <div ng-click="saveResults=null" ng-show="saveResults.success" class="delete-error alert alert-success">Deleted</div>
+                    <div ng-click="saveResults=null" ng-show="saveResults.failure" class="delete-error alert alert-danger">Error</div>
+                </div>
+                <button project-role="editor" class="btn right" ng-show="gridOptions.selectedItems.length > 0" ng-click="deleteActivities()">Delete Allotment</button>
+                
             </div>
 
             <div class="gridActivities" ng-grid="gridOptions" style="margin-top: 10px;"></div>

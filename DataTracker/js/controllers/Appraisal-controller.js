@@ -3,8 +3,8 @@
 
 var mod_apr = angular.module('AppraisalControllers', ['ui.bootstrap']);
 
-var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope','DatastoreService',
-    	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope, DatastoreService) {
+var appraisalController = ['$scope','$route','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope','DatastoreService',
+    	function ($scope, $route, $routeParams, DataService, $modal, $location, $window, $rootScope, DatastoreService) {
 
             $scope.dataset = DataService.getDataset($routeParams.Id);
             $scope.activities = DataService.getActivities($routeParams.Id);
@@ -58,6 +58,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
 
             $scope.showFilter = false;
 
+
             $scope.selectedActivity = [];
 
             $scope.gridOptionsFilter = {};
@@ -101,8 +102,10 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             //when someone clicks an item in the returned list of parcels
             $scope.selectParcel = function(parcelObjectId)
             {
+                $scope.map.loading = true;
                 $scope.clearAll();
                 $scope.map.querySelectParcel(null,parcelObjectId, function(features){
+                    $scope.map.loading = false;
                     if (features.length == 0) { 
                           alert('No parcel polygon found that matches that allotment.');
                           return;
@@ -115,8 +118,6 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                         $scope.map.infoWindow.setContent($scope.getInfoWindowContent(features[0]));
                         $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());    
                     });
-
-                    
                    
                     $scope.$apply();
                     
@@ -148,12 +149,14 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                 }
 
                 $scope.map.selectedFeature = undefined;
+                $scope.map.loading = true;
 
   //              console.log("clicked a grid item.  querying for: ");
 //                console.dir($scope.gridOptions.selectedItems[0].Location.SdeObjectId);
                 var selectedAppraisal = $scope.gridOptions.selectedItems[0];
                 $scope.clearAll();
                 $scope.map.querySelectParcel(null,selectedAppraisal.Location.SdeObjectId, function(features){
+                    $scope.map.loading = false;
                     if (features.length == 0) { 
                           //alert('No parcel polygon found that matches that appraisal.');
                           return;
@@ -167,8 +170,9 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                         $scope.map.infoWindow.show($scope.map.selectedGraphic.geometry.getExtent().getCenter());    
                     });
 
-                    console.log("Found ObjectId: " + $scope.map.selectedFeature.attributes.OBJECTID);
+                    $scope.$apply();
                 });
+
             },true);
 
             $scope.filterByFeature = function(features){
@@ -177,7 +181,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             
             // expose a method for handling clicks ON THE MAP - this is linked to from the Map.js directive
             $scope.click = function(e){
-                
+                $scope.map.loading = true;
                 $scope.clearAll();
                 $scope.map.reposition(); //this is important or else we end up with our map points off somehow.
 
@@ -211,7 +215,7 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                     
                     $scope.activities = $scope.filteredActivities;
                     $scope.filteringActivities = true; //need this because we also filter to empty...
-
+                    $scope.map.loading = false;
                     $scope.$apply(); //bump angular
 
 
@@ -241,9 +245,10 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
                    $scope.project.$promise.then(function(){
                         //grab our new locationId
                         var location = getByField($scope.project.Locations, $scope.map.selectedFeature.attributes.OBJECTID,"SdeObjectId");
+                        var acres = $scope.map.selectedFeature.attributes.ACRES_GIS;
                         
                         //bounce the user to the data entry form with that location selected.
-                        $location.path("/dataentryform/"+$scope.dataset.Id).search({LocationId: location.Id, Allotment: location.Label});
+                        $location.path("/dataentryform/"+$scope.dataset.Id).search({LocationId: location.Id, Allotment: location.Label, Acres: acres});
                    });
                     
                    
@@ -358,23 +363,20 @@ var appraisalController = ['$scope','$routeParams', 'DataService', '$modal', '$l
             
             $scope.deleteActivities = function() {
                 $scope.saveResults = {};
-                if(!confirm("Are you sure you want to delete " + $scope.gridOptions.selectedItems.length + " activities?  There is no undo for this operation."))
+                if(!confirm("Are you sure you want to delete this allotment?  There is no undo for this operation."))
                     return;
 
                 DataService.deleteActivities($rootScope.Profile.Id, $scope.dataset.Id, $scope.gridOptions, $scope.saveResults);
                 var deleteWatcher = $scope.$watch('saveResults', function(){
                     if($scope.saveResults.success)
                     {
-                        //clear selection
-                        $scope.gridOptions.selectAll(false);
-                        $scope.activities = DataService.getActivities($routeParams.Id); //reload from the db.
-                        deleteWatcher();
-                        console.log("success!");
+                        $scope.activities = undefined;
+                        $route.reload();
                     }
                     else if($scope.saveResults.failure)
                     {
                         deleteWatcher();
-                        console.log("failure!");
+                        console.log("failure! there was a problem deleting a record...");
                     }
                 },true);
             };

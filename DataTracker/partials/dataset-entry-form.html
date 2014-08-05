@@ -7,7 +7,17 @@
 </ul>
 <h4>Add new record: {{dataset.Name}}</h4>
  
-<div ng-include="'partials/dataentry/messages.html'"/>
+<div ng-show="activities.success" style="margin-bottom: 50px;">
+    <div class="alert alert-success" ng-show="activities.success">
+    <h4 class="alert-heading">Success!</h4>
+    {{activities.success}}
+    </div>
+    <button style="margin-left: 3px;" class="btn right" ng-click="doneButton()">Another New Record</button>
+    <button style="margin-left: 3px;" class="btn right" ng-click="viewButton()">Back to list</button>
+</div>
+<div>
+    <p ng-show="activities.errors.saveError" class="alert alert-danger">{{activities.errors.saveError}}</p>
+</div>
 
 <div class="row" ng-show="!activities.success">
 

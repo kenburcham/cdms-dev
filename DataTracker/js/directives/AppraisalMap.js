@@ -1,48 +1,124 @@
 
 var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
-var BaseMapLayers=
-               [
-                   {
-                       Key: "taxMap",
-                       ThumbnailSource: "images/Tax map.png",
-                       Name: "Tax Map",
-                       MapURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token
-                   },
-                   {
-                       Key: "imageryMap",
-                       ThumbnailSource: "images/imagery.png",
-                       Name: "Imagery",
-                       //MapURL: "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
-                       MapURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapImageryParcels/MapServer?token=" + security_token
-                   },
-                   {
-                       Key: "parcelMap",
-                       ThumbnailSource: "images/zoning.png",
-                       Name: "Zoning",
-                       //MapURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/BasemapZoning/MapServer"
-                       MapURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapZoningParcels/MapServer?token=" + security_token
-                   }
 
-
-               ];
+var defaultLayer = "imageryLayer";
 
 var parcelLayerConfig = 
       {
-        Key: "taxParcelLayer",
-        ServiceURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-        OutFields: "PARCELID, Address",
-        isAddressSearchService: true,
-        //ParcelQuery: "PARCELID LIKE '%${0}%' ",
-        ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
-        LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
-        DisplayFields: ["PARCELID", "Address"],
-        UseColor: true,
-        objectIDField: "PARCELID",
-        Color: "#FF6600",
-        Alpha: 0.25,
+        taxParcelLayer: {
+          Display: "Tax Parcel",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token,
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+      imageryLayer: {
+          Display: "Imagery",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapDECD_Imagery/MapServer",
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+
+      platLayer: {
+          Display: "Plat",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Plat/MapServer",
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+      soilLayer: {
+          Display: "Soil",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Soils/MapServer",
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+      topoLayer: {
+          Display: "Topography",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Topo/MapServer",
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+      zoneLayer: {
+          Display: "Zoning",
+          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer",
+          OutFields: "PARCELID, Address",
+          isAddressSearchService: true,
+          //ParcelQuery: "PARCELID LIKE '%${0}%' ",
+          ParcelQuery: "PARCELID LIKE '%${0}%' OR ALLOTMENT LIKE '%${0}%' OR ADDRESS LIKE '%${0}%'",
+          LocateParcelQuery: "PARCELID = '${0}' OR ALLOTMENT = '${0}'",
+          DisplayFields: ["PARCELID", "Address"],
+          UseColor: true,
+          objectIDField: "PARCELID",
+          Color: "#FF6600",
+          Alpha: 0.25,
+        },
+
       };
 
+var servicesLayerConfig = 
+{
+  streamBuffers: {
+    Display: "Stream Buffers",
+    ServiceURL: "http://restdata.ctuir.org/arcgis/rest/services/StreamBuffers/MapServer",
+  },
+  utilityLines: {
+    Display: "Utility Lines",
+    ServiceURL: "http://restdata.ctuir.org/arcgis/rest/services/UtilityLines/MapServer",
+  },
+  waterSewer: {
+    Display: "Water / Sewer",
+    ServiceURL: "http://restdata.ctuir.org/arcgis/rest/services/WaterSewer/MapServer",
+  },
+  roads: {
+    Display: "Roads",
+    ServiceURL: "http://restdata.ctuir.org/arcgis/rest/services/Roads/MapServer",
+  },
 
+};
 
 define([
   'app',
@@ -108,12 +184,73 @@ define([
         var map = new Map($attrs.id, mapOptions);
         //our first layer from up above...
         //console.log("//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token);
-        var layer = new esri.layers.ArcGISTiledMapServiceLayer("//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token);
-        //console.dir(layer);
-        map.addLayer(layer);
 
-        map.parcelLayer = new esri.layers.GraphicsLayer();
-        map.addLayer(map.parcelLayer);
+        //setup basemaps
+        map.selectedBasemap = defaultLayer;
+        map.selectedServiceLayers = [];
+
+        map.basemaps = [];
+        for (var property in parcelLayerConfig) {
+          if(parcelLayerConfig.hasOwnProperty(property))
+          {
+              map.basemaps.push({label: parcelLayerConfig[property].Display, name: property});
+          }
+        };
+
+        map.serviceLayers = [];
+        for (var property in servicesLayerConfig) {
+          if(servicesLayerConfig.hasOwnProperty(property))
+          {
+              map.serviceLayers.push({label: servicesLayerConfig[property].Display, name: property});
+          }
+        };
+
+
+
+        
+
+        //var layer = new esri.layers.ArcGISTiledMapServiceLayer("//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token);
+
+        //var layer = new esri.layers.ArcGISTiledMapServiceLayer(parcelLayerConfig[map.selectedBasemap].ServiceURL);
+        //map.addLayer(layer);
+        //map.currentBasemapLayer = layer;
+
+        //map.parcelLayer = new esri.layers.GraphicsLayer();
+        //map.addLayer(map.parcelLayer);
+
+        map.updateLayers = function(){
+
+            console.log("Changing Layer: "+map.selectedBasemap);
+
+            try{
+              console.log("Loading layer: " + parcelLayerConfig[map.selectedBasemap].ServiceURL);      
+
+              map.removeAllLayers();
+
+              //add the selected basemap
+              var new_layer = new esri.layers.ArcGISTiledMapServiceLayer(parcelLayerConfig[map.selectedBasemap].ServiceURL);
+              map.addLayer(new_layer);
+              map.currentBasemapLayer = new_layer;
+
+              //now add any selected service layers
+              for (var i = map.selectedServiceLayers.length - 1; i >= 0; i--) {
+                var service_layer = new esri.layers.ArcGISDynamicMapServiceLayer(servicesLayerConfig[map.selectedServiceLayers[i]].ServiceURL);
+                map.addLayer(service_layer);
+              };
+
+              map.parcelLayer = new esri.layers.GraphicsLayer();
+              map.addLayer(map.parcelLayer);
+
+              console.log("done!");
+              map.reposition();
+            }
+            catch(e)
+            {
+              console.dir(e);
+            }
+        };
+
+        map.updateLayers();
 
 
         // start exposing an API by setting properties on "this" which is our controller
@@ -163,9 +300,9 @@ define([
         //use this for doing a search by parcelid or address
         map.querySearchParcel = function(searchParam, callback)
         {
-          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig.ServiceURL);
+          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig[map.selectedBasemap].QueryURL);
           var query = new esri.tasks.Query();
-          query.where = dojo.string.substitute(parcelLayerConfig.ParcelQuery, [searchParam]);
+          query.where = dojo.string.substitute(parcelLayerConfig[map.selectedBasemap].ParcelQuery, [searchParam]);
           query.returnGeometry = false;
           query.outSpatialReference = this.spatialReference;
           query.outFields = ["*"];
@@ -182,9 +319,9 @@ define([
         //use this for selecting a specific parcel/allotment by id (no geometry)
         map.queryMatchParcel = function(searchParam, callback)
         {
-          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig.ServiceURL);
+          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig[map.selectedBasemap].QueryURL);
           var query = new esri.tasks.Query();
-          query.where = dojo.string.substitute(parcelLayerConfig.LocateParcelQuery, [searchParam]);
+          query.where = dojo.string.substitute(parcelLayerConfig[map.selectedBasemap].LocateParcelQuery, [searchParam]);
           query.returnGeometry = false;
           query.outSpatialReference = this.spatialReference;
           query.outFields = ["*"];
@@ -202,7 +339,9 @@ define([
         //use this to select a particular parcel either by objectid (like after a search) or x,y mapPoint
         map.querySelectParcel = function(mapPoint, objectId, callback){
 
-          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig.ServiceURL);
+          console.log("Running query on: "+ parcelLayerConfig[map.selectedBasemap].QueryURL);
+
+          var queryTask = new esri.tasks.QueryTask(parcelLayerConfig[map.selectedBasemap].QueryURL);
           var query = new esri.tasks.Query();
 
           query.outSpatialReference = this.spatialReference;
@@ -217,6 +356,7 @@ define([
           
           query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
           queryTask.execute(query, function (result) {
+              console.dir(result);
               callback(result.features); //give back the parcel features we found...
           }, function(err){
               console.log("Failure executing query!");

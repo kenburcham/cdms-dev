@@ -8,7 +8,17 @@
 <h4>Editing activity in: {{dataset.Name}}</h4>
  
 
-<div ng-include="'partials/dataentry/messages.html'"/>
+<div ng-show="activities.success" style="margin-bottom: 50px;">
+    <div class="alert alert-success" ng-show="activities.success">
+    <h4 class="alert-heading">Success!</h4>
+    {{activities.success}}
+    </div>
+    <button style="margin-left: 3px;" class="btn right" ng-click="doneButton()">Back to list</button>
+</div>
+<div>
+    <p ng-show="activities.errors.saveError" class="alert alert-danger">{{activities.errors.saveError}}</p>
+</div>
+
 <div ng-show="errors.heading.length>0" class="alert alert-danger"><div ng-repeat="error in errors.heading">{{error}}</div></div>
 
 <div class="row" ng-show="!activities.success">

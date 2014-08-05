@@ -118,7 +118,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 
 		$scope.viewButton = function()
 		{
-			$location.path("/dataview/"+$scope.new_activity[0].Id);
+			$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		}
 
 		 $scope.cancel = function(){
@@ -348,6 +348,13 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		 	$route.reload();
 			//DataSheet.initScope($scope);		
 		}
+
+		$scope.viewButton = function()
+		{
+			$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
+		}
+
+
 
 		/* -- these functions are for uploading - */
 		$scope.openFileModal = function(row, field)

@@ -1585,8 +1585,9 @@ function parseField(field, scope)
         console.log("*** there is a rule parsing error for " + field.Field.Name + " *** ");
         console.dir(e);
     }
-
+    
     fireRules("DefaultValue", null, field, null, null, null, null);
+    fireRules("Default", null, field, null, null, null, null);
 
     field.parsed = true;
 
