@@ -4,13 +4,6 @@
 
 var mod_di = angular.module('DataImportControllers', ['ui.bootstrap']);
 
-//"constants" of indexes to the mappableFields array
-// note: we did have to hard-code these on the dataset-import.html page in ng-disabled attrbutes
-var DO_NOT_MAP = 0;
-var ACTIVITY_DATE = 1;
-var INDEX_FIELD = 2;
-
-var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
 mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreService','DataService','$location','$upload','ActivityParser','DataSheet', '$rootScope', 'Logger','$route','$modal','ChartService',
     	function($scope, $routeParams, DatastoreService, DataService, $location, $upload, ActivityParser, DataSheet, $rootScope, Logger,$route, $modal, ChartService) {

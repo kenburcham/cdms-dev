@@ -436,7 +436,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
          scope.openPrintWindow = function()
          {
-            $window.open('http://gis-sql/ReportServer/Pages/ReportViewer.aspx?%2fQuadReport_Prototype%2fQuadReport_Single&rs:Command=Render&Id='+scope.project.Id,'_blank');
+            $window.open(PROJECT_REPORT_URL+scope.project.Id,'_blank');
          };
 
          scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service

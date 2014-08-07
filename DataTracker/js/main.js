@@ -62,8 +62,8 @@ define([
 	//any functions in here are available to EVERY scope.  use sparingly!
 	app.run(function($rootScope,$location) {
 	  $rootScope.config = {
-	      version: "1.0",
-	      CDMS_DOCUMENTATION_URL: "http://intranet.ctuir.org/adminstration/oit/gis/wiki/Pages/Project%20Tracker%20Documentation.aspx",
+	      version: CURRENT_VERSION,
+	      CDMS_DOCUMENTATION_URL: CDMS_DOCUMENTATION_URL,
 
 	  };
 

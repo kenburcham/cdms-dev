@@ -33,7 +33,7 @@ mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','Data
 
 		
 		$scope.openReportWindow = function( target ){
-			$window.open('http://gis-sql/Reports/Pages/Folder.aspx?ItemPath=%2f' + target,'_blank');
+			$window.open( REPORTSERVER_URL + target,'_blank');
 		};
 
 }]);

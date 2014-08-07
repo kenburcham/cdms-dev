@@ -1,7 +1,5 @@
 
-var BING_KEY = "AuaAtT6zhx1rfuP1hR_e0zh5pxy6u7Echhe9KbwfCcQRG_Y_ewSg5OcFDm-DF-8w";
-var DEFAULT_BASEMAP = "BingMapsRoad";
-
+//not being used currently?
 var basemapConfig = [
        // { type: 'streets', title: 'ESRI Roads'},
         //{ type: 'topo', title: 'Topographical'},
@@ -147,7 +145,7 @@ define([
         });
 
         map.on("load", function(e){
-          createBasemapDropdown(map);
+          //createBasemapDropdown(map);
         });
 
         $scope.map = map;
@@ -216,7 +214,7 @@ function createBasemapDropdown(map) {
               }));
           });
 
-          basemapGallery.select("BingMapsRoad");
+          basemapGallery.select(DEFAULT_BASEMAP);
 
       } catch (e) {
         console.log("----------------------------------------------------");

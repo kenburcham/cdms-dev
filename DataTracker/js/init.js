@@ -26,7 +26,7 @@ require([
   	.always(function(){
 		console.log("Booting angular.");
   		angular.bootstrap(document.body, ['app']);
-      console.log("parsing");
+      console.log("Booting dojo.");
       parser.parse();
   	});
 	  

@@ -1,11 +1,4 @@
-var serviceServerUrl = '//data.ctuir.org';
-var serverUrl = '//data.ctuir.org/cdms-dev';
 
-var serviceUrl = serviceServerUrl + '/servicesSTAGE';
-var successUrl = serverUrl + '/DataTracker/index.html';
-var loginUrl = serverUrl + '/DataTracker/login.html'
-
-var USER_PREFERENCE_LANDINGPAGE = "LandingPage";
 
 var app = angular.module('loginModule', ['ngRoute','ui.bootstrap', 'ngResource']);
 

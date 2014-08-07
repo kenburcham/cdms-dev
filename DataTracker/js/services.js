@@ -2,8 +2,6 @@
 
 var mod = angular.module('DatasetServices', ['ngResource']);
 
-var date_pattern = "/[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}/";
-
 //Note: typically you won't want to use these factories directly in your
 // controllers, but rather use the DataService below.
 mod.factory('Projects',['$resource', function(resource){

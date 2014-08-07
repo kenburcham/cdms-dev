@@ -1,5 +1,8 @@
 
 //Chart Services - charting for different datasets.
+//  If you want to build a custom chart for your dataset (we like it as a nice simple visual),
+//  you'll just need to create your own chart service named "YourDataset_ChartService" for each one.
+//  and use the below as example/ideas
 
 var cmod = angular.module('ChartServices', []);
 
