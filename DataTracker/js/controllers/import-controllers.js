@@ -176,7 +176,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.toggleDuplicates = function(){
 
 				try{
-					if($scope.ignoreDuplicates)
+					if(!$scope.ignoreDuplicates)
 					{
 						$scope.TempRecordsBucket = [];
 						$scope.DuplicateRecordsBucket = [];
@@ -530,7 +530,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 								    for(var a = 0; a < row_items.length; a++)
 								    {
-								        var row_item = row_items[a].trim().toUpperCase();
+								        var row_item = row_items[a].trim().toUpperCase();  //KBHERE -- take this off after the upgrade!
 
 								        //$scope.Logger.debug(" on --> "+row_item);
 								        if(new_row[field.DbColumnName].indexOf(row_item) == -1)
@@ -577,7 +577,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 									{
 										//console.log(" -- " + data_row[col].trim().toUpperCase());
 										//if(typeof data_row == "string") //might otherwise be a number or something...
-										new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....
+										new_row[field.DbColumnName] = data_row[col].trim().toUpperCase(); //uppercase select's too....  KBHERE
 									}
 
 								}
@@ -588,7 +588,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 						}
 					});
 console.log("here");
-					//Appraisal special importer case
+					//Appraisal special importer case - remove this once we're done the appraisal import!
 					if($scope.dataset.Id == 1193)
 					{
 						$scope.importAppraisalLine(new_row);
@@ -774,18 +774,25 @@ console.log("here2");
 
                     	//set some specific defaults -- this is a one-time thing (famous last words)
                     	row.AppraisalYear = '2014';
-                    	row.AppraisalStatus = 'Not Started';
-                    	//row.AppraisalStatus = 'Complete';
-                    	row.AppraisalType = 'Land Buy Back';
+						row.AppraisalType = 'Land Buy Back';
+						row.Appraiser = 'David Nicholson';
 
+                    	// Wave 1
+                    	//row.CobellAppraisalWave = 'Wave 1';
+                    	//row.AppraisalStatus = 'Complete';
+                    	//row.AllotmentStatus = 'Submitted to Regional Office';
+
+                    	//other waves
+                    	row.CobellAppraisalWave = 'Wave 3';
+                    	row.AppraisalStatus = 'Not Started';
                     	row.AllotmentStatus = 'Requested';
-                    	//row.AllotmentStatus = 'Ready for review by DECD';
+                    	
                     	var map_loc = 'http://gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
                     	row.MapFiles = '[{"Name":"Imagery","Link":"'+map_loc+'Imagery_'+row['Allotment']+'.pdf"},{"Name":"Plat","Link":"'+map_loc+'Plat_'+row['Allotment']+'.pdf"},{"Name":"Soils","Link":"'+map_loc+'Soils_'+row['Allotment']+'.pdf"},{"Name":"Topo","Link":"'+map_loc+'Topo_'+row['Allotment']+'.pdf"},{"Name":"Zoning","Link":"'+map_loc+'Zoning_'+row['Allotment']+'.pdf"}]';
-                    	row.CobellAppraisalWave = 'Wave 3';
+                    	
                     	row.LastAppraisalRequestDate = new Date();
 
-
+                    	row.Acres = features[0].attributes['ACRES_GIS'];
 
                     	//create a new location from the map feature selected
 		                var new_location = {

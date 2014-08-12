@@ -48,7 +48,7 @@ var DEFAULT_LOCATION_PROJECTION_ZONE = {
                 UTMZone: "11",
             };   //Used as default when creating a new location
 var BING_KEY = "AuaAtT6zhx1rfuP1hR_e0zh5pxy6u7Echhe9KbwfCcQRG_Y_ewSg5OcFDm-DF-8w"; //CTUIR's bing key -- only licensed from our server, so get a public/free one and use it
-var DEFAULT_BASEMAP = "BingMapsRoad";
+//var DEFAULT_BASEMAP = "BingMapsRoad";
 
 
 //constants -- you might need to change these to match index values in your own database
@@ -151,6 +151,17 @@ DataGradeMethods.push("Unknown Accuracy Method");
 var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
 
 var defaultLayer = "imageryLayer";
+
+//used for dataset-activities (standard datasets)
+var datasetActivitiesBasemapConfig = {
+       // { library: "Esri", type: 'streets', title: 'ESRI Roads'},
+        //{ library: "Esri", type: 'topo', title: 'Topographical'},
+        //{ library: "Esri", type: 'hybrid', title: 'Hybrid' },
+        roadsLayer: { library: "Bing", type: 'BingMapsRoad', Display: 'Roads' },
+        imageryLayer: { library: "Bing", type: 'BingMapsAerial', Display: 'Aerial' },
+        hybridLayer: { library: "Bing", type: 'BingMapsHybrid', Display: 'Hybrid' },
+};
+
 
 //This is the list of Basemaps that show up on the Appraisals custom dataset page
 var parcelLayerConfig = 

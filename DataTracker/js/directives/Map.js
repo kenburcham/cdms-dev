@@ -1,13 +1,4 @@
 
-//not being used currently?
-var basemapConfig = [
-       // { type: 'streets', title: 'ESRI Roads'},
-        //{ type: 'topo', title: 'Topographical'},
-        //{ type: 'hybrid', title: 'Hybrid' },
-        { type: 'BingMapsRoad', title: 'Roads' },
-        { type: 'BingMapsAerial', title: 'Aerial' },
-        { type: 'BingMapsHybrid', title: 'Hybrid' },
-];
 
 
 define([
@@ -18,9 +9,12 @@ define([
   'esri/InfoTemplate',
   'esri/dijit/BasemapLayer',
   'esri/dijit/BasemapGallery',
-  'esri/dijit/Basemap'
-], function (app, Map, Point, InfoWindow, InfoTemplate) {
+  'esri/dijit/Basemap',
+  'esri/virtualearth/VETiledLayer'
+], function (app, Map, Point, InfoWindow, InfoTemplate, VETiledLayer) {
 
+
+  
   // register a new directive called esriMap with our app
   app.directive('esriMap', function(){
     // this object will tell angular how our directive behaves
@@ -55,13 +49,19 @@ define([
       // this is also the best place to setup our map
       controller: function($scope, $element, $attrs){
 
-        //console.dir($attrs);
+        //possible bing maps
+        var bing_layers_map = {
+          BingMapsRoad: esri.virtualearth.VETiledLayer.MAP_STYLE_ROAD,
+          BingMapsAerial: esri.virtualearth.VETiledLayer.MAP_STYLE_AERIAL ,
+          BingMapsHybrid: esri.virtualearth.VETiledLayer.MAP_STYLE_AERIAL_WITH_LABELS
+        };
 
+console.dir(bing_layers_map);
         // setup our map options based on the attributes and scope
         var mapOptions = {
           center: ($attrs.center) ? $attrs.center.split(",") : $scope.center,
           zoom: ($attrs.zoom) ? $attrs.zoom : $scope.zoom,
-          basemap: 'streets', //($attrs.basemap) ? $attrs.basemap : $scope.basemap,
+          //basemap: 'streets', //($attrs.basemap) ? $attrs.basemap : $scope.basemap,
           spatialReference: {
               wkid:102100 //mercator
               //wkid:26911 //nad_1983
@@ -72,6 +72,64 @@ define([
 
         // declare our map
         var map = new Map($attrs.id, mapOptions);
+
+        map.selectedBasemap = defaultLayer;
+        
+        map.basemaps = [];
+        for (var property in datasetActivitiesBasemapConfig) {
+          if(datasetActivitiesBasemapConfig.hasOwnProperty(property))
+          {
+              map.basemaps.push({label: datasetActivitiesBasemapConfig[property].Display, name: property});
+          }
+        };
+
+        map.updateLayers = function(){
+
+            console.log("Changing Layer: "+map.selectedBasemap);
+
+            try{
+              //console.log("Loading layer: " + datasetActivitiesBasemapConfig[map.selectedBasemap].ServiceURL);      
+
+              map.removeAllLayers();
+
+              var new_layer = undefined;
+
+              //add the selected basemap
+              if(datasetActivitiesBasemapConfig[map.selectedBasemap].library == 'CTUIR')
+                new_layer = new esri.layers.ArcGISTiledMapServiceLayer(datasetActivitiesBasemapConfig[map.selectedBasemap].ServiceURL);
+              else if(datasetActivitiesBasemapConfig[map.selectedBasemap].library == 'Bing')
+              {
+                new_layer = new esri.virtualearth.VETiledLayer({
+                  bingMapsKey: BING_KEY,
+                  mapStyle: bing_layers_map[datasetActivitiesBasemapConfig[map.selectedBasemap].type]
+                });
+              }
+
+
+
+              map.addLayer(new_layer);
+              map.currentBasemapLayer = new_layer;
+
+              if(map.locationLayer)
+                map.addLayer(map.locationLayer);
+
+              map.parcelLayer = new esri.layers.GraphicsLayer();
+              map.addLayer(map.parcelLayer);
+
+              console.log("done!");
+              map.reposition();
+            }
+            catch(e)
+            {
+              console.dir(e);
+            }
+        };
+
+        map.updateLayers();
+
+
+
+
 
         // start exposing an API by setting properties on "this" which is our controller
         // lets expose the "addLayer" method so child directives can add themselves to the map
@@ -157,70 +215,3 @@ define([
     };
   });
 });
-
-
-//In order to use bing maps, we have to use a basemapGallery.
-//  A dojo menu div named "basemapMenu" is required to exist
-//  and we fill it up with the configured map options.
-function createBasemapDropdown(map) {
-        console.dir(map);
-      var basemapGallery
-
-      //create an array of Basemap objects corresponding to the above list
-      var basemaps = dojo.map(basemapConfig, function (item) {
-          return new esri.dijit.Basemap({
-              layers: [new esri.dijit.BasemapLayer({
-                  type: item.type
-              })], id: item.type, title: item.title
-          });
-      });
-
-      console.dir(basemaps);
-
-      try{
-
-          basemapGallery = new esri.dijit.BasemapGallery({
-              basemaps: basemaps,
-              //showArcGISBasemaps: true,
-              bingMapsKey: BING_KEY,
-              map: map,
-          });
-
-
-
-          //add each one to the existing "basemapMenu" dropdown and wire up an onclick to set the basemap.
-          dojo.forEach(basemaps, function (basemap) {
-
-            var menu = dijit.byId("basemapMenu");
-
-              //clear out any that exist.
-              if(menu.hasChildren())
-              angular.forEach(menu.getChildren, function(child){
-                console.log("removing a child...");
-                  menu.removeChild(child);
-              });
-
-              menu.addChild(new dijit.MenuItem({
-                  label: basemap.title,
-                  onClick: dojo.hitch(this, function () {
-                      if (basemap.id == "streets")
-                          projectMap.setBasemap(basemap.id);
-                      else {
-                          basemapGallery.select(basemap.id);
-                          //projectMap.setBasemap(basemap.id);
-                      }
-                      
-                  })
-              }));
-          });
-
-          basemapGallery.select(DEFAULT_BASEMAP);
-
-      } catch (e) {
-        console.log("----------------------------------------------------");
-
-          console.dir(e);
-      }
-
-      return basemapGallery;
-}

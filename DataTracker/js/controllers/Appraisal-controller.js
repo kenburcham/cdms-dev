@@ -188,6 +188,8 @@ var appraisalController = ['$scope','$route','$routeParams', 'DataService', '$mo
                 $scope.map.querySelectParcel(e.mapPoint, null, function(features){
                     if (features.length == 0) { 
                       alert('No parcel found at that location.');
+                      $scope.map.loading = false;
+                      $scope.$apply(); //bump angular
                       return;
                     };
 

@@ -33,8 +33,8 @@
 
                 <input type="file" ng-file-select="onFileSelect($files)" value="{{file.name}}">
                 
-                <div ng-show="openAdvanced==true">
-                    <div class="right" style="margin-right: 10px;">
+                <div style="margin-top: 15px;">
+                    <div class="right" style="margin-right: 10px; ">
                         <input type="text" size="3" ng-model="startOnLine" ng-init="startOnLine=1"/>
                     </div>
                     <div>Column headers start on line (csv/tsv only): </div>
@@ -44,13 +44,10 @@
                 <div class="right" style="margin-top: 3px; margin-left: 5px;"><img ng-show="loading" src="images/FishLoading.gif"/></div>
                 <button class="btn btn-primary right" ng-disabled="!file" ng-click="uploadFile()">Load >></button>
                 <br/>
-                <div style="margin-top: 70px">
-                    <a ng-show="openAdvanced==false" ng-init="openAdvanced=false" href ng-click="openAdvanced=true">Column headers start on line: 1</a>
-                </div>
-                <div class="" style="background-color: #EAF0F8; height: 40px; width: 315px; font-size: x-small; margin-left: -40px; padding-top:5px;">
-                    <center><i>File types supported: .csv, .tsv or .xlsx</i>
-                            <br/>Note: Older .xls files must be saved as .xlsx
-                    </center>
+                
+                <div class="text-center" style="background-color: #EAF0F8; height: 40px; width: 100%; margin-top: 40px; font-size: x-small; padding-top:5px;">
+                    <i>File types supported: .csv, .tsv or .xlsx</i>
+                    <br/>Note: Older .xls files must be saved as .xlsx
                 </div>
                 
             </div>
@@ -95,7 +92,7 @@
                     <td>
 
                         <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 170px; margin-top: 4px;" ng-model="ActivityFields.InstrumentId">
-                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
                         </select>
                         
                     </td>
@@ -166,7 +163,7 @@
                         <div class="header-label">Instrument: </div>
                         <div class="header-value">                            
                             <select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-change="selectInstrument()" style="width: 200px; margin-top: 4px; margin-bottom: 4px;" ng-model="ActivityFields.InstrumentId">
-                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+                                <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
                             </select>
 
                         </div>

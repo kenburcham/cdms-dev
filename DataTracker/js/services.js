@@ -1008,7 +1008,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
                     var minwidth = (980 < $window.innerWidth) ? $window.innerWidth - 50 : 980;
                     //console.log("minwidth: " + minwidth);
 
-                    var width = 110 * length; //multiply number of columns by 100px
+                    var width = 150 * length; //multiply number of columns by 100px
                     //console.log("or multiplied: " + width);
 
                     //if(width < minwidth) width=minwidth; //min-width
@@ -1474,6 +1474,9 @@ function makeFieldColDef(field, scope) {
             case 'text':
                 coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 break;
+            case 'currency':
+                coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
+                break;                
             case 'textarea':
                 coldef.editableCellTemplate = '<input type="text" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />';
                 break;
@@ -1504,6 +1507,10 @@ function makeFieldColDef(field, scope) {
 
         case 'date':
             coldef.cellFilter = 'date: \'MM/dd/yyyy\'';
+            break;
+
+        case 'currency':
+            coldef.cellFilter = 'currency';
             break;
 
         case 'datetime':

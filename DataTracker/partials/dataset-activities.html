@@ -10,6 +10,7 @@
     <li class="active">{{dataset.Name}}</li>  
 </ul>
 
+
 <div ng-show="selectedLocation" project-role="editor">
     <button style="margin-top: -12px; margin-left: 5px;" class="btn right btn-danger" ng-click="clearLocation()">Cancel</button>
     <button style="margin-top: -12px; margin-left: 5px;" class="btn right btn-danger" ng-click="removeLocation()">Delete</button>
@@ -27,10 +28,16 @@
         <div class="span2">
             <button style="margin-bottom: 15px;" type="button" ng-click="toggleMap()">{{ShowMap.Message}} <span ng-show="!ShowMap.Display" class="glyphicon glyphicon-circle-arrow-right"></span><span ng-show="ShowMap.Display" class="glyphicon glyphicon-circle-arrow-down"></span></button>
             <!-- img class="map-center" src="images/map_image1.png"  -->
-            
-            <esri-map class="claro" ng-show="ShowMap.Display" id="map" center="-118.45,45.56" zoom="10" basemap="streets" onclick="click">
-                <esri-feature-layer url="//restdata.ctuir.org/arcgis/rest/services/CDMS/DNR_CDMS/FeatureServer/0" filter="location"></esri-feature-layer>
-            </esri-map>
+            <div ng-show="ShowMap.Display">
+                <div style="margin-left:125px; margin-top: -45px; margin-bottom: 25px;" id="basemapDropdown">
+                    <img src="images/imgBaseMap.png" width="35px"/>
+                    <select class="form-control" style="display: inline" ng-options="b.name as b.label for b in map.basemaps" ng-model="map.selectedBasemap" ng-change="map.updateLayers()"></select>
+                </div>
+
+                <esri-map class="claro" id="map" center="-118.45,45.56" zoom="10" basemap="streets" onclick="click">
+                    <esri-feature-layer url="//restdata.ctuir.org/arcgis/rest/services/CDMS/DNR_CDMS/FeatureServer/0" filter="location"></esri-feature-layer>
+                </esri-map>
+            </div>
             
             <h4>{{dataset.Name}}</h4>
             <div ng-show="selectedLocation"><i>Filtering by location: <b>{{selectedLocation.Label}}</b></i>  <button ng-click="removeFilter()" class="btn btn-xs">clear</button><br/><br/></div>
