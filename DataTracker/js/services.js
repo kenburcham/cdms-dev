@@ -84,6 +84,13 @@ mod.factory('GetMyDatasetsAction', ['$resource', function($resource){
         });
 }]);
 
+mod.factory('GetMyProjectsAction', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetMyProjects', {}, {
+            query: {method: 'GET', params: {}, isArray: true}
+        });
+}]);
+
+
 mod.factory('SaveUserPreferenceAction', ['$resource', function($resource){
         return $resource(serviceUrl+'/action/SaveUserPreference');
 }]);
@@ -354,8 +361,8 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
     }
 ]);
 
-mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset','GetDepartments',
-    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset, GetDepartments){
+mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','GetMyProjectsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset','GetDepartments',
+    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, GetMyProjectsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset, GetDepartments){
     var service = {
 
         //our "singleton cache" kinda thing
@@ -383,6 +390,10 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
 
         getMyDatasets: function() {
             return GetMyDatasetsAction.query();
+        },
+
+        getMyProjects: function() {
+            return GetMyProjectsAction.query();
         },
 
         getDataset: function(datasetId) {

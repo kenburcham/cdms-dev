@@ -449,6 +449,7 @@ table.metadata td
 .map-inset {
 	margin-top: -40px;
 	margin-left: 40px;
+	margin-right: 60px;
 	border: lightgray 1px solid;
 }
 

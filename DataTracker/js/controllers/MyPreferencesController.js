@@ -1,8 +1,8 @@
-//my datasets - MyDatasetsCtrl
+//my datasets + projects
 
 'use strict';
 
-var mod_mydata = angular.module('MyDatasetsControllers', ['ui.bootstrap']);
+var mod_mydata = angular.module('MyPreferencesControllers', ['ui.bootstrap']);
 
 mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','DataService','$window',
 	function($scope, $rootScope,$location, DataService, $window){
@@ -37,4 +37,11 @@ mod_mydata.controller('MyDatasetsCtrl', ['$scope','$rootScope','$location','Data
 		};
 
 }]);
+
+
+mod_mydata.controller('MyProjectsCtrl', ['$scope','$rootScope','$location','DataService','$window',
+	function($scope, $rootScope,$location, DataService, $window){
+		$scope.myprojects = DataService.getMyProjects();
+}]);
+
 

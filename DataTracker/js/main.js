@@ -17,7 +17,7 @@ define([
 	  'DataImportControllers',
 	  'DatasetDetailsControllers',
 	  'AppraisalControllers',
-	  'MyDatasetsControllers',
+	  'MyPreferencesControllers',
 	  'ActivitiesController',
 	  'ModalsController',
 	  'ChartServices',
@@ -35,6 +35,7 @@ define([
 
 	        //this one is a little special -- loads up the arcgis mapping stuff.
 	        $routeProvider.when('/mydata', {templateUrl: 'partials/mydatasets.html', controller: 'MyDatasetsCtrl'});
+	        $routeProvider.when('/myprojects', {templateUrl: 'partials/myprojects.html', controller: 'MyProjectsCtrl'});
 	        $routeProvider.when('/activities/:Id', {templateUrl: 'partials/dataset-activities.html', controller: 'DatasetActivitiesCtrl', permission: 'Edit'});
 	        $routeProvider.when('/dataview/:Id', {templateUrl: 'partials/dataset-view.html', controller: 'DatasetViewCtrl'});
 	        $routeProvider.when('/dataentry/:Id',{templateUrl: 'partials/dataset-entry.html', controller: 'DataEntryDatasheetCtrl', permission: 'Edit'});
@@ -95,6 +96,14 @@ function configureProfile(profile)
 	else
 		profile.favoriteDatasets = [];
 
+	//same for favorite projects
+	var favoriteProjects = getByName(profile.UserPreferences, "Projects"); 
+	if(favoriteProjects)
+		profile.favoriteProjects = favoriteProjects.Value.split(",");
+	else
+		profile.favoriteProjects = [];
+
+
 	if(profile.Roles)
 		profile.Roles = angular.fromJson(profile.Roles);
 	
@@ -149,16 +158,12 @@ function configureProfile(profile)
 	};
 
 	profile.isDatasetFavorite = function(datasetId){
-		/*
-		console.log("checking: " + datasetId);
-		console.log(profile.favoriteDatasets.join());
-		if (profile.favoriteDatasets.indexOf(datasetId+"") != -1)
-			console.log("YES!");
-		else
-			console.log("NO");
-		*/
 		return (profile.favoriteDatasets.indexOf(datasetId+"") != -1);
 	};
+
+	profile.isProjectFavorite = function(projectId){
+		return (profile.favoriteProjects.indexOf(projectId+"") != -1);
+	};	
 
 	profile.toggleDatasetFavorite = function(dataset)
 	{
@@ -168,6 +173,16 @@ function configureProfile(profile)
 			profile.favoriteDatasets.push(dsid);
 		else
 			profile.favoriteDatasets.splice(index,1);
+	};
+
+	profile.toggleProjectFavorite = function(project)
+	{
+		var dsid = project.Id+"";
+		var index = profile.favoriteProjects.indexOf(dsid);
+		if(index == -1) //doesn't exist
+			profile.favoriteProjects.push(dsid);
+		else
+			profile.favoriteProjects.splice(index,1);
 	};
 
 

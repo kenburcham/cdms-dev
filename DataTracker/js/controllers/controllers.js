@@ -204,6 +204,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
     scope.filteredUsers = false;
     scope.allInstruments = DatastoreService.getAllInstruments();
     scope.CellOptions = {}; //for metadata dropdown options
+    scope.isFavorite = $rootScope.Profile.isProjectFavorite(routeParams.Id);
 
     scope.metadataList = {};
     scope.metadataPropertiesPromise = DataService.getMetadataProperties(METADATA_ENTITY_PROJECTTYPEID);
@@ -331,6 +332,29 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
 
 
         },true);
+
+        scope.toggleFavorite = function(){
+            scope.isFavorite = !scope.isFavorite; //make the visible change instantly.
+
+            scope.results = {};
+
+            $rootScope.Profile.toggleProjectFavorite(scope.project);
+
+            DataService.saveUserPreference("Projects", $rootScope.Profile.favoriteProjects.join(), scope.results);
+
+            var watcher = scope.$watch('results', function(){
+                if(scope.results.done)
+                {
+                    //if something goes wrong, roll it back.
+                    if(scope.results.failure)
+                    {
+                        scope.isFavorite = !scope.isFavorite;
+                        $rootScope.Profile.toggleProjectFavorite(scope.project);
+                    }
+                    watcher();
+                }
+            },true);
+        }
 
          scope.users = [];
          scope.$watch('project.Id', function(){
@@ -624,6 +648,7 @@ var projectsController = ['$scope', 'DataService', '$modal',
 
             });
         };
+
 
         scope.click = function(e){
 
