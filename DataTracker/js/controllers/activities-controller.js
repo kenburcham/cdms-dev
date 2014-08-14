@@ -16,7 +16,7 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
         else
         {
             $scope.headingMessage = "Create new location for a project"; //default mode =
-            $scope.row = DEFAULT_LOCATION_PROJECTION_ZONE;
+            $scope.row = angular.copy(DEFAULT_LOCATION_PROJECTION_ZONE);
         }
 
 
