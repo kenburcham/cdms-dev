@@ -19,7 +19,7 @@
 					<div class="col-md-12">
 						<input type="radio" ng-model="Criteria.paramActivityDateType" value="between">Between</input>
 						<br/>
-						<input class="query-date-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.BetweenFromActivityDate" is-open="copened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
+						<input class="query-date-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.BetweenFromActivityDate" is-open="copened" datepicker-options="dateOptions" ng-required="false" close-text="Close" ng-change="Criteria.paramActivityDateType = 'between'"/>
 						and
 						<input class="query-date-control" type="text" datepicker-popup="shortDate" ng-model="Criteria.BetweenToActivityDate" is-open="dopened" datepicker-options="dateOptions" ng-required="false" close-text="Close" />
 					</div>
@@ -31,6 +31,16 @@
 					</div>
 					<div class="col-md-8">
 						<select ng-model="Criteria.ParamQAStatusId" ng-options="id as name for (id, name) in QAStatusOptions">
+						</select>
+					</div>
+				</div>
+
+				<div class="row top-divider" ng-show="RowQAStatuses">
+					<div class="col-md-4">
+						Row QA:
+					</div>
+					<div class="col-md-8">
+						<select ng-model="Criteria.ParamRowQAStatusId" multiple ng-multiple="true" size="4" ng-options="id as name for (id, name) in RowQAStatuses">
 						</select>
 					</div>
 				</div>
@@ -52,7 +62,7 @@
 
 			<div class="row">
 				<div class="col-md-7">
-					<select multiple ng-multiple="false" size="12" ng-model="Criteria.ParamFieldSelect" ng-change="clearValue()" ng-options="Value.Label for Value in dataFields"/>
+					<select multiple ng-multiple="false" size="18" ng-model="Criteria.ParamFieldSelect" ng-change="clearValue()" ng-options="Value.Label for Value in dataFields"/>
 				</div>
 				<div class="col-md-5 selected-field-description">
 					{{Criteria.ParamFieldSelect[0].Field.Description}}
@@ -64,7 +74,7 @@
 		<div class="col-md-3 criteria-list-box">
 			<p class="text-center query-header-text">matches criteria</p>
 			<div class="row">
-				<div class="col-md-12" style="height: 200px;">
+				<div class="col-md-12" style="height: 250px;">
 					<ng-include src="'partials/query/field-' + Criteria.ParamFieldSelect[0].ControlType + '.html'"></ng-include>
 				</div>
 			</div>

@@ -34,6 +34,14 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     		$scope.query = {results: []};
     		$scope.dataSheetDataset = [];
     		$scope.dataFields = [];
+			$scope.criteriaList = [];
+	    	$scope.queryToolVisible = true;
+			$scope.Criteria = {};
+			$scope.Criteria.paramActivityDateType = "all"; //default
+			
+
+    		$scope.AutoExecuteQuery = true;
+
 
     		$scope.gridDatasheetOptions = { 
     			data: 'dataSheetDataset', 
@@ -77,7 +85,16 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
                                         field: 'ActivityQAStatusId',
                                         displayName: 'QA Status',
                                         cellFilter: 'QAStatusFilter'
-                                    }];
+                                    },
+                                    {
+					    				field: "QAStatusId", //QARowStatus
+					    				displayName: "QA",
+					    				minWidth: 50, maxWidth: 200,
+					 					cellFilter: 'RowQAStatusFilter',
+					 					visible: false,  //start off hidden -- show only if relevant
+					    			}
+
+                                    ];
 
     		$scope.$watch('project.Name', function(){
     			if($scope.project){
@@ -126,18 +143,25 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
 	    		});
 
+	    		$scope.dataFields = $scope.dataFields.sort(orderByAlpha);
+
 				$scope.recalculateGridWidth($scope.datasheetColDefs.length);
+
+				$scope.RowQAStatuses =  $rootScope.RowQAStatuses = undefined;
+
+				//add in the QA field if it is relevant for this dataset.
+				if($scope.dataset.RowQAStatuses.length > 1)
+				{
+					$scope.RowQAStatuses =  $rootScope.RowQAStatuses = makeObjects($scope.dataset.RowQAStatuses, 'Id', 'Name');  //Row qa status ids
+
+					$scope.RowQAStatuses["all"] = "- All -";
+					$scope.Criteria.ParamRowQAStatusId = ["all"];
+					$scope.datasheetColDefs[3].visible = true; //QAStatusId
+				}
+
 
 	    	});
 
-			$scope.criteriaList = [];
-
-	    	$scope.queryToolVisible = true;
-			$scope.Criteria = {};
-			$scope.Criteria.paramActivityDateType = "all"; //default
-			
-
-    		$scope.AutoExecuteQuery = true;
 
     		$scope.removeCriteria = function(idx) {
     			$scope.criteriaList.splice(idx,1);
@@ -173,6 +197,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					criteria: {
 						DatasetId: 	  $scope.dataset.Id,
 						QAStatusId:   $scope.Criteria.ParamQAStatusId,
+						RowQAStatusId: $scope.Criteria.ParamRowQAStatusId,
 						Locations:    angular.toJson($scope.Criteria.LocationIds).toString(),
 						FromDate:     $scope.Criteria.BetweenFromActivityDate,
 						ToDate:       $scope.Criteria.BetweenToActivityDate,
@@ -182,6 +207,9 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					},
 					loading: true,
     			};
+
+    			if(query.criteria.RowQAStatusId)
+    				query.criteria.RowQAStatusId = angular.toJson(query.criteria.RowQAStatusId).toString();
 
     			return query;
     		};
@@ -197,33 +225,21 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 	    	};
 
 	    	$scope.$watch('query.loading', function(){
+	    		if(!$scope.dataset.Id)
+	    			return;
+
 	    		console.log("-- gathering graph data");
 	    		$scope.dataSheetDataset = $scope.query.results;
 	    		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {height: 360, width: 800});
 	    		//$scope.chartData = getAdultWeirChartData($scope.query.results);	
 	    		
 	    	});
-	    	
-
-
-
-	    	
 
 	    	$scope.openActivity = function()
 	    	{
 	    		$location.path("/dataview/"+$scope.onRow.entity.ActivityId);
 	    	};
 
-    		$scope.queryList = [
-    		{
-    			Title: "2013 Fall and Spring Chinook",
-    			Description: "All activity for Spring/Fall Chinook from 1/1/13-12/31/13"
-    		},
-    		{
-    			Title: "Broodstock 2013",
-    			Description: "All fish used for broodstock in 2013"
-    		}
-    		];
 
     		$scope.openExportView = function() {
 				var modalInstance = $modal.open({
@@ -301,6 +317,10 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
     			
     			var fieldIndex = 0;
 
+    			$scope.dataFields = $scope.dataFields.sort(orderByAlpha);
+    			console.log("ordered!");
+    			console.dir($scope.dataFields);
+
 				angular.forEach($scope.dataFields, function(field){
 					parseField(field, $scope);
 					
@@ -332,8 +352,16 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
 			
 		//$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');  //TODO
 			$scope.QAStatusOptions = {};
+			$scope.RowQAStatuses = {};
+	        
 	        $scope.QAStatusOptions["all"] = "- All -";
+	        $scope.RowQAStatusOptions["all"] = "- All -";
+	        
 	        $scope.Criteria.ParamQAStatusId = "all";
+	        $scope.Criteria.ParamRowQAStatusId = "all";
+	        
+	        $scope.RowQAStatuses["all"] = "- All -";
+
 
     		$scope.AutoExecuteQuery = true;
 
@@ -354,7 +382,7 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
 					Value: 				$scope.Criteria.Value,
 				});
 
-				console.dir($scope.criteriaList);
+				//console.dir($scope.criteriaList);
 
 				$scope.Criteria.Value = null;
 

@@ -64,7 +64,9 @@
                 <div class="header-label">Instrument: </div>
                 <div class="header-value">
                     
-                    <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()" ng-options="i.Id as i.Name for i in project.Instruments"></select>
+                    <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()">
+                        <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
+                    </select>
                     
                     <div ng-show="row.DataGradeText">
                     <a href ng-click="openAccuracyCheckModal()">

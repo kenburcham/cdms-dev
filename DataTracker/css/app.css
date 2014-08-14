@@ -133,7 +133,7 @@ input.form-control-checkbox { width: 30px;}
 	background-color: #CEE3F6;
 	padding: 5px 15px 15px 15px;
 	border-radius: 3px;
-	height: 280px;
+	height: 375px;
 }
 
 .selected-field-description{
@@ -147,14 +147,14 @@ input.form-control-checkbox { width: 30px;}
 	background-color: #F3E3C0;
 	padding: 5px 15px 15px 15px;
 	border-radius: 3px;
-	height: 280px;
+	height: 375px;
 }
 .criteria-list-box
 {
 	background-color: #CEF6D3;
 	padding: 5px 15px 15px 15px;
 	border-radius: 3px;
-	height: 280px;
+	height: 375px;
 }
 
 .query-header-text
