@@ -184,7 +184,7 @@ var parcelLayerConfig =
       imageryLayer: {
           Display: "Imagery",
           QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapDECD_Imagery/MapServer",
+          ServiceURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapDECD_Imagery/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -200,7 +200,7 @@ var parcelLayerConfig =
       platLayer: {
           Display: "Plat",
           QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Plat/MapServer",
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Plat/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -215,7 +215,7 @@ var parcelLayerConfig =
       soilLayer: {
           Display: "Soil",
           QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Soils/MapServer",
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Soils/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -230,7 +230,7 @@ var parcelLayerConfig =
       topoLayer: {
           Display: "Topography",
           QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Topo/MapServer",
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Topo/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -245,7 +245,7 @@ var parcelLayerConfig =
       zoneLayer: {
           Display: "Zoning",
           QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer",
+          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -265,27 +265,27 @@ var servicesLayerConfig =
 {
   streamBuffers: {
     Display: "Stream Buffers",
-    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/StreamBuffers/MapServer",
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/StreamBuffers/MapServer?token=" + security_token,
   },
   utilityLines: {
     Display: "Utilities",
-    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/UtilityLines/MapServer",
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/UtilityLines/MapServer?token=" + security_token,
   },
   waterSewer: {
     Display: "Water / Sewer",
-    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/WaterSewer/MapServer",
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/WaterSewer/MapServer?token=" + security_token,
   },
   roads: {
     Display: "Roads",
-    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/Roads/MapServer",
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/Roads/MapServer?token=" + security_token,
   },
   range: {
     Display: "Grazing Range",
-    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/RangeUnits/MapServer",
+    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/RangeUnits/MapServer?token=" + security_token,
   },
   forest: {
     Display: "Timber Stands",
-    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/ForestStands/MapServer",
+    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/ForestStands/MapServer?token=" + security_token,
   },
 
 };
