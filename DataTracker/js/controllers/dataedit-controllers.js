@@ -58,6 +58,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
         $scope.row = {ActivityQAStatus: {}}; //header field values get attached here by dbcolumnname
         $scope.selectedItems = [];
 
+		$scope.gridOptionsFilter = {};
+
         //datasheet grid
 		$scope.gridDatasheetOptions = {
 			data: 'dataSheetDataset',
@@ -67,7 +69,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 	        enableCellEdit: true,
 	        columnDefs: 'datasheetColDefs',
 	        enableColumnResize: true,
-	        selectedItems: $scope.selectedItems
+	        selectedItems: $scope.selectedItems,
+	        filterOptions: $scope.gridOptionsFilter,
 
 		};
 

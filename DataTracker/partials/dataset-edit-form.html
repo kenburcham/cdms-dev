@@ -115,10 +115,17 @@
         </div>
 
     </div>
-<div class="right" style="margin-top: -25px;" ng-show="dataset.RowQAStatuses.length > 1">
-    <button class="btn btn-sm" ng-click="clearSelections()">Clear selections</button>
-    <button class="btn btn-sm" ng-click="openBulkQAChange()">Bulk Row QA Change</button>
+
+<div style="margin-top: 10px;">&nbsp;</div>
+<button class="btn btn-sm" ng-click="showFilter= !showFilter">Filter</button>    
+<button ng-show="dataset.RowQAStatuses.length > 1" class="btn btn-sm" ng-click="clearSelections()">Clear selections</button>
+<button ng-show="dataset.RowQAStatuses.length > 1" class="btn btn-sm" ng-click="openBulkQAChange()">Bulk Row QA Change</button>
+
+
+<div ng-show="showFilter" style="padding: 8px; width: 260px;">
+    <input class="form-control" ng-model="gridOptionsFilter.filterText" placeholder="Filter By" type="text"/><img class="right" style="margin-top: -30px;" src="images/search-sm.png"/>
 </div>
+
 <div class="datasheet-grid" ng-grid="gridDatasheetOptions" ng-style="gridWidth" style="margin-top: 20px;"></div>
 
 <div ng-include="'partials/dataentry/bottom-bar.html'"/>
