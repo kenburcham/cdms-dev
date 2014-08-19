@@ -64,6 +64,12 @@ var FIELD_ROLE_VIRTUAL = 5;
 var METADATA_ENTITY_PROJECTTYPEID = 1;
 var METADATA_ENTITY_HABITATTYPEID = 2;
 var METADATA_ENTITY_DATASETTYPEID = 5;
+
+var METADATA_PROPERTY_MAPIMAGE = 26;
+var METADATA_PROPERTY_MAPIMAGE_HTML = 25;
+var METADATA_PROPERTY_SUMMARYIMAGE = 11;
+var METADATA_PROPERTY_SUMMARYIMAGE_HTML = 13;
+
 var USER_PREFERENCE_LANDINGPAGE = "LandingPage"; //Name of UserPreference that contains a user's landing page (if specified)
 
 var CDMS_DOCUMENTATION_URL = "http://intranet.ctuir.org/adminstration/oit/gis/wiki/Pages/Project%20Tracker%20Documentation.aspx";

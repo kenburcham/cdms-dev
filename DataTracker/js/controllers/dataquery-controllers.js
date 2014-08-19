@@ -243,7 +243,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 
     		$scope.openExportView = function() {
 				var modalInstance = $modal.open({
-					templateUrl: 'partials/exportfile-modal.html',
+					templateUrl: 'partials/modals/exportfile-modal.html',
 					controller: 'ModalExportController',
 					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 					//resolve: { files: function() { return $scope.files; } }

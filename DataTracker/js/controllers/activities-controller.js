@@ -205,7 +205,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.addLocation = function(){
                 var modalInstance = $modal.open({
-                    templateUrl: 'partials/modal-addlocation.html',
+                    templateUrl: 'partials/modals/modal-addlocation.html',
                     controller: 'ModalAddLocationCtrl',
                     scope: $scope, //very important to pass the scope along...
                 });
@@ -237,7 +237,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
             $scope.editLocation = function(){
                 $scope.row = $scope.selectedLocation;
                 var modalInstance = $modal.open({
-                    templateUrl: 'partials/modal-addlocation.html',
+                    templateUrl: 'partials/modals/modal-addlocation.html',
                     controller: 'ModalAddLocationCtrl',
                     scope: $scope, //very important to pass the scope along...
                 });

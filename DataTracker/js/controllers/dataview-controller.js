@@ -134,7 +134,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 				$scope.row = {ActivityQAStatus: {}}; //modal selections
 
 	        	var modalInstance = $modal.open({
-						templateUrl: 'partials/changeqa-modal.html',
+						templateUrl: 'partials/modals/changeqa-modal.html',
 						controller: 'ModalQaUpdateCtrl',
 						scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 						//resolve: { files: function() { return $scope.files; } }
@@ -148,7 +148,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 			$scope.openExportView = function() {
 				var modalInstance = $modal.open({
-					templateUrl: 'partials/exportfile-modal.html',
+					templateUrl: 'partials/modals/exportfile-modal.html',
 					controller: 'ModalDataEntryCtrl',
 					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 					//resolve: { files: function() { return $scope.files; } }
@@ -159,7 +159,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     		//copy and paste alert -- this should be in a common thing!
     		$scope.openDataEntryModal = function() {
 				var modalInstance = $modal.open({
-					templateUrl: 'partials/dataentry-modal.html',
+					templateUrl: 'partials/modals/dataentry-modal.html',
 					controller: 'ModalDataEntryCtrl',
 					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 					//resolve: { files: function() { return $scope.files; } }

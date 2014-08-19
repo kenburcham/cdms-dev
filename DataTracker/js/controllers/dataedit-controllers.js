@@ -205,6 +205,15 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		};
 
 
+        $scope.createInstrument = function(){
+            $scope.viewInstrument = null;
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-create-instrument.html',
+              controller: 'ModalCreateInstrumentCtrl',
+              scope: $scope, //very important to pass the scope along...
+            });
+         };
+
 
 		$scope.reloadProject = function(){
                 //reload project instruments -- this will reload the instruments, too

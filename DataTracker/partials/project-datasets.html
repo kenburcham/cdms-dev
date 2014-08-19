@@ -10,8 +10,8 @@
 </ul>
 
 <div ng-mouseover="showMapButton=true" ng-mouseout="showMapButton=false" ng-init="showMapButton=false" class="right map-inset" ng-bind-html="mapHtml"></div>
-<button project-role="editor" ng-mouseover="showMapButton=true" ng-show="showMapButton==true" style="margin-right: -220px" class="right btn">Choose Map Image</button>
-<button project-role="editor" ng-mouseover="showMapButton=true" ng-show="!mapHtml" class="right btn">Choose Map Image</button>
+<button project-role="editor" ng-mouseover="showMapButton=true" ng-click="openChooseMapImage()" ng-show="showMapButton==true" style="margin-right: -220px" class="right btn">Choose Map Image</button>
+<button project-role="editor" ng-mouseover="showMapButton=true" ng-click="openChooseMapImage()" ng-show="!mapHtml" class="right btn">Choose Map Image</button>
 <h3>{{project.Name}}</h3>
 <p>{{project.Description}}</p>
 

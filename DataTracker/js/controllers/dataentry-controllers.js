@@ -303,8 +303,17 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
               scope: $scope, //very important to pass the scope along... 
         
             });
-
 		};
+
+        $scope.createInstrument = function(){
+            $scope.viewInstrument = null;
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/instruments/modal-create-instrument.html',
+              controller: 'ModalCreateInstrumentCtrl',
+              scope: $scope, //very important to pass the scope along...
+            });
+         };
+
 
 		$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 

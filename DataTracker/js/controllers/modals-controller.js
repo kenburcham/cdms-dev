@@ -1,6 +1,51 @@
 //file modal controller
 var mod_fmc = angular.module('ModalsController', ['ui.bootstrap']);
 
+
+
+mod_fmc.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+    $scope.header_message = "Create new instrument";
+
+    $scope.instrument_row = {
+        StatusId: 0,
+        OwningDepartmentId: 1,
+    };
+
+    if($scope.viewInstrument)
+    {
+        $scope.header_message = "Edit instrument: " + $scope.viewInstrument.Name;
+        $scope.instrument_row = $scope.viewInstrument;
+    }
+
+
+    $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
+    $scope.Departments = DataService.getDepartments();
+    $scope.RawProjects = DataService.getProjects();
+
+
+    $scope.save = function(){
+        var saveRow = angular.copy($scope.instrument_row);
+        saveRow.AccuracyChecks = undefined;
+        saveRow.InstrumentType = undefined;
+        saveRow.OwningDepartment = undefined;
+        var promise = DatastoreService.saveInstrument($scope.project.Id, saveRow);
+        promise.$promise.then(function(){
+            $scope.reloadProject();
+            $modalInstance.dismiss();
+        });
+    };
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss();
+    };
+  }
+]);
+
+
+
+
 //handles managing file controltypes
 mod_fmc.controller('FileModalCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
     function($scope,  $modalInstance, DataService, DatastoreService){
@@ -115,3 +160,168 @@ mod_fmc.controller('LinkModalCtrl', ['$scope','$modalInstance', 'DataService','D
 
     }
 ]);
+
+
+mod_fmc.controller('ModalChooseMapCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+     var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
+                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' +
+                               '</a>' +
+                               '</div>';
+        $scope.chooseMapSelection = [];
+        
+        $scope.chooseMapGallery = {
+            data: 'project.Images',
+            columnDefs:
+            [
+                {field:'Name',displayName: 'File', cellTemplate: galleryLinkTemplate},
+                {field: 'Title'},
+                {field: 'Description'},
+                //{field: 'Size'},
+            ],
+            multiSelect: false,
+            selectedItems: $scope.chooseMapSelection
+
+        };
+    
+
+    $scope.save = function(){
+
+        if($scope.chooseMapSelection.length == 0)
+        {
+            alert("Please choose an image to save by clicking on it and try again.");
+            return;
+        }
+
+        //is there already a mapselection?
+        var mapmd = getByField($scope.project.Metadata, METADATA_PROPERTY_MAPIMAGE, "MetadataPropertyId");
+        var mapmd_html = getByField($scope.project.Metadata, METADATA_PROPERTY_MAPIMAGE_HTML, "MetadataPropertyId");
+
+        if(!mapmd)
+        {
+            mapmd = {   MetadataPropertyId: METADATA_PROPERTY_MAPIMAGE, UserId: $scope.Profile.Id  };
+            $scope.project.Metadata.push(mapmd);
+        }
+
+        if(!mapmd_html)
+        {
+            mapmd_html = {  MetadataPropertyId: METADATA_PROPERTY_MAPIMAGE_HTML, UserId: $scope.Profile.Id  };
+            $scope.project.Metadata.push(mapmd_html);
+        }        
+
+        mapmd.Values = $scope.chooseMapSelection[0].Id; //fileid of the chosen image file
+
+        //whip up the html .. might be good to have this in a pattern somewhere external!
+        var the_html = "<div class='selected-image-div'>";
+            the_html += "<img src='" + $scope.chooseMapSelection[0].Link + "' class='selected-image'>";
+            if ($scope.chooseMapSelection[0].Description)
+                the_html += "<p>" + $scope.chooseMapSelection[0].Description + "</p>";
+            the_html += "</div>";
+
+        mapmd_html.Values = the_html;
+
+        //console.dir($scope.project.Metadata);
+
+        var promise = DataService.saveProject($scope.project);
+            promise.$promise.then(function(){
+                $scope.reloadProject();
+                $modalInstance.dismiss();
+        });
+
+    };
+
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss();
+    };
+  }
+]);
+
+mod_fmc.controller('ModalChooseSummaryImagesCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+  function($scope,  $modalInstance, DataService, DatastoreService){
+
+     var galleryLinkTemplate = '<a href="{{row.getProperty(\'Link\')}}" target="_blank" title="{{row.getProperty(\'Link\')}}">' +
+                                '<img ng-src="{{row.getProperty(\'Link\')}}" width="150px"/><br/><div class="ngCellText" ng-class="col.colIndex()">' +
+                               '</a>' +
+                               '</div>';
+        $scope.chooseSummaryImagesSelection = [];
+        
+        $scope.chooseSummaryImagesGallery = {
+            data: 'project.Images',
+            columnDefs:
+            [
+                {field:'Name',displayName: 'File', cellTemplate: galleryLinkTemplate},
+                {field: 'Title'},
+                {field: 'Description'},
+                //{field: 'Size'},
+            ],
+            multiSelect: true,
+            selectedItems: $scope.chooseSummaryImagesSelection
+
+        };
+    
+
+    $scope.save = function(){
+
+        if($scope.chooseSummaryImagesSelection.length == 0)
+        {
+            alert("Please choose at least one image to save by clicking on it and try again.");
+            return;
+        }
+
+        //is there already a metadata record?
+        var imgmd = getByField($scope.project.Metadata, METADATA_PROPERTY_SUMMARYIMAGE, "MetadataPropertyId");
+        var imgmd_html = getByField($scope.project.Metadata, METADATA_PROPERTY_SUMMARYIMAGE_HTML, "MetadataPropertyId");
+
+        if(!imgmd)
+        {
+            imgmd = {   MetadataPropertyId: METADATA_PROPERTY_SUMMARYIMAGE, UserId: $scope.Profile.Id  };
+            $scope.project.Metadata.push(imgmd);
+        }
+
+        if(!imgmd_html)
+        {
+            imgmd_html = {  MetadataPropertyId: METADATA_PROPERTY_SUMMARYIMAGE_HTML, UserId: $scope.Profile.Id  };
+            $scope.project.Metadata.push(imgmd_html);
+        }        
+
+        var selections = [];
+        var the_html = "";
+
+        for (var i = $scope.chooseSummaryImagesSelection.length - 1; i >= 0; i--) {
+            var selection = $scope.chooseSummaryImagesSelection[i];
+
+            //whip up the html .. might be good to have this in a pattern somewhere external!
+            the_html += "<div class='selected-image-div'>";
+                the_html += "<img src='" + selection.Link + "' class='selected-image'>";
+                if (selection.Description)
+                    the_html += "<p>" + selection.Description + "</p>";
+                the_html += "</div>";
+
+            selections.push(selection.Id);
+
+        }
+
+        imgmd_html.Values = the_html;
+        imgmd.Values = selections.toString();
+
+        console.dir($scope.project.Metadata);
+
+        var promise = DataService.saveProject($scope.project);
+            promise.$promise.then(function(){
+                $scope.reloadProject();
+                $modalInstance.dismiss();
+        });
+
+    };
+
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss();
+    };
+  }
+]);
+
+
+

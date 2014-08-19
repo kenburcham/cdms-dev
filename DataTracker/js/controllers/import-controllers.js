@@ -141,6 +141,15 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 				$scope.clearSelections();
 			};
 
+			$scope.createInstrument = function(){
+	            $scope.viewInstrument = null;
+	            var modalInstance = $modal.open({
+	              templateUrl: 'partials/instruments/modal-create-instrument.html',
+	              controller: 'ModalCreateInstrumentCtrl',
+	              scope: $scope, //very important to pass the scope along...
+	            });
+	         };
+
 			$scope.openBulkQAChange = function(){
 
 	            var modalInstance = $modal.open({
@@ -587,13 +596,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 							console.dir(e);
 						}
 					});
-console.log("here");
+
 					//Appraisal special importer case - remove this once we're done the appraisal import!
 					if($scope.dataset.Id == 1193)
 					{
 						$scope.importAppraisalLine(new_row);
 					}
-console.log("here2");
+
 					//now that the row is populated with import values, lets spin through each filed again and fire any rules
 					//* ---- Run the rules for each field on this row ---- *//
 					var row = new_row;
@@ -745,7 +754,7 @@ console.log("here2");
 
 	    	$scope.openDuplicatesModal = function(){
 				var modalInstance = $modal.open({
-					templateUrl: 'partials/viewduplicates-modal.html',
+					templateUrl: 'partials/modals/viewduplicates-modal.html',
 					controller: 'ModalDuplicatesViewCtrl',
 					scope: $scope, //very important to pass the scope along... -- TODO: but we don't want to pass in the whole $scope...
 					//resolve: { files: function() { return $scope.files; } }

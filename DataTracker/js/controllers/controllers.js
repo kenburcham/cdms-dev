@@ -74,52 +74,6 @@ mod_ds.controller('ModalProjectEditorCtrl', ['$scope','$modalInstance', 'DataSer
 ]);
 
 
-mod_ds.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
-  function($scope,  $modalInstance, DataService, DatastoreService){
-
-    $scope.header_message = "Create new instrument";
-
-    $scope.row = {
-        StatusId: 0,
-        OwningDepartmentId: 1,
-    };
-
-    if($scope.viewInstrument)
-    {
-        $scope.header_message = "Edit instrument: " + $scope.viewInstrument.Name;
-        $scope.row = $scope.viewInstrument;
-    }
-
-
-    $scope.InstrumentTypes = DatastoreService.getInstrumentTypes();
-    $scope.Departments = DataService.getDepartments();
-    $scope.RawProjects = DataService.getProjects();
-
-    $scope.$watch('RawProjects', function(){
-      if($scope.RawProjects)
-        $scope.Projects = $scope.RawProjects.sort(orderByAlphaName);
-    },true);
-
-    $scope.save = function(){
-        var saveRow = angular.copy($scope.row);
-        saveRow.AccuracyChecks = undefined;
-        saveRow.InstrumentType = undefined;
-        saveRow.OwningDepartment = undefined;
-        var promise = DatastoreService.saveInstrument($scope.project.Id, saveRow);
-        promise.$promise.then(function(){
-            $scope.reloadProject();
-            $modalInstance.dismiss();
-        });
-    };
-
-    $scope.cancel = function(){
-        $modalInstance.dismiss();
-    };
-  }
-]);
-
-
-
 mod_ds.controller('ModalEditFileCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
   function($scope,  $modalInstance, DataService, DatastoreService){
 
@@ -224,7 +178,7 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
             		[
             			{field:'Name', displayName:'Dataset Name', cellTemplate: linkTemplate},
             			{field:'Description',displayName: 'Description'},
-            			{field:'CreateDate',displayName: 'Last Activity', cellTemplate: activityTemplate}
+            			//{field:'CreateDate',displayName: 'Last Activity', cellTemplate: activityTemplate}
             		]
             };
 
@@ -415,7 +369,22 @@ var projectDatasetsController = ['$scope', '$routeParams', 'DataService','Datast
         });
 
 
+        scope.openChooseMapImage = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/modals/choosemap-modal.html',
+              controller: 'ModalChooseMapCtrl',
+              scope: scope, //very important to pass the scope along...
+            });
+         };
 
+         
+        scope.openChooseSummaryImages = function(){
+            var modalInstance = $modal.open({
+              templateUrl: 'partials/modals/choosesummaryimages-modal.html',
+              controller: 'ModalChooseSummaryImagesCtrl',
+              scope: scope, //very important to pass the scope along...
+            });
+         };
 
          scope.openAccuracyCheckForm = function(ac_row){
             if(ac_row)
