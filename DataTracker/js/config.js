@@ -35,9 +35,12 @@ var CURRENT_VERSION = ".3";
 //Change these to point to your own webserver directories
 var serviceUrl = '//data.ctuir.org/servicesSTAGE'; //location of cdms-services deployment (REST Services)
 var serverUrl = '//data.ctuir.org/cdms-dev';       //location of cdms-dev files (Javascript+HTML application)
+var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
+//var security_token = "2NSvy0BMObG__a4gbRkBDUWarspCqssN9Zpn6sTTPEWTbIF0t-wOmSg4DjtSHYQn"; //   8/25/14.cdms.ctuir.org
 
-var REPORTSERVER_URL = '//gis-sql/Reports/Pages/Folder.aspx?ItemPath=%2f'; //the Datastore "name" will be appended here, so make sure your report server folders are named the same as your datastore
-var PROJECT_REPORT_URL = '//gis-sql/ReportServer/Pages/ReportViewer.aspx?%2fQuadReport_Prototype%2fQuadReport_Single&rs:Command=Render&Id='; //this is the report called from the "Quad REport" button on the project view page
+
+var REPORTSERVER_URL = 'http://gis-sql/Reports/Pages/Folder.aspx?ItemPath=%2f'; //the Datastore "name" will be appended here, so make sure your report server folders are named the same as your datastore
+var PROJECT_REPORT_URL = 'http://gis-sql/ReportServer/Pages/ReportViewer.aspx?%2fQuadReport_Prototype%2fQuadReport_Single&rs:Command=Render&Id='; //this is the report called from the "Quad REport" button on the project view page
 
 
 //GIS defaults - change these to point to your own ArcGIS server
@@ -154,7 +157,6 @@ DataGradeMethods.push("No Accuracy Check Conducted");
 DataGradeMethods.push("Unknown Accuracy Method");
 
 //Appraisal Map config
-var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
 
 var defaultLayer = "imageryLayer";
 
@@ -174,8 +176,8 @@ var parcelLayerConfig =
       {
         taxParcelLayer: {
           Display: "Tax Parcel",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/BasemapParcelViewerCTUIR/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -189,8 +191,8 @@ var parcelLayerConfig =
         },
       imageryLayer: {
           Display: "Imagery",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "http://restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapDECD_Imagery/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapDECD_Imagery/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -205,8 +207,8 @@ var parcelLayerConfig =
 
       platLayer: {
           Display: "Plat",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Plat/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Plat/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -220,8 +222,8 @@ var parcelLayerConfig =
         },
       soilLayer: {
           Display: "Soil",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Soils/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Soils/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -235,8 +237,8 @@ var parcelLayerConfig =
         },
       topoLayer: {
           Display: "Topography",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Topo/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Topo/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -250,8 +252,8 @@ var parcelLayerConfig =
         },
       zoneLayer: {
           Display: "Zoning",
-          QueryURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer?token=" + security_token,
+          QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
@@ -287,11 +289,11 @@ var servicesLayerConfig =
   },
   range: {
     Display: "Grazing Range",
-    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/RangeUnits/MapServer?token=" + security_token,
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/RangeUnits/MapServer?token=" + security_token,
   },
   forest: {
     Display: "Timber Stands",
-    ServiceURL: "//restdata.umatilla.nsn.us/arcgis/rest/services/ForestStands/MapServer?token=" + security_token,
+    ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/ForestStands/MapServer?token=" + security_token,
   },
 
 };

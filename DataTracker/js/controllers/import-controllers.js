@@ -796,7 +796,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
                     	row.AppraisalStatus = 'Not Started';
                     	row.AllotmentStatus = 'Requested';
                     	
-                    	var map_loc = 'http://gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
+                    	var map_loc = '//gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
                     	row.MapFiles = '[{"Name":"Imagery","Link":"'+map_loc+'Imagery_'+row['Allotment']+'.pdf"},{"Name":"Plat","Link":"'+map_loc+'Plat_'+row['Allotment']+'.pdf"},{"Name":"Soils","Link":"'+map_loc+'Soils_'+row['Allotment']+'.pdf"},{"Name":"Topo","Link":"'+map_loc+'Topo_'+row['Allotment']+'.pdf"},{"Name":"Zoning","Link":"'+map_loc+'Zoning_'+row['Allotment']+'.pdf"}]';
                     	
                     	row.LastAppraisalRequestDate = new Date();
