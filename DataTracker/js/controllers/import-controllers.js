@@ -43,15 +43,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 				{
 					Label: "[-- Index Field --]"
 				},
+				{
+					Label: "[-- QA Row Status Id --]"
+				},
+
 				/*
 				{
 					Label: "[-- Location Id --]"
 				},
-
-				{
-					Label: "[-- QA Row Status Id --]"
-				},
 				*/
+				
 			];
 
 
@@ -388,10 +389,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					/*
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[LOCATION_ID].Label)
 						$scope.mappedActivityFields[LOCATION_ID] = field_name;
-
-					else if($scope.mapping[field_name].Label === $scope.mappableFields[QA_STATUS_ID].Label)
-						$scope.mappedActivityFields[QA_STATUS_ID] = field_name;
 					*/
+					else if($scope.mapping[field_name].Label === $scope.mappableFields[ROW_QA_STATUS_ID].Label)
+						$scope.mappedActivityFields[ROW_QA_STATUS_ID] = field_name;
+					
 					else
 					{
 						//undisable corresponding speical field if this had been one
@@ -404,9 +405,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					/*
 						if($scope.mappedActivityFields[LOCATION_ID] === field_name)
 							$scope.mappedActivityFields[LOCATION_ID] = false;
-						if($scope.mappedActivityFields[QA_STATUS_ID] === field_name)
-							$scope.mappedActivityFields[QA_STATUS_ID] = false;
 						*/
+						if($scope.mappedActivityFields[ROW_QA_STATUS_ID] === field_name)
+							$scope.mappedActivityFields[ROW_QA_STATUS_ID] = false;
+						
 					}
 
 				}
@@ -512,12 +514,14 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					//spin through and copy the values in for mapped fields
 					angular.forEach($scope.mapping, function(field, col){
 						try{
-
 							if(field.Label != $scope.mappableFields[DO_NOT_MAP])
 							{
 								//just ditch if it is an empty value
 								if(data_row[col] == null || data_row[col] == "")
 									return;
+
+								if(field.Label == $scope.mappableFields[ROW_QA_STATUS_ID].Label)
+									new_row.RowQAStatusId = data_row[col];
 
 								//check for numeric or ignore as blank if it isn't.
 								if(field.ControlType == "number" && !isNumber(data_row[col]) )
