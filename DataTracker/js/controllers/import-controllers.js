@@ -66,6 +66,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					$location.path("/unauthorized");
 				}
 
+				//Add the OtherAgencyId to the label - requirement from Colette
+				angular.forEach($scope.project.Locations, function(loc)
+	    		{
+	    			if(loc.OtherAgencyId)
+	    				loc.Label = loc.Label + ' (' + loc.OtherAgencyId + ')';
+	    		});
+
 	        	//setup locationOptions dropdown
 				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
@@ -85,9 +92,6 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 	    				$scope.setLocation();
 	    			});
 	    		}
-
-
-
 
 	        });
 

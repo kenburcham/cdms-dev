@@ -150,7 +150,11 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                                '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("headerdata.Allotment") }}</a>' +
                                '</div>';
 
-
+            var locationLabelTemplate = '<div class="ngCellText" ng-class="col.colIndex()">'+
+                    '<span>{{row.getProperty("Location.Label") }}</span>'+
+                    '<span ng-if="row.getProperty(\'Location.OtherAgencyId\')"> ({{row.getProperty(\'Location.OtherAgencyId\')}})</span>' +
+                    '</div>';
+             
             var QATemplate = '<div class="ngCellText" ng-class="col.colIndex()">{{QAStatusList[row.getProperty("ActivityQAStatus.QAStatusId")]}}</div>';
 
             //performance idea: if project-role evaluation ends up being slow, you can conditionally include here...
@@ -166,7 +170,7 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', visible: false, width: '120px'},
 
                         {field:'Location.Id',displayName: 'LocId', visible: false, width: '55px'},
-                        {field:'Location.Label',displayName: 'Location'},
+                        {field:'Location.Label',displayName: 'Location', cellTemplate: locationLabelTemplate},
                         {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
                         {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false, width: '120px'},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
