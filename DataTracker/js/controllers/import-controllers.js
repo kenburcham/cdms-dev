@@ -183,7 +183,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.selectInstrument = function(){
 				//get latest accuracy check
 				$scope.viewInstrument = getByField($scope.project.Instruments, $scope.ActivityFields.InstrumentId, "Id");
-				if($scope.viewInstrument.AccuracyChecks)
+				if($scope.viewInstrument && $scope.viewInstrument.AccuracyChecks)
 					$scope.row.AccuracyCheckId = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1].Id; //set to last one
 			};
 
@@ -726,6 +726,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			 	$scope.activities = undefined;
 			 	$route.reload();
 			 };
+
+			 $scope.viewButton = function(){
+			 	$location.path("/activities/"+$scope.dataset.Id);
+			 }
 
 			$scope.saveDataSheet = function() {
 

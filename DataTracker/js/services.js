@@ -889,7 +889,8 @@ mod.service('ActivityParser',[ 'Logger',
                         //convert to a date string on client side for datetimes
                         if(field.ControlType == "datetime" && row[field.DbColumnName])
                         {
-                            row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
+                            if(currentTimezone)
+                                row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
                         }
 
                         rowHasValue = true; //ok, we have a value in this row.
