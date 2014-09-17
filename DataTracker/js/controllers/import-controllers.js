@@ -756,7 +756,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 				}
 
-	            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+				var sheetCopy = angular.copy($scope.dataSheetDataset);
+
+	            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.headerFields, $scope.detailFields);
 	            if(!$scope.activities.errors)
 	            {
 	                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
