@@ -1466,11 +1466,13 @@ function makeFieldColDef(field, scope) {
         switch(field.ControlType)
         {
             case 'select':
+            case 'lookup':
                 coldef.editableCellTemplate = '<select ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"><option value="" selected="selected"></option></select>';
                 scope.CellOptions[field.DbColumnName+'Options'] = makeObjectsFromValues(scope.dataset.DatastoreId+field.DbColumnName, field.Field.PossibleValues);
 //                console.log("and we used: " + scope.dataset.DatastoreId+field.DbColumnName + " as the key");
                 break;
             case 'multiselect':
+            case 'multilookup':
                 //coldef.editableCellTemplate = '<select class="field-multiselect" multiple="true" ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"/>';
                 //coldef.cellTemplate = '<div class="ngCellText cell-multiselect" ng-class="col.colIndex()"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>';
                 coldef.editableCellTemplate = '<select class="field-multiselect" multiple="true" ng-blur="updateCell(row,\''+field.DbColumnName+'\')" ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in CellOptions.'+ field.DbColumnName +'Options"/>';
@@ -1514,6 +1516,7 @@ function makeFieldColDef(field, scope) {
     switch(field.ControlType)
     {
         case 'multiselect':
+        case 'multilookup':
             coldef.cellFilter = 'arrayValues';
             break;
 
