@@ -87,6 +87,16 @@ angular.module('DatasetFilters', [])
             return $sce.trustAsHtml(retval);
             
         };
+    }).filter('countItems', function($sce){
+        return function(input)
+        {
+            var retval = '-';
+            if(input)
+            {
+                retval = array_count(input) + "";
+            }
+            return $sce.trustAsHtml(retval);
+        }
     })
     
 

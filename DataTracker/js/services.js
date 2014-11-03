@@ -223,6 +223,13 @@ mod.factory('GetDepartments', ['$resource', function($resource){
         return $resource(serviceUrl+'/api/Department');
 }]);
 
+mod.factory('GetRelationData', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/GetRelationData',{},{
+                       save: {method: 'POST', isArray: true}
+        });
+}]);
+
+
 
 
 mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile','GetTimeZones',
@@ -361,8 +368,8 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
     }
 ]);
 
-mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','GetMyProjectsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset','GetDepartments',
-    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, GetMyProjectsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset, GetDepartments){
+mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','ProjectDatasets', 'Activities', 'Datasets', 'Data', 'SaveActivitiesAction', 'UpdateActivitiesAction','QueryActivitiesAction','SetProjectEditors', 'DeleteActivitiesAction', 'SetQaStatusAction', 'GetMyDatasetsAction','GetMyProjectsAction','SaveUserPreferenceAction','ExportActivitiesAction','GetMetadataProperties','SaveDatasetMetadata','GetMetadataFor','SaveProject','GetHeadersDataForDataset','GetDepartments','GetRelationData',
+    function($q, resource, Projects, Users, Project, ProjectDatasets, Activities, Datasets, Data, SaveActivitiesAction, UpdateActivitiesAction, QueryActivitiesAction, SetProjectEditors, DeleteActivitiesAction, SetQaStatusAction, GetMyDatasetsAction, GetMyProjectsAction, SaveUserPreferenceAction, ExportActivitiesAction,GetMetadataProperties, SaveDatasetMetadata, GetMetadataFor, SaveProject,GetHeadersDataForDataset, GetDepartments, GetRelationData){
     var service = {
 
         //our "singleton cache" kinda thing
@@ -408,6 +415,10 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
             });
 
             return service.dataset;
+        },
+
+        getRelationData: function(relationFieldId, activityId, rowId){
+            return GetRelationData.save({FieldId: relationFieldId, ActivityId: activityId, ParentRowId: rowId});
         },
 
         configureDataset: function(dataset)
@@ -735,7 +746,7 @@ mod.service('ActivityParser',[ 'Logger',
     function(Logger){
         var service = {
 
-            parseSingleActivity: function(heading, data, headerFields, detailFields){
+            parseSingleActivity: function(heading, data, fields){
                 var activities = {activities: {}, errors: false};
 
                 var tmpdata = data.slice(0); // create a copy.
@@ -749,14 +760,14 @@ mod.service('ActivityParser',[ 'Logger',
                     {
                         angular.forEach(tmpdata, function(data_row, index){
                             //note we mash the heading fields into our row -- addActivity splits them out appropriately.
-                            service.addActivity(activities, key, angular.extend(data_row, heading), headerFields, detailFields);
+                            service.addActivity(activities, key, angular.extend(data_row, heading), fields);
                         });
                     }
                     else
                     {
                         //at least do a single.
                         console.log("trying a single with no rows!");
-                        service.addActivity(activities, key, heading, headerFields, detailFields);
+                        service.addActivity(activities, key, heading, fields);
                     }
 
                 }
@@ -771,7 +782,7 @@ mod.service('ActivityParser',[ 'Logger',
             },
 
             //parses an array of header+detail fields into discrete activities
-            parseActivitySheet: function(data, headerFields, detailFields){
+            parseActivitySheet: function(data, fields){
                 var activities = {activities: {}, errors: false};
 
                 var tmpdata = data.slice(0); //create a copy
@@ -780,7 +791,7 @@ mod.service('ActivityParser',[ 'Logger',
                     var key = service.makeKey(row);
 
                     if(key)
-                        service.addActivity(activities, key, row, headerFields, detailFields);
+                        service.addActivity(activities, key, row, fields);
                     else
                         service.addError(activities, index, "Both a Location and ActivityDate are required to save a new Activity.");
 
@@ -806,7 +817,7 @@ mod.service('ActivityParser',[ 'Logger',
                 return undefined;
             },
 
-            addActivity: function(activities, key, row, headerFields, detailFields){
+            addActivity: function(activities, key, row, fields){
                 if(row.Timezone)
                     var currentTimezone = row.Timezone;
 
@@ -863,7 +874,7 @@ mod.service('ActivityParser',[ 'Logger',
                         activities['ActivityId'] = row.ActivityId;
 
                     //copy the other header fields from this first row.
-                    angular.forEach(headerFields, function(field){
+                    angular.forEach(fields.header, function(field){
 
                         //flatten multiselect values into an json array string
                         if(field.ControlType == "multiselect" && row[field.DbColumnName])
@@ -876,30 +887,29 @@ mod.service('ActivityParser',[ 'Logger',
 
                 }
 
-                var rowHasValue = false; //we don't save blank detail records.
+                //iterate through each field and do any necessary processing to field values
+                var rowHasValue = prepFieldsToSave(row, fields.detail, currentTimezone);
 
-                //handle field level validation or processing
-                angular.forEach(detailFields, function(field){
-                    if(row[field.DbColumnName])
+                //console.dir(fields);
+
+                //iterate through fields now and also prep any grid fields
+                angular.forEach(Object.keys(fields.relation), function(relation_field){
+                    //console.dir(relation_field);
+                    //console.log("we ahve a grid cell to save!: " + relation_field);
+                    var rel_grid = row[relation_field];
+                    //console.dir(rel_grid);
+                    angular.forEach(rel_grid, function(grid_row)
                     {
-                        //flatten multiselect values into an json array string
-                        if(field.ControlType == "multiselect")
-                            row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
-
-                        //convert to a date string on client side for datetimes
-                        if(field.ControlType == "datetime" && row[field.DbColumnName])
-                        {
-                            if(currentTimezone)
-                                row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
-                        }
-
-                        rowHasValue = true; //ok, we have a value in this row.
-                    }
+                        //console.dir(grid_row);
+                        var gridHasValue = prepFieldsToSave(grid_row, fields.relation[relation_field], currentTimezone);
+                        rowHasValue = (rowHasValue) ? rowHasValue : gridHasValue; //bubble up the true!
+                    });
                 });
 
                 //only save the detail row if we have a value in at least one of the fields.
                 if(rowHasValue)
                     activities.activities[key].Details.push(row);
+
             },
 
         };
@@ -907,6 +917,32 @@ mod.service('ActivityParser',[ 'Logger',
         return service;
     }]);
 
+function prepFieldsToSave(row, fields, currentTimezone)
+{
+    var rowHasValue = false;
+
+    //handle field level validation or processing
+    angular.forEach(fields, function(field){
+        if(row[field.DbColumnName])
+        {
+            //flatten multiselect values into an json array string
+            if(field.ControlType == "multiselect")
+                row[field.DbColumnName] = angular.toJson(row[field.DbColumnName]).toString(); //wow, definitely need tostring here!
+
+            //convert to a date string on client side for datetimes
+            if(field.ControlType == "datetime" && row[field.DbColumnName])
+            {
+                if(currentTimezone)
+                    row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
+            }
+
+            rowHasValue = true;
+        }
+    });
+
+    return rowHasValue;
+
+}
 
 mod.service('FileUploadService',['$q','$upload',function($q, $upload){
         var service = {
@@ -1508,7 +1544,9 @@ function makeFieldColDef(field, scope) {
                 coldef.cellTemplate = '<button class="right btn btn-xs" ng-click="addFiles(row, col.field)">Add</button> <span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span>';
                 //<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
                 break;
-
+            //case 'grid':
+            //    coldef.cellTemplate = '<button class="right btn btn-xs" ng-click="viewRelation(row, col.field)">View</button> <span ng-cell-text ng-bind-html="row.getProperty(col.field)"></span>';
+            //    break;
         }
     }
 
@@ -1540,6 +1578,13 @@ function makeFieldColDef(field, scope) {
             coldef.width = '200';
             if(!coldef.enableCellEdit)
                 coldef.cellTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text ng-bind-html="row.getProperty(col.field) | fileNamesFromString"></span></div>';//<span ng-bind-html="fileNamesFromRow(row,\''+ field.DbColumnName + '\')"></span>';
+            break;
+        case 'grid':
+            coldef.minWidth = '150';
+            coldef.maxWidth = '150';
+            coldef.width = '150';
+            coldef.cellTemplate = '<button class="right btn btn-xs" ng-click="viewRelation(row, col.field)">View</button> <div class="ngCellText" ng-bind-html="row.getProperty(col.field) | countItems"></div>';
+            //coldef.cellTemplate = '<span ng-cell-text ng-bind-html="row.getProperty(col.field) | countItems"></span>';
             break;
     }
 

@@ -19,7 +19,7 @@
             <div class="header-label">Activity Date:</div>
             <div class="header-value">{{grid.Header.Activity.ActivityDate}}&nbsp;</div>            
 
-            <div ng-repeat="field in headerFields">
+            <div ng-repeat="field in header.fields">
             <div class="header-column">
                 <div class="header-label">{{field.Label}}:</div>
                 <div class="header-value">{{grid.Header[field.DbColumnName]}}&nbsp;</div>
