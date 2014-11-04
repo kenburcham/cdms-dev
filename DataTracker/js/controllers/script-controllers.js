@@ -3,8 +3,8 @@
 
 var mod_script = angular.module('ScriptControllers', ['ui.bootstrap']);
 
-mod_script.controller('ScriptletController', ['$scope','$upload', 'DataService','DatastoreService',
-  function($scope, $upload,  DataService, DatastoreService){
+mod_script.controller('ScriptletController', ['$scope','$upload', 'DataService','DatastoreService','ActivityParser',
+  function($scope, $upload,  DataService, DatastoreService,ActivityParser){
 
   		$scope.project = { Id: "2246" }; // default to the DECD project id 
   		$scope.dataset = DataService.getDataset(1193); 
@@ -88,31 +88,95 @@ mod_script.controller('ScriptletController', ['$scope','$upload', 'DataService',
 
 			var updatedActivities = [];
 
+			//query.results will be the .. uh results.
+			$scope.query = { criteria: {DatasetId: $scope.dataset.Id, Fields: [], Locations: "[\"all\"]", QAStatusId: "all"} } ;
+
 			//fetch current records via query
-			$scope.activities = DataService.queryActivities({ criteria: {DatasetId: $scope.dataset.Id, Fields: [], Locations: "[\"all\"]", QAStatusId: "all"} } );;
+			DataService.queryActivities($scope.query);
 
-			$scope.$watch('activities', function(){
-				//if(!$scope.activities)
-				//	return;
+			$scope.$watch('query.results', function(){
+				if(!$scope.query.results)
+					return;
 
-				var datasheet = [];
+				console.dir($scope.query.results);
+
+				var datasheet = "";
 
 				console.log("spinning through...");
 				angular.forEach($scope.uploadResults.Data.rows, function(incoming){
-					console.dir(incoming);
+					//console.dir(incoming);
 					//spin through our upload data and match up with existing activity.  Use parcelId
-					angular.forEach($scope.activities, function(existing){
-						if(existing.Allotment == incoming["Allotment:"])
+					//if(incoming["Allotment:"] == "C3")
+					angular.forEach($scope.query.results, function(existing){
+						if(existing.Allotment == incoming["Allotment:"] && existing.Value != incoming["Value:"])
 						{
-							console.dir(existing);
-							datasheet.push(existing);
-							existing.NewValue=incoming["Value:"];
+							datasheet += "INSERT INTO Appraisal_Details (AppraisalYear, AppraisalFiles, AppraisalPhotos, AppraisalComments, AppraisalStatus, RowId, RowStatusId, ActivityId, ByUserId, QAStatusId, EffDt, AppraisalType, AppraisalLogNumber, AppraisalValue, AppraisalValuationDate, Appraiser, TypeOfTransaction, PartiesInvolved, AppraisalProjectType)";
+							datasheet += "VALUES ("; 
+							if(!existing.AppraisalYear)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalYear + "',";
+							
+							if(!existing.AppraisalFiles)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalFiles + "',";
+							
+							if(!existing.AppraisalPhotos)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalPhotos + "',";
+							
+							if(!existing.AppraisalComments)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalComments + "',";
+
+							if(!existing.AppraisalStatus)
+									datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalStatus + "',";
+							
+							datasheet += existing.RowId + ",";
+							datasheet += existing.RowStatusId + ",";
+							datasheet += existing.ActivityId + ",";
+							datasheet += "1,";
+							datasheet += existing.QAStatusId + ",";
+							datasheet += "'" + "2014-11-03 2:30 PM" + "',";
+							
+							if(!existing.AppraisalType)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalType + "',";
+							
+							if(!existing.AppraisalLogNumber)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.AppraisalLogNumber + "',";
+							
+							datasheet += "'" + incoming["Value:"] + "',";
+							datasheet += "'" + incoming["Date of Value:"] + "',";
+							datasheet += "'" + existing.Appraiser + "',";
+							
+							if(!existing.TypeOfTransaction)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.TypeOfTransaction + "',";
+							
+							if(!existing.PartiesInvolved)
+								datasheet += "null,";
+							else
+								datasheet += "'" + existing.PartiesInvolved + "',";
+							
+							datasheet += "'" + existing.AppraisalProjectType + "')\n\n";
+							
+
 
 						}
 					});
 				});	
 
-	            $scope.activities = ActivityParser.parseActivitySheet(datasheet, $scope.fields);
+	            //$scope.activities = ActivityParser.parseActivitySheet(datasheet, $scope.fields);
 	            
 	            /*
 	            if(!$scope.activities.errors)
@@ -123,9 +187,10 @@ mod_script.controller('ScriptletController', ['$scope','$upload', 'DataService',
 	                });
 	            }
 	            */
+	            $scope.activities = datasheet;
 	            console.log("done!");
 
-			},true);
+			});
 			
 		};
 			
