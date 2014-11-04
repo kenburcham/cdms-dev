@@ -104,6 +104,18 @@
 					  <div class="panel-body">
 					  		<h3>{{project.Name}} :: Manage Instruments</h3>
 
+							<div project-role="editor" class="panel-body" style="width: 600px;">
+								<h3>Add an Instrument:</h3>
+								
+								<select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-model="selectedInstrument" style="width: 300px;">
+									    <option ng-repeat="instrument in allInstruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+								</select>
+
+								<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="createInstrument()">Create New</button>
+								<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="addInstrument()">Add to Project</button>
+								
+							</div>
+
 					  		<p><i>Manage instruments and their accuracy checks for this project</i></p>
 					  		<hr/>
 
@@ -138,17 +150,7 @@
 
 					  </div>
 
-					<div project-role="editor" class="panel-body" style="width: 600px;">
-						<h3>Add an Instrument:</h3>
-						
-						<select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-model="selectedInstrument" style="width: 300px;">
-							    <option ng-repeat="instrument in allInstruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
-						</select>
-
-						<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="createInstrument()">Create New</button>
-						<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="addInstrument()">Add to Project</button>
-						
-					</div>
+					
 
 		        </div>
 		    </div>
