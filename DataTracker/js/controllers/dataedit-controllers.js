@@ -246,8 +246,8 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		};
 
 		$scope.selectAccuracyCheck = function(){
-			//if($scope.row.AccuracyCheckId)
-			//	$scope.row.AccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
+			if($scope.row.AccuracyCheckId)
+				$scope.row.AccuracyCheck = getByField($scope.viewInstrument.AccuracyChecks, $scope.row.AccuracyCheckId, "Id");
 		};
 
 

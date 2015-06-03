@@ -21,6 +21,15 @@ angular.module('DatasetFilters', [])
             return input;
         };
     })
+    .filter('instrumentFilter', function($rootScope){ 
+        return function(input) {
+            if($rootScope.instrumentOptions[input])
+			{
+                return $rootScope.instrumentOptions[input];
+			}
+            return input;
+        };
+    })
     .filter('QAStatusFilter', function($rootScope){
         return function(input) {
             if($rootScope.QAStatusOptions[input])

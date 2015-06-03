@@ -776,13 +776,15 @@ mod.service('ActivityParser',[ 'Logger',
 
                 var tmpdata = data.slice(0); //create a copy
 
+                var activityDateToday = new Date(); //need an activity date to use for the whole sheet if we need to provide one.
+
                 angular.forEach(tmpdata, function(row, index){
-                    var key = service.makeKey(row);
+                    var key = service.makeKey(row, activityDateToday);
 
                     if(key)
                         service.addActivity(activities, key, row, headerFields, detailFields);
                     else
-                        service.addError(activities, index, "Both a Location and ActivityDate are required to save a new Activity.");
+                        service.addError(activities, index, "Please check for errors, something required is missing to save a new Activity.");
 
                 });
 
@@ -797,10 +799,14 @@ mod.service('ActivityParser',[ 'Logger',
                 activities.errors.saveError = message;
             },
 
-            makeKey: function(row){
+            makeKey: function(row, activityDateToday){
+
+                if(!row.activityDate)
+                    row.activityDate = toExactISOString(activityDateToday);
+
                 if(row.locationId && row.activityDate)
                 {
-                    return row.locationId + '_' + row.activityDate;
+					return row.locationId + '_' + row.activityDate;
                 }
 
                 return undefined;
@@ -813,9 +819,23 @@ mod.service('ActivityParser',[ 'Logger',
                 if(!activities.activities[key])
                 {
 
-                    //console.dir(row.activityDate);
+                    var a_date = row.activityDate;
 
-                    var a_date = new Date(row.activityDate).toISOString();
+                    if(row.activityDate instanceof Date)
+                    {
+                        //console.log("is a Date");
+
+                        a_date = toExactISOString(row.activityDate); //
+                        ///console.log(a_date);
+                    }
+                    else
+                    {
+                      //  console.log("Is a string.");
+                        a_date = row.activityDate;
+                    }
+                    //console.log("finally: " + a_date);
+
+                    //console.log(a_date);
 
                     //setup the new activity object structure
                     activities.activities[key] = {
@@ -874,6 +894,18 @@ mod.service('ActivityParser',[ 'Logger',
                         activities.activities[key].Header[field.DbColumnName] = row[field.DbColumnName];
                     });
 
+                }
+
+                //add in activityqa if there isn't one (now required) -- for every row
+                if(!row.ActivityQAStatus)
+                {
+                    //datasheet case
+                    row.ActivityQAStatus =
+                        {
+                            QAStatusId: row.QAStatusId,
+                            Comments: ''
+                        };
+                    row.QAStatusId = row.RowQAStatusId; // and then set QA status for this row...
                 }
 
                 var rowHasValue = false; //we don't save blank detail records.
@@ -978,6 +1010,7 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
         var QACellEditTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'QAStatusId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in QAStatusOptions"/>';
 
+		var InstrumentCellEditTemplate = '<select ng-class="\'colt\' + col.index" ng-blur="updateCell(row,\'InstrumentId\')" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-options="id as name for (id, name) in instrumentOptions"/>';
 
         var service = {
 
@@ -1084,32 +1117,41 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
             },
 
             getColDefs: function(){
-                var coldefs = [{
-                                        field: 'locationId',
-                                        Label: 'Location',
-                                        displayName: 'Location',
-                                        editableCellTemplate: LocationCellEditTemplate,
-                                        cellFilter: 'locationNameFilter',
-                                        Field: { Description: "What location is this record related to?"}
-                                    },
-                                    {
-                                        field: 'activityDate',
-                                        Label: 'Activity Date',
-                                        displayName: 'Activity Date',
-                                        cellFilter: 'date: \'MM/dd/yyyy\'',
-                                        editableCellTemplate: '<input ng-blur="updateCell(row,\'activityDate\')" type="text" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />',
-                                        Field: { Description: "Date of activity in format: '10/22/2014'"}
-                                    },
-                                    {
-                                        field: 'QAStatusId',
-                                        Label: 'QA Status',
-                                        displayName: 'QA Status',
-                                        editableCellTemplate: QACellEditTemplate,
-                                        cellFilter: 'QAStatusFilter',
-                                        Field: { Description: "Quality Assurance workflow status"}
+	            var coldefs = [{
+                            field: 'locationId',
+                            Label: 'Location',
+                            displayName: 'Location',
+                            editableCellTemplate: LocationCellEditTemplate,
+                            cellFilter: 'locationNameFilter',
+                            Field: { Description: "What location is this record related to?"}
+                        },
+                        {
+                            field: 'activityDate',
+                            Label: 'Activity Date',
+                            displayName: 'Activity Date',
+                            cellFilter: 'date: \'MM/dd/yyyy\'',
+                            editableCellTemplate: '<input ng-blur="updateCell(row,\'activityDate\')" type="text" ng-pattern="'+date_pattern+'" ng-model="COL_FIELD" ng-input="COL_FIELD" />',
+                            Field: { Description: "Date of activity in format: '10/22/2014'"}
+                        },
+                        {
+                            field: 'QAStatusId',
+                            Label: 'QA Status',
+                            displayName: 'QA Status',
+                            editableCellTemplate: QACellEditTemplate,
+                            cellFilter: 'QAStatusFilter',
+                            Field: { Description: "Quality Assurance workflow status"}
 
-                                    }
-                              ];
+                        },
+                        {
+                            field: 'InstrumentId',
+                            Label: 'Instrument',
+                            displayName: 'Instrument',
+                            visible: false,
+                            cellFilter: 'instrumentFilter', //'','instrumentFilter',
+                            editableCellTemplate: InstrumentCellEditTemplate, //'<input ng-blur="updateCell(row,\'instrumentId\')" ng-model="COL_FIELD" ng-input="COL_FIELD" />',   'InstrumentCellEditTemplate',
+                            Field: { Description: "Instrument that detected this value."}
+                        },
+                  ];
 
                 return coldefs;
             },
@@ -1643,6 +1685,17 @@ function makeObjects(optionList, keyProperty, valueProperty)
     return objects;
 }
 
+//specific for instruments because we need the serial number too
+function makeInstrumentObjects(optionList)
+{
+    var objects = {};
+
+    angular.forEach(optionList, function(item){
+        objects[item['Id']] = item['Name'] + '(' + item['SerialNumber'] + ')';
+    });
+
+    return objects;
+}
 
 //takes a possiblevalues field list and turns it into a list we can use in a select
 //give us a unique key to reference it by for caching.
@@ -2198,6 +2251,29 @@ function dateToUTC(a_date)
     return utc;
 }
 
+function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+}
+
+
+function toExactISOString(a_date)
+{
+    var s_utc = a_date.getFullYear() +
+        '-' + pad(a_date.getMonth() + 1) +
+        '-' + pad(a_date.getDate()) +
+        'T' + pad(a_date.getHours()) +
+        ':' + pad(a_date.getMinutes()) +
+        ':' + pad(a_date.getSeconds()) +
+        '.' + (a_date.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+        'Z';
+
+    return s_utc;
+
+}
+
 //give me a date string and offset (in ms) and I'll give you back a Date
 //  with the offset applied.
 //  used in rules.
@@ -2223,21 +2299,25 @@ function formatDate(d)
     return d_str;
 }
 
-//if(somearray.contains("a"))...
+//if(somearray.contains("a"))... (case insensitive)
 if(!Array.prototype.contains)
 {
     Array.prototype.contains = function(searchElement)
     {
+        searchElement = searchElement.toLowerCase();
+
         if (this==null)
             throw new TypeError('Array.contains: "this" is null or not defined');
 
         if(this.length == 0)
             return false;
 
-        if(this.indexOf(searchElement) == -1)
-            return false;
+        for (var i = this.length - 1; i >= 0; i--) {
+            if(this[i].toLowerCase() == searchElement)
+                return true;
+        };
 
-        return true;
+        return false;
 
     }
 }

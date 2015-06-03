@@ -64,6 +64,12 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
         	//console.dir($scope.project);
 			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
+        	if($scope.project.Instruments.length > 0)
+        	{
+        		$scope.instrumentOptions = $rootScope.instrumentOptions = makeInstrumentObjects($scope.project.Instruments);
+        		getByField($scope.datasheetColDefs, 'Instrument','Label').visible=true;
+			}
+
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
 			{
@@ -79,9 +85,11 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
         	$scope.project = DataService.getProject($scope.dataset.ProjectId);
 			
         	$scope.QAStatusOptions = $rootScope.QAStatusOptions = makeObjects($scope.dataset.QAStatuses, 'Id','Name');
+ 
 
 			//iterate the fields of our dataset and populate our grid columns
 			angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
+								
 				parseField(field, $scope);
 				
 				if(field.FieldRoleId == FIELD_ROLE_HEADER)
@@ -93,14 +101,28 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 				{
 					$scope.detailFields.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
-				}
-				
+				}				
     		});
 
 			//now everything is populated and we can do any post-processing.
 			if($scope.datasheetColDefs.length > 2)
 			{
 				$scope.addNewRow();
+			}
+
+			if($scope.dataset.Config)
+			{
+				var filteredColDefs = [];
+
+				angular.forEach($scope.datasheetColDefs, function(coldef){
+					if($scope.dataset.Config.DataEntryPage &&
+						!$scope.dataset.Config.DataEntryPage.HiddenFields.contains(coldef.field))
+					{
+						filteredColDefs.push(coldef);
+					}
+				});
+
+				$scope.datasheetColDefs = $scope.colDefs = filteredColDefs;
 			}
 
 			$scope.recalculateGridWidth($scope.datasheetColDefs.length);
@@ -198,8 +220,8 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
-
+			//$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
+/*
 			//if there is only one location, just set it to that location
 			if(array_count($scope.locationOptions)==1)
 			{
@@ -210,7 +232,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 				});
 				
 			}
-
+*/
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
 			{
@@ -322,6 +344,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			$scope.viewInstrument = getByField($scope.project.Instruments, $scope.row.InstrumentId, "Id");
 			$scope.row.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
 			$scope.row.DataGradeText = getDataGrade($scope.row.LastAccuracyCheck) ;
+			$scope.row.AccuracyCheckId = $scope.row.LastAccuracyCheck.Id;
 		};
 
 		$scope.cancel = function(){
@@ -362,8 +385,6 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		{
 			$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		}
-
-
 
 		/* -- these functions are for uploading - */
 		$scope.openFileModal = function(row, field)

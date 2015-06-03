@@ -71,7 +71,7 @@
                         
                         <div ng-show="row.DataGradeText">
                         <a href ng-click="openAccuracyCheckModal()">
-                            <span style="margin-left: 200px" ng-show="row.DataGradeText">Grade: {{row.DataGradeText}} on {{row.LastAccuracyCheck.CheckDate | date}} </span>
+                            <span ng-show="row.DataGradeText">Grade: {{row.DataGradeText}} on {{row.LastAccuracyCheck.CheckDate | date}} </span>
                         </a></div>
                     </div>
                     <div style="margin-top: 5px; margin-left: 7px;"><button ng-click="createInstrument()" class="btn btn-xs">Add</button></div>
