@@ -11,8 +11,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
     	$scope.dataset = DataService.getDataset($routeParams.Id);
 			$scope.mappedActivityFields = {};
 			$scope.userId = $rootScope.Profile.Id;
-			$scope.headerFields = [];
-			$scope.detailFields = [];
+			$scope.fields = { header: [], detail: [], relation: []}; 
 			$scope.dataSheetDataset = [];
 			$scope.showHeaderForm = false;
 			$scope.row = {}; //header form values if used...
@@ -303,12 +302,12 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 						//setup the headers/details and datasheet fields
 						if(field.FieldRoleId == FIELD_ROLE_HEADER)
 						{
-							$scope.headerFields.push(field);
+							$scope.fields.header.push(field);
 							$scope.HeaderColDefs.push(makeFieldColDef(field, $scope));
 						}
 						else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 						{
-							$scope.detailFields.push(field);
+							$scope.fields.detail.push(field);
 							$scope.DetailColDefs.push(makeFieldColDef(field, $scope));
 						}
 
@@ -321,7 +320,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					});
 
     				//set defaults for header fields
-					angular.forEach($scope.headerFields, function(headerfield){
+					angular.forEach($scope.fields.header, function(headerfield){
 						$scope.row[headerfield.DbColumnName] = (headerfield.DefaultValue) ? headerfield.DefaultValue : null;
 					});
 
@@ -758,7 +757,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 				var sheetCopy = angular.copy($scope.dataSheetDataset);
 
-	            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.headerFields, $scope.detailFields);
+	            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.fields);
 	            if(!$scope.activities.errors)
 	            {
 	                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);

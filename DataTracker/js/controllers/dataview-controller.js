@@ -32,8 +32,7 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
     	function($scope, $routeParams, DataService, $modal, $location, DataSheet, $route, $rootScope, ChartService) {
     		$scope.grid = DataService.getActivityData($routeParams.Id); //activity data for a particular activityId
     		
-    		$scope.headerFields = [];
-    		$scope.detailFields = [];
+			$scope.fields = { header: [], detail: [], relation: []}; 
     		$scope.datasheetColDefs = [];
     		$scope.dataSheetDataset = [];
 
@@ -90,6 +89,8 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
     		});
 
+    		$scope.gridFields = [];
+
     		//setup a listener to populate column headers on the grid
 			$scope.$watch('grid.Dataset', function() { 
 				if(!$scope.grid.Dataset) return; //not done cooking yet.
@@ -104,13 +105,17 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 						if(field.FieldRoleId == FIELD_ROLE_HEADER)
 						{
-							$scope.headerFields.push(field);
+							$scope.fields.header.push(field);
 						}
 						else if (field.FieldRoleId == FIELD_ROLE_DETAIL)
 						{
-							$scope.detailFields.push(field);
+							$scope.fields.detail.push(field);
 							$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 						}
+
+						//keep a list of grid fields (relations) for later loading
+						if(field.ControlType == "grid")
+							$scope.gridFields.push(field);
 		    		});
 
 		    		$scope.fieldsloaded = true;
@@ -126,6 +131,21 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 
 
 	    	});
+
+
+			$scope.$watch('dataSheetDataset', function(){
+				if(!$scope.dataSheetDataset)
+					return;
+
+				//kick off the loading of relation data (we do this for UI performance rather than returning with the data...)
+				angular.forEach($scope.dataSheetDataset, function(datarow){
+					angular.forEach($scope.gridFields, function(gridfield){
+						datarow[gridfield.DbColumnName] = DataService.getRelationData(gridfield.FieldId, datarow.ActivityId, datarow.RowId);
+						console.log("kicking off loading of " + datarow.ActivityId + ' ' + datarow.RowId);
+					})	
+				})
+				
+			});
 
 			$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 
@@ -166,6 +186,28 @@ mod_dv.controller('DatasetViewCtrl', ['$scope','$routeParams','DataService','$mo
 				});
 			};
 
+			$scope.openRelationGridModal = function(row, field)
+			{
+				$scope.relationgrid_row = row;
+				$scope.relationgrid_field = field;
+				$scope.isEditable = false;
+				
+				var modalInstance = $modal.open({
+					templateUrl: 'partials/modals/relationgrid-modal.html',
+					controller: 'RelationGridModalCtrl',
+					scope: $scope, 
+				});
+				
+			};
+
+	        $scope.viewRelation = function(row, field_name)
+	        {
+	        	//console.dir(row.entity);
+	        	var field = $scope.FieldLookup[field_name];
+	        	//console.dir(field);
+
+	        	$scope.openRelationGridModal(row.entity, field);
+	        }
 
 			//defined in services
 			$scope.previousActivity = function(){

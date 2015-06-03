@@ -33,8 +33,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		initEdit(); // stop backspace from ditching in the wrong place.
 
 		$scope.userId = $rootScope.Profile.Id;
-		$scope.headerFields = [];
-		$scope.detailFields = [];
+		$scope.fields = { header: [], detail: [], relation: {} };
 		$scope.colDefs = [];
         
         //setup the data array that will be bound to the grid and filled with the json data objects
@@ -94,12 +93,12 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 				
 				if(field.FieldRoleId == FIELD_ROLE_HEADER)
 				{
-					$scope.headerFields.push(field);
+					$scope.fields.header.push(field);
 					$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 				}
 				else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
-					$scope.detailFields.push(field);
+					$scope.fields.detail.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 				}				
     		});
@@ -165,7 +164,10 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		};
 
 		$scope.saveData = function() {
-            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+
+			var sheetCopy = angular.copy($scope.dataSheetDataset);
+
+            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.fields);
             
             if(!$scope.activities.errors)
             {
@@ -189,8 +191,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		initEdit(); // stop backspace from ditching in the wrong place.
 
 		$scope.userId = $rootScope.Profile.Id;
-		$scope.headerFields = [];
-		$scope.detailFields = [];
+		$scope.fields = { header: [], detail: [], relation: []}; 
 		$scope.datasheetColDefs = [];
         
 		$scope.filesToUpload = {};
@@ -263,11 +264,11 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 
 				if(field.FieldRoleId == FIELD_ROLE_HEADER)
 				{
-					$scope.headerFields.push(field);
+					$scope.fields.header.push(field);
 				}
 				else if (field.FieldRoleId == FIELD_ROLE_DETAIL)
 				{
-					$scope.detailFields.push(field);
+					$scope.fields.detail.push(field);
     				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 
     				//a convention:  if your dataset has a ReadingDateTime field then we enable timezones for an activity.
@@ -285,7 +286,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			}
 
 			//set defaults for header fields
-			angular.forEach($scope.headerFields, function(field){
+			angular.forEach($scope.fields.header, function(field){
 				$scope.row[field.DbColumnName] = (field.DefaultValue) ? field.DefaultValue : null;
 
 				//FEATURE: any incoming parameter value that matches a header will get copied into that header value.
@@ -298,7 +299,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 
 			$scope.row.ActivityQAStatus.QAStatusId = ""+$scope.dataset.DefaultActivityQAStatusId;
 
-			$scope.recalculateGridWidth($scope.detailFields.length);
+			$scope.recalculateGridWidth($scope.fields.detail.length);
 
 			$scope.validateGrid($scope);
 
@@ -386,6 +387,28 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			$location.path("/"+$scope.dataset.activitiesRoute+"/"+$scope.dataset.Id);
 		}
 
+		$scope.viewRelation = function(row, field_name)
+        {
+        	console.dir(row.entity);
+        	var field = $scope.FieldLookup[field_name];
+        	console.dir(field);
+
+        	$scope.openRelationEditGridModal(row.entity, field);
+        }
+
+
+		$scope.openRelationEditGridModal = function(row, field)
+		{
+			$scope.relationgrid_row = row;
+			$scope.relationgrid_field = field;
+			$scope.isEditable = true;
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/modals/relationgrid-edit-modal.html',
+				controller: 'RelationGridModalCtrl',
+				scope: $scope, 
+			});
+		};
+
 		/* -- these functions are for uploading - */
 		$scope.openFileModal = function(row, field)
         {
@@ -422,8 +445,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
                 $scope.updatedRows.push(row.entity.Id);
 
         }
-        /*  -- */
-
+      
 		$scope.saveData = function(){
 			console.log("save!");
 
@@ -467,7 +489,9 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 					//console.log("Ok our new list of files: "+$scope.row[field]);
 				});
 
-				$scope.activities = ActivityParser.parseSingleActivity($scope.row, $scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+				var sheetCopy = angular.copy($scope.dataSheetDataset);		
+
+				$scope.activities = ActivityParser.parseSingleActivity($scope.row, sheetCopy, $scope.fields);
 				if(!$scope.activities.errors)
 				{
 					DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);

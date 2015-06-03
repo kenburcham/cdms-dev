@@ -27,6 +27,8 @@ define([
 	  'AdminController',
 	  'angularCharts',
 	  'checklist-model',
+	  'ScriptControllers',
+
 	  ])
 	    .config(['$routeProvider', function($routeProvider) {
 	    	
@@ -55,6 +57,8 @@ define([
 	        //custom routes for datasets that require custom controller+pages
 	        $routeProvider.when('/appraisals/:Id', {templateUrl: 'partials/appraisals/Appraisal-activities.html', controller: 'AppraisalCtrl'});
 	        $routeProvider.when('/unauthorized', {templateUrl: 'partials/errors/unauthorized.html',controller: 'ErrorCtrl'});
+
+	        $routeProvider.when('/script', {templateUrl: 'partials/scripts/index.html', controller: 'ScriptletController'});
 
 	        //when all else fails...
 	        $routeProvider.otherwise({redirectTo: '/projects'});
