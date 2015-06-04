@@ -834,19 +834,19 @@ mod.service('ActivityParser',[ 'Logger',
 
                     if(row.activityDate instanceof Date)
                     {
-                        //console.log("is a Date");
+                        console.log("is a Date");
 
                         a_date = toExactISOString(row.activityDate); //
-                        ///console.log(a_date);
+                        console.log(a_date);
                     }
                     else
                     {
-                      //  console.log("Is a string.");
+                        console.log("Is a string.");
                         a_date = row.activityDate;
                     }
-                    //console.log("finally: " + a_date);
+                    console.log("finally: " + a_date);
 
-                    //console.log(a_date);
+                    console.log(a_date);
 
                     //setup the new activity object structure
                     activities.activities[key] = {
@@ -964,8 +964,18 @@ function prepFieldsToSave(row, fields, currentTimezone)
             //convert to a date string on client side for datetimes
             if(field.ControlType == "datetime" && row[field.DbColumnName])
             {
-                if(currentTimezone)
-                    row[field.DbColumnName] = toDateOffset(row[field.DbColumnName], currentTimezone.TimezoneOffset).toISOString();
+                if(row[field.DbColumnName] instanceof Date)
+                {
+                    row[field.DbColumnName] = toExactISOString(row[field.DbColumnName]);
+                }
+                else
+                {
+                    try{    
+                        row[field.DbColumnName] = toExactISOString(new Date(row[field.DbColumnName]));
+                    }catch(e){
+                        console.log("Error converting date: "+row[field.DbColumnName]);
+                    }
+                }
             }
 
             rowHasValue = true;

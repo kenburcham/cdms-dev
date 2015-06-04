@@ -182,7 +182,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.selectInstrument = function(){
 				//get latest accuracy check
 				$scope.viewInstrument = getByField($scope.project.Instruments, $scope.ActivityFields.InstrumentId, "Id");
-				if($scope.viewInstrument && $scope.viewInstrument.AccuracyChecks)
+				if($scope.viewInstrument && $scope.viewInstrument.AccuracyChecks.length > 0)
 					$scope.row.AccuracyCheckId = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1].Id; //set to last one
 			};
 
@@ -565,13 +565,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 									{
 										if(data_row[col])
 										{
-											//var d = toDateOffset(data_row[col], $scope.ActivityFields.Timezone.TimezoneOffset);
-											var d = new Date(data_row[col]);
-											//TODO: better way to fix this?
-											if(d.getFullYear() < 1950)
-												d.setFullYear(d.getFullYear() + 100);
 
-											new_row[field.DbColumnName] = d.toISOString();
+											//var d = toDateOffset(data_row[col], $scope.ActivityFields.Timezone.TimezoneOffset);
+											//var d = new Date(data_row[col]);
+
+											//new_row[field.DbColumnName] = new Date(toExactISOString(d));
+											//console.log(data_row[col] + " ==> " + new_row[field.DbColumnName]);
+											new_row[field.DbColumnName] = data_row[col];
 										}
 									}
 									catch(e)
@@ -755,9 +755,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 				}
 
-				var sheetCopy = angular.copy($scope.dataSheetDataset);
+				//var sheetCopy = angular.copy($scope.dataSheetDataset); //causes memory problems on IE for large files.
 
-	            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.fields);
+	            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.fields);
 	            if(!$scope.activities.errors)
 	            {
 	                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
