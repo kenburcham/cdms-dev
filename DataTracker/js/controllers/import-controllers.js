@@ -43,15 +43,16 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 				{
 					Label: "[-- Index Field --]"
 				},
+				{
+					Label: "[-- QA Row Status Id --]"
+				},
+
 				/*
 				{
 					Label: "[-- Location Id --]"
 				},
-
-				{
-					Label: "[-- QA Row Status Id --]"
-				},
 				*/
+				
 			];
 
 
@@ -388,10 +389,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					/*
 					else if($scope.mapping[field_name].Label === $scope.mappableFields[LOCATION_ID].Label)
 						$scope.mappedActivityFields[LOCATION_ID] = field_name;
-
-					else if($scope.mapping[field_name].Label === $scope.mappableFields[QA_STATUS_ID].Label)
-						$scope.mappedActivityFields[QA_STATUS_ID] = field_name;
 					*/
+					else if($scope.mapping[field_name].Label === $scope.mappableFields[ROW_QA_STATUS_ID].Label)
+						$scope.mappedActivityFields[ROW_QA_STATUS_ID] = field_name;
+					
 					else
 					{
 						//undisable corresponding speical field if this had been one
@@ -404,9 +405,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					/*
 						if($scope.mappedActivityFields[LOCATION_ID] === field_name)
 							$scope.mappedActivityFields[LOCATION_ID] = false;
-						if($scope.mappedActivityFields[QA_STATUS_ID] === field_name)
-							$scope.mappedActivityFields[QA_STATUS_ID] = false;
 						*/
+						if($scope.mappedActivityFields[ROW_QA_STATUS_ID] === field_name)
+							$scope.mappedActivityFields[ROW_QA_STATUS_ID] = false;
+						
 					}
 
 				}
@@ -512,12 +514,14 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					//spin through and copy the values in for mapped fields
 					angular.forEach($scope.mapping, function(field, col){
 						try{
-
 							if(field.Label != $scope.mappableFields[DO_NOT_MAP])
 							{
 								//just ditch if it is an empty value
 								if(data_row[col] == null || data_row[col] == "")
 									return;
+
+								if(field.Label == $scope.mappableFields[ROW_QA_STATUS_ID].Label)
+									new_row.RowQAStatusId = data_row[col];
 
 								//check for numeric or ignore as blank if it isn't.
 								if(field.ControlType == "number" && !isNumber(data_row[col]) )
@@ -665,6 +669,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.uploadFile = function()
 			{
 				$scope.loading=true;
+					console.log("serviceUrl = " + serviceUrl);
+					console.log("project.Id = " + $scope.project.Id);
+					console.log("startOnLine = " + $scope.startOnLine);
+					console.log("file...");
+					console.dir($scope.file);
 			      $scope.upload = $upload.upload({
 			        url: serviceUrl + '/data/UploadImportFile', //upload.php script, node.js route, or servlet url
 			        method: "POST",
@@ -690,7 +699,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			      .error(function(data)
 			      	{
 			      		$scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
-			      		$scope.loading=false;
+			      		console.log("$scope.upload next...");
+						console.dir($scope.upload);
+						$scope.loading=false;
 			      	});
 			      //.then(success, error, progress);
 			};
@@ -744,9 +755,18 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 				}
 
+				console.log("Next come dataSheetDataset, headerFields, detailFields...");
+				console.dir($scope.dataSheetDataset);
+				console.dir($scope.headerFields);
+				console.dir($scope.detailFields);
+
 	            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
 	            if(!$scope.activities.errors)
 	            {
+					console.log("This is what we are importing...userId, dataset.Id, activities...");
+					console.dir($scope.userId);
+					console.dir($scope.dataset.Id);
+					console.dir($scope.activities);					
 	                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
 	            }
 
@@ -796,7 +816,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
                     	row.AppraisalStatus = 'Not Started';
                     	row.AllotmentStatus = 'Requested';
                     	
-                    	var map_loc = 'http://gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
+                    	var map_loc = '//gis.ctuir.org/DECD/Appraisals/maps/Round_Basemaps_DECD_';
                     	row.MapFiles = '[{"Name":"Imagery","Link":"'+map_loc+'Imagery_'+row['Allotment']+'.pdf"},{"Name":"Plat","Link":"'+map_loc+'Plat_'+row['Allotment']+'.pdf"},{"Name":"Soils","Link":"'+map_loc+'Soils_'+row['Allotment']+'.pdf"},{"Name":"Topo","Link":"'+map_loc+'Topo_'+row['Allotment']+'.pdf"},{"Name":"Zoning","Link":"'+map_loc+'Zoning_'+row['Allotment']+'.pdf"}]';
                     	
                     	row.LastAppraisalRequestDate = new Date();

@@ -39,7 +39,7 @@
             <div class="form-group" ng-class="{ 'has-error' :  form.Easting.$error.float}" style="margin-bottom: 0px;">
             <div class="header-label">Easting:</div>
             <div class="header-value">
-                <input class="form-control" name="Easting" ng-model="row.GPSEasting" placeholder="ex: 541324" smart-float />
+                <input class="form-control" name="Easting" ng-model="row.GPSEasting" placeholder="ex: 541324" sixfloat />
                 <p class="field-error-block" ng-show="form.Easting.$error.float">This is not a valid Easting</p>
             </div>
             </div>
@@ -47,7 +47,7 @@
             <div class="form-group" ng-class="{ 'has-error' :  form.Northing.$error.float}" style="margin-bottom: 0px;">
             <div class="header-label">Northing:</div>
             <div class="header-value">
-                <input class="form-control" name="Northing" ng-model="row.GPSNorthing" placeholder="ex: 7896254" smart-float />
+                <input class="form-control" name="Northing" ng-model="row.GPSNorthing" placeholder="ex: 7896254" sevenfloat />
                 <p class="field-error-block" ng-show="form.Northing.$error.float">This is not a valid Northing</p>
             </div>
             </div>

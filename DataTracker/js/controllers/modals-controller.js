@@ -122,7 +122,7 @@ mod_fmc.controller('LinkModalCtrl', ['$scope','$modalInstance', 'DataService','D
 
         //note: file selected for upload are managed by onFileSelect from parent scope (dataeditcontroller, most likely)
 
-        $scope.makeNewLink = function(){$scope.newLink = {Name: "", Link: "http://"}}; 
+        $scope.makeNewLink = function(){$scope.newLink = {Name: "", Link: "//"}}; 
         $scope.makeNewLink();
 
         $scope.currentLinks = $scope.link_row[$scope.link_field.DbColumnName];
