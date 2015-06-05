@@ -157,12 +157,6 @@ DataGradeMethods.push("No Accuracy Check Conducted");
 DataGradeMethods.push("Unknown Accuracy Method");
 
 //Appraisal Map config
-<<<<<<< HEAD
-//var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
-var security_token = "2NSvy0BMObG__a4gbRkBDUWarspCqssN9Zpn6sTTPEWTbIF0t-wOmSg4DjtSHYQn"; //   8/25/14.cdms.ctuir.org
-
-=======
->>>>>>> 52dadae245ac8cf0a139a3ae9292bb82df880bf4
 
 var defaultLayer = "imageryLayer";
 
@@ -259,11 +253,7 @@ var parcelLayerConfig =
       zoneLayer: {
           Display: "Zoning",
           QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-<<<<<<< HEAD
           ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/BasemapZoningParcels/MapServer?token=" + security_token,
-=======
-          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer?token=" + security_token,
->>>>>>> 52dadae245ac8cf0a139a3ae9292bb82df880bf4
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",
