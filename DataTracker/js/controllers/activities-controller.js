@@ -150,7 +150,11 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                                '<a href="#/dataview/{{row.getProperty(\'Id\')}}">{{row.getProperty("headerdata.Allotment") }}</a>' +
                                '</div>';
 
-
+            var locationLabelTemplate = '<div class="ngCellText" ng-class="col.colIndex()">'+
+                    '<span>{{row.getProperty("Location.Label") }}</span>'+
+                    '<span ng-if="row.getProperty(\'Location.OtherAgencyId\')"> ({{row.getProperty(\'Location.OtherAgencyId\')}})</span>' +
+                    '</div>';
+             
             var QATemplate = '<div class="ngCellText" ng-class="col.colIndex()">{{QAStatusList[row.getProperty("ActivityQAStatus.QAStatusId")]}}</div>';
 
             //performance idea: if project-role evaluation ends up being slow, you can conditionally include here...
@@ -165,8 +169,8 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                         {field:'headerdata.Allotment',displayName: 'Allotment', cellTemplate: allotmentTemplate, visible: false, width: '100px'},
                         {field:'headerdata.AllotmentStatus',displayName: 'Status', visible: false, width: '120px'},
 
-
-                        {field:'Location.Label',displayName: 'Location'},
+                        {field:'Location.Id',displayName: 'LocId', visible: false, width: '55px'},
+                        {field:'Location.Label',displayName: 'Location', cellTemplate: locationLabelTemplate},
                         {field:'Location.WaterBody.Name',displayName: 'Waterbody', visible: false},
                         {field:'headerdata.FieldActivityType',displayName: 'Field Activity Type', visible: false, width: '120px'},
                         {field:'Description', displayName: 'Date Range', cellTemplate: desclinkTemplate, visible: false},
@@ -430,9 +434,10 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                 {
                     console.log("showing fields");
                     $scope.columnDefs[0].visible = false;
-                    $scope.columnDefs[4].visible = true;
+                    $scope.columnDefs[3].visible = true;
                     $scope.columnDefs[5].visible = true;
                     $scope.columnDefs[6].visible = true;
+                    $scope.columnDefs[7].visible = true;
                 }
 
                 if($scope.dataset.Datastore.Name == 'Appraisals')

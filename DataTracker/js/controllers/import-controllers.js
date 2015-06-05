@@ -66,6 +66,13 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 					$location.path("/unauthorized");
 				}
 
+				//Add the OtherAgencyId to the label - requirement from Colette
+				angular.forEach($scope.project.Locations, function(loc)
+	    		{
+	    			if(loc.OtherAgencyId)
+	    				loc.Label = loc.Label + ' (' + loc.OtherAgencyId + ')';
+	    		});
+
 	        	//setup locationOptions dropdown
 				$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
@@ -85,9 +92,6 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 	    				$scope.setLocation();
 	    			});
 	    		}
-
-
-
 
 	        });
 
@@ -179,7 +183,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.selectInstrument = function(){
 				//get latest accuracy check
 				$scope.viewInstrument = getByField($scope.project.Instruments, $scope.ActivityFields.InstrumentId, "Id");
-				if($scope.viewInstrument.AccuracyChecks)
+				if($scope.viewInstrument && $scope.viewInstrument.AccuracyChecks)
 					$scope.row.AccuracyCheckId = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1].Id; //set to last one
 			};
 
@@ -730,6 +734,10 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			 	$route.reload();
 			 };
 
+			 $scope.viewButton = function(){
+			 	$location.path("/activities/"+$scope.dataset.Id);
+			 }
+
 			$scope.saveDataSheet = function() {
 
 				if($scope.gridHasErrors)
@@ -761,6 +769,7 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 				console.dir($scope.detailFields);
 
 	            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+
 	            if(!$scope.activities.errors)
 	            {
 					console.log("This is what we are importing...userId, dataset.Id, activities...");

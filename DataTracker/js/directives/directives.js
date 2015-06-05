@@ -312,6 +312,35 @@ mod.directive('ctuirMultiselectField',
 
     });
 
+mod.directive('ctuirMultilookupField',
+    function(){
+
+        var result = {
+            templateUrl: 'partials/dataentry/field-multilookup.html',
+            restrict: 'E',
+            controller: function($scope, $element, $attrs) {
+               $scope.selectOptions = makeObjectsFromValues($scope.dataset.DatastoreId+$scope.field.DbColumnName, $scope.field.Field.PossibleValues);
+            }
+        };
+        
+        return result;
+
+    });
+
+mod.directive('ctuirLookupField',
+    function(){
+
+        var result = {
+            templateUrl: 'partials/dataentry/field-lookup.html',
+            restrict: 'E',
+            controller: function($scope, $element, $attrs) {
+                $scope.selectOptions = makeObjectsFromValues($scope.dataset.DatastoreId+$scope.field.DbColumnName, $scope.field.Field.PossibleValues);
+            }
+        };
+
+        return result;
+
+    });
 
 mod.directive('ctuirFileField',
     function($modal){
