@@ -38,7 +38,6 @@ var serverUrl = '//data.ctuir.org/cdms-dev';       //location of cdms-dev files 
 var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
 //var security_token = "2NSvy0BMObG__a4gbRkBDUWarspCqssN9Zpn6sTTPEWTbIF0t-wOmSg4DjtSHYQn"; //   8/25/14.cdms.ctuir.org
 
-
 var REPORTSERVER_URL = 'http://gis-sql/Reports/Pages/Folder.aspx?ItemPath=%2f'; //the Datastore "name" will be appended here, so make sure your report server folders are named the same as your datastore
 var PROJECT_REPORT_URL = 'http://gis-sql/ReportServer/Pages/ReportViewer.aspx?%2fQuadReport_Prototype%2fQuadReport_Single&rs:Command=Render&Id='; //this is the report called from the "Quad REport" button on the project view page
 
@@ -92,6 +91,7 @@ var loginUrl = serverUrl + '/DataTracker/login.html'
 var DO_NOT_MAP = 0;
 var ACTIVITY_DATE = 1;
 var INDEX_FIELD = 2;
+var ROW_QA_STATUS_ID = 3;
 var DEFAULT_IMPORT_QACOMMENT = "Initial Import";
 
 
@@ -253,7 +253,7 @@ var parcelLayerConfig =
       zoneLayer: {
           Display: "Zoning",
           QueryURL: "//restdata.ctuir.org/arcgis/rest/services/TaxParcelQueryCTUIR/MapServer/0?token=" + security_token,
-          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/DECD/BasemapsDECD_Zoning/MapServer?token=" + security_token,
+          ServiceURL: "//restdata.ctuir.org/arcgis/rest/services/BasemapZoningParcels/MapServer?token=" + security_token,
           OutFields: "PARCELID, Address",
           isAddressSearchService: true,
           //ParcelQuery: "PARCELID LIKE '%${0}%' ",

@@ -673,6 +673,11 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			$scope.uploadFile = function()
 			{
 				$scope.loading=true;
+					console.log("serviceUrl = " + serviceUrl);
+					console.log("project.Id = " + $scope.project.Id);
+					console.log("startOnLine = " + $scope.startOnLine);
+					console.log("file...");
+					console.dir($scope.file);
 			      $scope.upload = $upload.upload({
 			        url: serviceUrl + '/data/UploadImportFile', //upload.php script, node.js route, or servlet url
 			        method: "POST",
@@ -698,7 +703,9 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 			      .error(function(data)
 			      	{
 			      		$scope.uploadErrorMessage = "There was a problem uploading your file.  Please try again or contact the Helpdesk if this issue continues.";
-			      		$scope.loading=false;
+			      		console.log("$scope.upload next...");
+						console.dir($scope.upload);
+						$scope.loading=false;
 			      	});
 			      //.then(success, error, progress);
 			};
@@ -756,11 +763,19 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 
 				}
 
-				var sheetCopy = angular.copy($scope.dataSheetDataset);
+				console.log("Next come dataSheetDataset, headerFields, detailFields...");
+				console.dir($scope.dataSheetDataset);
+				console.dir($scope.headerFields);
+				console.dir($scope.detailFields);
 
-	            $scope.activities = ActivityParser.parseActivitySheet(sheetCopy, $scope.headerFields, $scope.detailFields);
+	            $scope.activities = ActivityParser.parseActivitySheet($scope.dataSheetDataset, $scope.headerFields, $scope.detailFields);
+
 	            if(!$scope.activities.errors)
 	            {
+					console.log("This is what we are importing...userId, dataset.Id, activities...");
+					console.dir($scope.userId);
+					console.dir($scope.dataset.Id);
+					console.dir($scope.activities);					
 	                DataService.saveActivities($scope.userId, $scope.dataset.Id, $scope.activities);
 	            }
 

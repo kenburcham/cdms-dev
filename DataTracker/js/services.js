@@ -776,9 +776,13 @@ mod.service('ActivityParser',[ 'Logger',
 
                 var tmpdata = data.slice(0); //create a copy
 
+				var activityDateToday = new Date(); //need an activity date to use for the whole sheet, if we need to provide one.  *****
+				
                 angular.forEach(tmpdata, function(row, index){
-                    var key = service.makeKey(row);
-
+                    //var key = service.makeKey(row); // *****
+					var key = service.makeKey(row, activityDateToday); // *****
+					console.log("key...");
+					console.dir(key);
                     if(key)
                         service.addActivity(activities, key, row, headerFields, detailFields);
                     else
@@ -797,8 +801,12 @@ mod.service('ActivityParser',[ 'Logger',
                 activities.errors.saveError = message;
             },
 
-            makeKey: function(row){
-                if(row.locationId && row.activityDate)
+            //makeKey: function(row){
+			makeKey:  function(row, activityDateToday){  // *****
+				if (!row.activityDate) // *****
+					row.activityDate = toExactISOString(activityDateToday); // *****
+
+				if(row.locationId && row.activityDate)
                 {
                     return row.locationId + '_' + row.activityDate;
                 }
@@ -815,7 +823,22 @@ mod.service('ActivityParser',[ 'Logger',
 
                     //console.dir(row.activityDate);
 
-                    var a_date = new Date(row.activityDate).toISOString();
+                    //var a_date = new Date(row.activityDate).toISOString();  // *****
+					/*****/
+					var a_date = row.activityDate;
+					
+					if (row.activityDate instanceof Date)
+					{
+						console.log("row.activityDate is a Date");
+						a_date = toExactISOString(row.activityDate);
+						console.log(a_date);
+					}
+					else
+					{
+						console.log("row.activityDate is a string.");
+						a_date = row.activityDate;
+					}
+					/*****/
 
                     //setup the new activity object structure
                     activities.activities[key] = {
@@ -1113,7 +1136,6 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 return coldefs;
             },
-
 
             //in order to call validate, you'll need to have your FieldLookup and CellOptions set
             //  on the controller (and obviously previously populated by the DataSheet service.)
@@ -2197,6 +2219,29 @@ function dateToUTC(a_date)
 
     return utc;
 }
+
+/*****/
+function pad(number) {
+	if (number < 10) {
+		return '0' + number;
+	}
+	return number;
+}
+
+function toExactISOString(a_date)
+{
+	var s_utc = a_date.getFullYear() +
+	'-' + pad(a_date.getMonth() + 1 ) +
+	'-' + pad(a_date.getDate()) +
+	'T' + pad(a_date.getHours()) +
+	':' + pad(a_date.getMinutes()) +
+	':' + pad(a_date.getSeconds()) +
+	'.' + (a_date.getMilliseconds() / 1000).toFixed(3).slice(2,5) +
+	'Z';
+	
+	return s_utc;
+}
+/*****/
 
 //give me a date string and offset (in ms) and I'll give you back a Date
 //  with the offset applied.

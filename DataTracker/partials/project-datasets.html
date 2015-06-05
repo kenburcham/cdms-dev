@@ -118,7 +118,17 @@
 
 					  		<p><i>Manage instruments and their accuracy checks for this project</i></p>
 					  		<hr/>
+							<div project-role="editor" class="panel-body" style="width: 600px;">
+								<h3>Add an Instrument:</h3>
+								
+								<select ui-select2="select2Options" data-placeholder="Add an Instrument" ng-model="selectedInstrument" style="width: 300px;">
+									    <option ng-repeat="instrument in allInstruments" value="{{instrument.Id}}">{{instrument.Name}} - SN:{{instrument.SerialNumber}}</option>
+								</select>
 
+								<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="createInstrument()">Create New</button>
+								<button style="margin-top: -10px; margin-left: 10px;" class="right btn" ng-click="addInstrument()">Add to Project</button>
+								
+							</div>
 					  		<div ng-show="project.Instruments.length==0">No instruments are associated with this project.</div>
 					  		<div class="col-md-6 admin-field-list-box" ng-show="project.Instruments.length>0">
 								<div class="row">

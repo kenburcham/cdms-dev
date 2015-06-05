@@ -51,16 +51,12 @@ angular.module('angularCharts').directive('acChart', [
         throw new Error('Please set height and width for the chart element');
       }
       function init() {
-		// Do not run this, when the form first loads.
-		if (scope.acdata)
-		{
-			prepareData();
-			setHeightWidth();
-			setContainers();
-			var chartFunc = getChartFunction(chartType);
-			chartFunc();
-			drawLegend();
-		}
+        prepareData();
+        setHeightWidth();
+        setContainers();
+        var chartFunc = getChartFunction(chartType);
+        chartFunc();
+        drawLegend();
       }
       function setHeightWidth() {
         if (!config.legend.display) {
@@ -90,13 +86,9 @@ angular.module('angularCharts').directive('acChart', [
       }
       function prepareData() {
         data = scope.acData;
-		console.log("scope.acData...");
-		console.dir(scope.acData);
         chartType = scope.acChart;
         if(!chartType) chartType = 'bar'; //default == kb
-		//if (series) // gc
-			series = data.series;
-		//if (data) // gc
+        series = data.series;
         points = data.data;
         if (scope.acConfig) {
           angular.extend(config, scope.acConfig);
