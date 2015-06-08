@@ -565,24 +565,8 @@ mod_di.controller("DatasetImportCtrl", ['$scope','$routeParams','DatastoreServic
 									{
 										if(data_row[col])
 										{
-
-											var d = null;
-
-											if($scope.ActivityFields.Timezone && $scope.ActivityFields.Timezone.TimezoneOffset)
-											{
-												d = toDateOffset(data_row[col], $scope.ActivityFields.Timezone.TimezoneOffset);
-											}
-											else
-											{
-												d = new Date(data_row[col]);
-											}
-
-											//TODO: better way to fix this? 
-					                        if(d.getFullYear() < 1950)
-					                            d.setFullYear(d.getFullYear() + 100);
-
+											var d = new Date(data_row[col]);
 											new_row[field.DbColumnName] = toExactISOString(d);
-
 										}
 									}
 									catch(e)

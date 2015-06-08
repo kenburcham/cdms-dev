@@ -2316,14 +2316,17 @@ function pad(number) {
 
 function toExactISOString(a_date)
 {
+    //TODO: better way to fix this? 
+    if(a_date.getFullYear() < 1950)
+        a_date.setFullYear(a_date.getFullYear() + 100);
+
     var s_utc = a_date.getFullYear() +
         '-' + pad(a_date.getMonth() + 1) +
         '-' + pad(a_date.getDate()) +
         'T' + pad(a_date.getHours()) +
         ':' + pad(a_date.getMinutes()) +
         ':' + pad(a_date.getSeconds()) +
-        '.' + (a_date.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-        'Z';
+        '.' + (a_date.getMilliseconds() / 1000).toFixed(3).slice(2, 5);
 
     return s_utc;
 
