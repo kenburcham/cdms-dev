@@ -787,10 +787,10 @@ mod.service('ActivityParser',[ 'Logger',
 
                 var tmpdata = data.slice(0); //create a copy
 
-                var activityDateToday = new Date(); //need an activity date to use for the whole sheet if we need to provide one.
-
+				var activityDateToday = new Date(); //need an activity date to use for the whole sheet, if we need to provide one.  
+				
                 angular.forEach(tmpdata, function(row, index){
-                    var key = service.makeKey(row, activityDateToday);
+					var key = service.makeKey(row, activityDateToday); 
 
                     if(key)
                         service.addActivity(activities, key, row, fields);
@@ -816,6 +816,7 @@ mod.service('ActivityParser',[ 'Logger',
                     row.activityDate = toExactISOString(activityDateToday);
 
                 if(row.locationId && row.activityDate)
+
                 {
 					return row.locationId + '_' + row.activityDate;
                 }
@@ -1201,7 +1202,6 @@ mod.service('DataSheet',[ 'Logger', '$window', '$route',
 
                 return coldefs;
             },
-
 
             //in order to call validate, you'll need to have your FieldLookup and CellOptions set
             //  on the controller (and obviously previously populated by the DataSheet service.)

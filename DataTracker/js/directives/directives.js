@@ -52,6 +52,7 @@ mod.directive('integer', function() {
 });
 
 var FLOAT_REGEXP = /^\-?\d+((\.)\d+)?$/;
+//var FLOAT_REGEXP = /^\-?\d{6}((\.)\d+)?$/;
 mod.directive('smartFloat', function() {
   return {
     require: 'ngModel',
@@ -70,6 +71,56 @@ mod.directive('smartFloat', function() {
           ctrl.$setValidity('float', false);
           return undefined;
         }
+      });
+    }
+  };
+});
+
+var FLOAT_REGEXP6 = /^\-?\d{6}((\.)\d+)?$/;
+mod.directive('sixfloat', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$parsers.unshift(function(viewValue) {
+        if(viewValue == "")
+        {
+            ctrl.$setValidity('float', true);
+            return true;
+        }
+	
+		if (FLOAT_REGEXP6.test(viewValue)) {
+          ctrl.$setValidity('float', true);
+          return parseFloat(viewValue.replace(',', '.'));
+        } else {
+          ctrl.$setValidity('float', false);
+          return undefined;
+        }
+				
+      });
+    }
+  };
+});
+
+var FLOAT_REGEXP7 = /^\-?\d{7}((\.)\d+)?$/;
+mod.directive('sevenfloat', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$parsers.unshift(function(viewValue) {
+        if(viewValue == "")
+        {
+            ctrl.$setValidity('float', true);
+            return true;
+        }
+	
+		if (FLOAT_REGEXP7.test(viewValue)) {
+          ctrl.$setValidity('float', true);
+          return parseFloat(viewValue.replace(',', '.'));
+        } else {
+          ctrl.$setValidity('float', false);
+          return undefined;
+        }
+				
       });
     }
   };

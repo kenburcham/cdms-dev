@@ -192,6 +192,7 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     		};
 
     		$scope.buildQuery = function(){
+				console.log("Inside buildQuery...");
 				var query = 
     			{
 					criteria: {
@@ -207,6 +208,8 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 					},
 					loading: true,
     			};
+				console.log("query is next...");
+				console.dir(query);
 
     			if(query.criteria.RowQAStatusId)
     				query.criteria.RowQAStatusId = angular.toJson(query.criteria.RowQAStatusId).toString();
@@ -215,7 +218,8 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
     		};
 
     		$scope.executeQuery = function(){
-    			
+ 				console.log("Inside executeQuery...");
+   			
     			$scope.query = $scope.buildQuery();
 
     			DataService.queryActivities($scope.query);
@@ -227,8 +231,10 @@ mod_dq.controller('DataQueryCtrl', ['$scope','$routeParams','DataService','$loca
 	    	$scope.$watch('query.loading', function(){
 	    		if(!$scope.dataset.Id)
 	    			return;
-
-	    		console.log("-- gathering graph data");
+				
+				console.log("Inside query.loading watch -- gathering graph data");
+				console.log("query.results is next...");
+				console.dir($scope.query.results);
 	    		$scope.dataSheetDataset = $scope.query.results;
 	    		ChartService.buildChart($scope, $scope.dataSheetDataset, $scope.dataset.Datastore.TablePrefix, {height: 360, width: 800});
 	    		//$scope.chartData = getAdultWeirChartData($scope.query.results);	
@@ -391,6 +397,8 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
     		};
 
     		$scope.buildQuery = function(){
+				console.log("Inside buildQuery...");
+				
 				var query = 
     			{
 					criteria: {
@@ -405,12 +413,16 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
 					},
 					loading: true,
     			};
+				
+				console.log("query is next...");
+				console.dir(query);
 
     			return query;
     		};
 
     		$scope.executeQuery = function(){
     			
+				console.log("Inside executeQuery...");
     			$scope.query = $scope.buildQuery();
 
     			DataService.queryActivities($scope.query);
@@ -420,7 +432,7 @@ mod_dq.controller('DatastoreQueryCtrl', ['$scope','$routeParams','DatastoreServi
 	    	};
 
 	    	$scope.$watch('query.loading', function(){
-	    		console.log("-- gathering graph data");
+	    		console.log("--- gathering graph data");
 	    		$scope.chartData = getAdultWeirChartData($scope.query.results);	
 	    		$scope.dataSheetDataset = $scope.query.results;
 	    	});

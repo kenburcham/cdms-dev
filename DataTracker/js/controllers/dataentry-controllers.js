@@ -221,8 +221,9 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
         	//console.dir($scope.project);
-			//$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
-/*
+
+			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
+
 			//if there is only one location, just set it to that location
 			if(array_count($scope.locationOptions)==1)
 			{
@@ -233,7 +234,7 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 				});
 				
 			}
-*/
+			
 			//check authorization -- need to have project loaded before we can check project-level auth
 			if(!$rootScope.Profile.isProjectOwner($scope.project) && !$rootScope.Profile.isProjectEditor($scope.project))
 			{
