@@ -60,6 +60,7 @@ mod_de.controller('DataEntryDatasheetCtrl', ['$scope','$routeParams','DataServic
 		//update our location options as soon as our project is loaded.
         $scope.$watch('project.Name', function(){
         	if(!$scope.project) return;
+
         	//console.dir($scope.project);
 			$scope.locationOptions = $rootScope.locationOptions = makeObjects(getUnMatchingByField($scope.project.Locations,PRIMARY_PROJECT_LOCATION_TYPEID,"LocationTypeId"), 'Id','Label') ;
 
@@ -346,7 +347,9 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 			$scope.viewInstrument = getByField($scope.project.Instruments, $scope.row.InstrumentId, "Id");
 			$scope.row.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
 			$scope.row.DataGradeText = getDataGrade($scope.row.LastAccuracyCheck) ;
-			$scope.row.AccuracyCheckId = $scope.row.LastAccuracyCheck.Id;
+
+			if($scope.row.LastAccuracyCheck)
+				$scope.row.AccuracyCheckId = $scope.row.LastAccuracyCheck.Id;
 		};
 
 		$scope.cancel = function(){
