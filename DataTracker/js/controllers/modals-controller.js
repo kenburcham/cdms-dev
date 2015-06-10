@@ -101,6 +101,8 @@ mod_fmc.controller('RelationGridModalCtrl', ['$scope','$modalInstance', 'DataSer
 
             //copy back to the actual row field
             //$scope.link_row[$scope.link_field.DbColumnName] = angular.toJson($scope.currentLinks);
+            //console.dir($scope.relationgrid_row);
+            $scope.updatedRows.push($scope.relationgrid_row.Id);
             $modalInstance.dismiss();
         };
 
