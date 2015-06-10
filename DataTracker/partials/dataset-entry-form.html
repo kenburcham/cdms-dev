@@ -35,13 +35,11 @@
     
         <div ng-include="'partials/grid-validation-error-box.html'"></div>
     </div>
-
     <div class="header-box" style="margin-top: 20px; width: 500px;">
             <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('Location')">
                 <div class="header-label">Location:</div>
                 <div class="header-value">
-                    <select class="form-control" ng-model="row['locationId']" ng-options="id as name for (id, name) in locationOptions">
-                    </select>
+                    <select class="form-control" ng-model="row['locationId']" ng-options="id as name for (id, name) in locationOptions | orderBy:'name'"></select>
                 </div>
             </div>
             <div ng-hide="dataset.Config && dataset.Config.DataEntryPage.HiddenFields.contains('ActivityDate')">
@@ -64,9 +62,9 @@
                 <div style="display: inline-flex; margin-left: -2px;" >
                     <div class="header-label">Instrument: </div>
                     <div class="header-value">
-                        
-                        <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()">
-                            <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
+
+                        <select ui-select2="select2Options" data-placeholder="Choose an Instrument" ng-change="selectInstrument()" style="width: 200px; margin-top: 4px;" ng-model="row.InstrumentId">
+                                <option ng-repeat="instrument in project.Instruments | orderBy:'instrument.Name'" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
                         </select>
                         
                         <div ng-show="row.DataGradeText">
