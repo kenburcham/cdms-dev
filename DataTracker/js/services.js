@@ -12,7 +12,7 @@ mod.factory('Projects',['$resource', function(resource){
 
 mod.factory('GetFishermanList',['$resource', function($resource){
         return $resource(serviceUrl+'/data/GetFishermanList', {}, {
-            query: {method: 'GET', params: {id:'id'}, isArray: true}
+            query: {method: 'GET', params: {id:'id'}, isArray: false}
         });
 }]);
 
