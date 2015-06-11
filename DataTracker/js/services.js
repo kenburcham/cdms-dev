@@ -392,6 +392,19 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 return service.project;
 
             service.project = Project.query({id: id});
+
+            service.project.$promise.then(function(){
+                //console.log("after-project-load!");
+                //do some sorting after we load for instruments
+                if(service.project.Instruments.length > 0)
+                {
+                    service.project.Instruments = service.project.Instruments.sort(orderByAlphaName);
+                }
+
+                //and also for locations
+                service.project.Locations = service.project.Locations.sort(orderByAlpha);
+            });
+
             return service.project;
         },
 
@@ -1796,6 +1809,9 @@ function makeObjectsFromValues(key, valuesList)
 
 function orderByAlpha(a,b)
 {
+     if(!a || !b || !a.Label || !b.Label)
+        return 0;
+
      var nameA=a.Label.toLowerCase(), nameB=b.Label.toLowerCase()
      if (nameA < nameB) //sort string ascending
       return -1
@@ -1806,6 +1822,9 @@ function orderByAlpha(a,b)
 
 function orderByAlphaName(a,b)
 {
+     if(!a || !b || !a.Label || !b.Label)
+        return 0;
+
      var nameA=a.Name.toLowerCase(), nameB=b.Name.toLowerCase()
      if (nameA < nameB) //sort string ascending
       return -1

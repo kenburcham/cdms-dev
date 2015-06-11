@@ -343,6 +343,9 @@ mod_de.controller('DataEntryFormCtrl', ['$scope','$routeParams','DataService','$
 		$scope.getDataGrade = function(check){ return getDataGrade(check)}; //alias from service
 
 		$scope.selectInstrument = function(){
+			if(!$scope.row.InstrumentId)
+				return;
+
 			//get latest accuracy check
 			$scope.viewInstrument = getByField($scope.project.Instruments, $scope.row.InstrumentId, "Id");
 			$scope.row.LastAccuracyCheck = $scope.viewInstrument.AccuracyChecks[$scope.viewInstrument.AccuracyChecks.length-1];
