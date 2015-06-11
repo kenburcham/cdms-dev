@@ -33,6 +33,8 @@ define([
 	        $routeProvider.when('/projects', {templateUrl: 'partials/projects.html', controller: 'ProjectsCtrl'});
 	        $routeProvider.when('/projects/:Id', {templateUrl: 'partials/project-datasets.html', controller: 'ProjectDatasetsCtrl'});
 
+	        $routeProvider.when('/test', {templateUrl: 'partials/test.html', controller: 'TestController'});
+
 	        //this one is a little special -- loads up the arcgis mapping stuff.
 	        $routeProvider.when('/mydata', {templateUrl: 'partials/mydatasets.html', controller: 'MyDatasetsCtrl'});
 	        $routeProvider.when('/myprojects', {templateUrl: 'partials/myprojects.html', controller: 'MyProjectsCtrl'});

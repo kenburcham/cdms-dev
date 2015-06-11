@@ -727,6 +727,33 @@ var errController = ['$scope',
   }
 ];
 
+//added as a way to test things.
+var testController = ['$scope', 'DataService', '$modal',
+  function(scope, DataService, $modal){
+    scope.FishermanList = DataService.getFishermanList(1205);
+
+    scope.$watch('FishermanList', function(){
+      console.log('FishermanList watch fired!');
+
+      console.dir(scope.FishermanList);
+
+      if(scope.FishermanList && scope.FishermanList.length > 0)
+      {
+          console.dir("And now FishermanList is populated.");
+
+          for(var a = 0; a < scope.FishermanList.length; a++)
+          {
+            console.dir(scope.FishermanList[a]);
+          }
+      }
+    },true);
+
+    console.log("First time we run");
+    console.dir(scope.FishermanList);
+
+  }];
+
+mod_ds.controller('TestController', testController);
 mod_ds.controller('ProjectsCtrl', projectsController);
 mod_ds.controller('ProjectDatasetsCtrl', projectDatasetsController);
 mod_ds.controller('ErrorCtrl', errController);

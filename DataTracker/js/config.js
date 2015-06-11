@@ -33,8 +33,8 @@ PURPOSE OR NON-INFRINGING. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF 
 var CURRENT_VERSION = ".3";
 
 //Change these to point to your own webserver directories
-var serviceUrl = '//data.ctuir.org/servicesSTAGE'; //location of cdms-services deployment (REST Services)
-var serverUrl = '//data.ctuir.org/cdms-dev';       //location of cdms-dev files (Javascript+HTML application)
+var serviceUrl = '//localhost:31772/services'; //location of cdms-services deployment (REST Services)
+var serverUrl = '//localhost:31772/cdms-dev';       //location of cdms-dev files (Javascript+HTML application)
 var security_token = "etaM2qefzYp_2YFz1HwWr9lqGdnaYSIcuy7KcEwV54cMZSI3K-Z_KXTkXNKgi_cm"; //   7/3/14.data.ctuir.org
 //var security_token = "2NSvy0BMObG__a4gbRkBDUWarspCqssN9Zpn6sTTPEWTbIF0t-wOmSg4DjtSHYQn"; //   8/25/14.cdms.ctuir.org
 
