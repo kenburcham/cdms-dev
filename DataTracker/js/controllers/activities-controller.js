@@ -124,8 +124,8 @@ mod_dac.controller('ModalAddLocationCtrl', ['$scope','$modalInstance', 'DataServ
 
 
 
-var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$modal', '$location','$window', '$rootScope',
-    	function ($scope, $routeParams, DataService, $modal, $location, $window, $rootScope) {
+var datasetActivitiesController = ['$scope','$routeParams', 'DataService', 'DatastoreService','$modal', '$location','$window', '$rootScope',
+    	function ($scope, $routeParams, DataService, DatastoreService, $modal, $location, $window, $rootScope) {
             $scope.dataset = DataService.getDataset($routeParams.Id);
             $scope.activities = DataService.getActivities($routeParams.Id);
             $scope.loading = true;
@@ -235,7 +235,16 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
 
             $scope.removeLocation = function(){
                 if(confirm("Are you sure you want to delete this location?"))
-                    alert("Not implemented.");
+                {
+                    var deleting = DatastoreService.deleteLocation($scope.selectedLocation.Id);
+                    $scope.removeFilter();
+                    
+                    deleting.$promise.then(function(){
+                        $scope.refreshProjectLocations();
+                        $scope.reloadProjectLocations();
+                    });
+                }
+                    
             };
 
             $scope.editLocation = function(){
@@ -306,7 +315,6 @@ var datasetActivitiesController = ['$scope','$routeParams', 'DataService', '$mod
                            $scope.map.graphics.remove($scope.newGraphic);
                            $scope.newGraphic = null; // just to clear the buttons on the UI.
                       }
-
 
                       //$scope.center = [e.mapPoint.x,e.mapPoint.y];
                 }

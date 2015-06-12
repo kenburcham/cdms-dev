@@ -74,6 +74,11 @@ mod.factory('DeleteActivitiesAction', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/DeleteDatasetActivities');
 }]);
 
+mod.factory('DeleteLocationAction', ['$resource', function($resource){
+        return $resource(serviceUrl+'/data/DeleteLocation');
+}]);
+
+
 mod.factory('SetQaStatusAction', ['$resource', function($resource){
         return $resource(serviceUrl+'/data/SetQaStatus');
 }]);
@@ -232,8 +237,8 @@ mod.factory('GetRelationData', ['$resource', function($resource){
 
 
 
-mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile','GetTimeZones',
-    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies,UpdateFile,DeleteFile, GetTimeZones){
+mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAllDatastoreFields','GetDatastore','GetDatastoreProjects','GetAllDatastores','GetDatastoreDatasets','GetSources','GetInstruments','SaveDatasetField','SaveMasterField','DeleteDatasetField','GetAllFields','AddMasterFieldToDataset','GetLocationTypes','SaveProjectLocation','GetAllInstruments','SaveProjectInstrument','SaveInstrument','SaveInstrumentAccuracyCheck','GetInstrumentTypes','RemoveProjectInstrument','GetWaterBodies','UpdateFile','DeleteFile','GetTimeZones','DeleteLocationAction',
+    function($q, GetAllPossibleDatastoreLocations,GetAllDatastoreFields,GetDatastore,GetDatastoreProjects,GetAllDatastores,GetDatastoreDatasets, GetSources, GetInstruments,SaveDatasetField, SaveMasterField, DeleteDatasetField,GetAllFields, AddMasterFieldToDataset, GetLocationTypes, SaveProjectLocation,GetAllInstruments,SaveProjectInstrument,SaveInstrument, SaveInstrumentAccuracyCheck, GetInstrumentTypes, RemoveProjectInstrument,GetWaterBodies,UpdateFile,DeleteFile, GetTimeZones,DeleteLocationAction){
         var service = {
 
             datastoreId: null,
@@ -354,6 +359,10 @@ mod.service('DatastoreService', ['$q','GetAllPossibleDatastoreLocations','GetAll
             deleteFile: function(projectId, file)
             {
                 return DeleteFile.save({ProjectId: projectId, File: file});
+            },
+            deleteLocation: function(locationId)
+            {
+                return DeleteLocationAction.save({LocationId: locationId});
             },
             getTimeZones: function()
             {
