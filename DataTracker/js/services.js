@@ -402,7 +402,7 @@ mod.service('DataService', ['$q','$resource', 'Projects', 'Users','Project','Pro
                 }
 
                 //and also for locations
-                service.project.Locations = service.project.Locations.sort(orderByAlpha);
+                //service.project.Locations = service.project.Locations.sort(orderByAlpha);
             });
 
             return service.project;
@@ -1765,6 +1765,28 @@ function makeInstrumentObjects(optionList)
     return objects;
 }
 
+//TODO: this will be handy in the future when we refactor the way lookupOptions works to use
+// an array of objects instead of properties of a single object.
+function sortObjectsByValue(list)
+{
+    var sorted = [];
+
+    Object.keys(list)
+        .map(function(k) { return [k, list[k]]; })
+        .sort(function(a,b){
+            if (a[1] < b[1]) return -1;
+             if (a[1] > b[1]) return 1;
+             return 0;
+          })
+          .forEach(function (d) {
+              var nextObj = {};
+              nextObj[d[0]] = d[1];
+              sorted.push(nextObj);
+          });
+
+    return sorted;
+
+}
 //takes a possiblevalues field list and turns it into a list we can use in a select
 //give us a unique key to reference it by for caching.
 function makeObjectsFromValues(key, valuesList)

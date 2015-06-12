@@ -26,6 +26,7 @@
 			<div class="header-label">Purchasing Project</div>
 			<div class="header-value">
 	  				<select class="form-control" ng-model="instrument_row.PurchasingProgramProjectId">
+	  					<option value="" ng-selected="instrument_row.PurchasingProgramProjectId == null">Unknown / NA</option>
 	  					<option ng-repeat="proj in RawProjects" ng-selected="proj.Id == instrument_row.PurchasingProgramProjectId" value="{{proj.Id}}">{{proj.Name}}</option>
 	  				</select>	
 			</div>
