@@ -323,6 +323,7 @@ ul.dropdown-menu .btn {
 
 .gridTable .ngCellText{
   height: auto !important;
+  min-height: 20px;
   white-space: normal;
   overflow:visible;
 }

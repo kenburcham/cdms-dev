@@ -21,6 +21,15 @@ angular.module('DatasetFilters', [])
             return input;
         };
     })
+    .filter('instrumentFilter', function($rootScope){ 
+        return function(input) {
+            if($rootScope.instrumentOptions[input])
+			{
+                return $rootScope.instrumentOptions[input];
+			}
+            return input;
+        };
+    })
     .filter('QAStatusFilter', function($rootScope){
         return function(input) {
             if($rootScope.QAStatusOptions[input])
@@ -87,6 +96,16 @@ angular.module('DatasetFilters', [])
             return $sce.trustAsHtml(retval);
             
         };
+    }).filter('countItems', function($sce){
+        return function(input)
+        {
+            var retval = '-';
+            if(input)
+            {
+                retval = array_count(input) + "";
+            }
+            return $sce.trustAsHtml(retval);
+        }
     })
     
 

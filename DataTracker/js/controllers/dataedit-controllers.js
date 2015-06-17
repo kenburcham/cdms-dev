@@ -35,8 +35,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 		initEdit(); // stop backspace from ditching in the wrong place.
 
 		$scope.userId = $rootScope.Profile.Id;
-		$scope.headerFields = [];
-		$scope.detailFields = [];
+		$scope.fields = { header: [], detail: [], relation: []}; 
 
 		//fields to support uploads
 		$scope.filesToUpload = {};
@@ -140,17 +139,18 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 
 					//set the detail (grid) values.
         	$scope.dataSheetDataset = $scope.dataset_activities.Details;
+        	$scope.gridFields = [];
 
         	//setup our header/detail field structure
 					angular.forEach($scope.dataset.Fields.sort(orderByIndex), function(field){
 						parseField(field, $scope);
 						if(field.FieldRoleId == FIELD_ROLE_HEADER)
 						{
-							$scope.headerFields.push(field);
+							$scope.fields.header.push(field);
 							//also copy the value to row
 							if(field.ControlType == "multiselect")
 							{
-								console.dir($scope.dataset_activities.Header[field.DbColumnName]);
+								//console.dir($scope.dataset_activities.Header[field.DbColumnName]);
 								$scope.row[field.DbColumnName] = angular.fromJson($scope.dataset_activities.Header[field.DbColumnName]);
 							}
 							else
@@ -158,19 +158,34 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 						}
 						else if(field.FieldRoleId == FIELD_ROLE_DETAIL)
 						{
-							$scope.detailFields.push(field);
+							$scope.fields.detail.push(field);
 		    				$scope.datasheetColDefs.push(makeFieldColDef(field, $scope));
 						}
 
+						//keep a list of grid fields (relations) for later loading
+						if(field.ControlType == "grid")
+							$scope.gridFields.push(field);
 					});
 
-				$scope.recalculateGridWidth($scope.detailFields.length);
+				$scope.recalculateGridWidth($scope.fields.detail.length);
 	      $scope.validateGrid($scope);
 
 		});
 
 
+		$scope.$watch('dataSheetDataset', function(){
+			if(!$scope.dataSheetDataset)
+				return;
 
+			//kick off the loading of relation data (we do this for UI performance rather than returning with the data...)
+			angular.forEach($scope.dataSheetDataset, function(datarow){
+				angular.forEach($scope.gridFields, function(gridfield){
+					datarow[gridfield.DbColumnName] = DataService.getRelationData(gridfield.FieldId, datarow.ActivityId, datarow.RowId);
+					console.log("kicking off loading of " + datarow.ActivityId + ' ' + datarow.RowId);
+				})	
+			})
+			
+		});
 
 		$scope.clearSelections = function()
 		{
@@ -270,6 +285,28 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 			$scope.dataSheetDataset.push(row);
 		};
 
+		$scope.viewRelation = function(row, field_name)
+        {
+        	//console.dir(row.entity);
+        	var field = $scope.FieldLookup[field_name];
+        	//console.dir(field);
+
+        	$scope.openRelationEditGridModal(row.entity, field);
+        }
+
+
+		$scope.openRelationEditGridModal = function(row, field)
+		{
+			$scope.relationgrid_row = row;
+			$scope.relationgrid_field = field;
+			$scope.isEditable = true;
+			var modalInstance = $modal.open({
+				templateUrl: 'partials/modals/relationgrid-edit-modal.html',
+				controller: 'RelationGridModalCtrl',
+				scope: $scope, 
+			});
+		};
+
 
 		/* -- these functions are for uploading - */
 		$scope.openFileModal = function(row, field)
@@ -359,7 +396,7 @@ mod_edit.controller('DataEditCtrl', ['$scope','$q','$sce','$routeParams','DataSe
 					//console.log("Ok our new list of files: "+$scope.row[field]);
 				});
 
-				$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.headerFields, $scope.detailFields);
+				$scope.activities = ActivityParser.parseSingleActivity($scope.row, angular.extend($scope.dataSheetDataset, $scope.deletedRows), $scope.fields);
 
 				if(!$scope.activities.errors)
 				{

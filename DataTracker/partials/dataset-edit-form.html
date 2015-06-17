@@ -63,16 +63,14 @@
 
             <div ng-show="project.Instruments.length > 0" >
 
-
-            <div style="display: inline-flex">
-                <div class="header-label">Instrument: </div>
-                <div class="header-value" style="margin-left: -2px;">                    
-                    <select class="form-control" ng-model="row.InstrumentId" ng-change="selectInstrument()">
-                         <option ng-repeat="instrument in project.Instruments" value="{{instrument.Id}}">{{instrument.Name}} ({{instrument.SerialNumber}})</option>
-                    </select>
+                <div style="display: inline-flex">
+                    <div class="header-label">Instrument: </div>
+                    <div class="header-value" style="margin-left: -2px;">                    
+                        <select class="form-control" value="127" ng-model="row.InstrumentId" ng-options="i.Id as i.Name+' ('+i.SerialNumber+')' for i in project.Instruments">
+                        </select>
+                    </div>
+                    <div ng-show="false" style="margin-top: 5px; margin-left: 7px;"><button class="btn btn-xs" ng-click="createInstrument()">Add</button></div>
                 </div>
-                <div ng-show="false" style="margin-top: 5px; margin-left: 7px;"><button class="btn btn-xs" ng-click="createInstrument()">Add</button></div>
-            </div>
                 
                 <div class="header-label">Accuracy Check: </div>
                 <div class="header-value">
@@ -91,7 +89,7 @@
             </div>
 
         <form novalidate class="row-form" name="headerForm">
-        <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
+        <div ng-repeat="field in fields.header" ng-switch on="field.ControlType">
             <ctuir-text-field ng-switch-when="text"></ctuir-text-field>
             <ctuir-textarea-field ng-switch-when="textarea"></ctuir-textarea-field>
             <ctuir-number-field ng-switch-when="number"></ctuir-number-field>    
@@ -139,4 +137,3 @@
 <div ng-include="'partials/dataentry/buttons.html'">&nbsp;</div>
 
 </div>
-

@@ -198,7 +198,7 @@
                 </div>
 
                 <form novalidate class="row-form">
-                <div ng-repeat="field in headerFields" ng-switch on="field.ControlType">
+                <div ng-repeat="field in fields.header" ng-switch on="field.ControlType">
                     <ctuir-text-field ng-switch-when="text"></ctuir-text-field>
                     <ctuir-textarea-field ng-switch-when="textarea"></ctuir-textarea-field>
                     <ctuir-number-field ng-switch-when="number"></ctuir-number-field>    

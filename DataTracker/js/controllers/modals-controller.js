@@ -44,6 +44,80 @@ mod_fmc.controller('ModalCreateInstrumentCtrl', ['$scope','$modalInstance', 'Dat
 ]);
 
 
+//when you click the "View" button on a relation table field, it opens this modal
+mod_fmc.controller('RelationGridModalCtrl', ['$scope','$modalInstance', 'DataService','DatastoreService',
+    function($scope,  $modalInstance, DataService, DatastoreService){
+
+        //incoming scope variable
+        // $scope.relationgrid_row, $scope.relationgrid_field
+        if($scope.relationgrid_field.Field == null || $scope.relationgrid_field.Field.DataSource == null)
+        {
+            $scope.alerts = [{type: "error", msg: "There is a misconfiguration in the relationship. "}];
+            return;
+        }
+        else
+        {
+            $scope.relation_dataset = DataService.getDataset($scope.relationgrid_field.Field.DataSource);
+        }
+
+        //get the relationdata out of the row -- use it if it exists, otherwise fetch it from the db.
+        if($scope.relationgrid_row[$scope.relationgrid_field.DbColumnName])
+            $scope.relationgrid_data = $scope.relationgrid_row[$scope.relationgrid_field.DbColumnName];
+        else
+        {
+            $scope.relationgrid_data = DataService.getRelationData($scope.relationgrid_field.FieldId, $scope.relationgrid_row.ActivityId, $scope.relationgrid_row.RowId);
+            $scope.relationgrid_row[$scope.relationgrid_field.DbColumnName] = $scope.relationgrid_data;
+        }
+
+        $scope.relationColDefs = [];
+        $scope.relationGrid = {
+            data: 'relationgrid_data',
+            columnDefs: 'relationColDefs',
+            enableCellSelection: true,
+            enableRowSelection: false,
+            enableCellEdit: $scope.isEditable,
+            enableColumnResize: true,
+        };
+
+        $scope.$watch('relation_dataset.Id', function(){
+            if(!$scope.relation_dataset.Id)
+                return;
+
+            var grid_fields = [];
+
+            //iterate the fields of our relation dataset and populate our grid columns
+            angular.forEach($scope.relation_dataset.Fields.sort(orderByIndex), function(field){
+                parseField(field, $scope);
+                grid_fields.push(field);
+                $scope.relationColDefs.push(makeFieldColDef(field, $scope));
+            });
+
+            //add our list of fields to a relationFields collection -- we will use this later when saving...
+            $scope.fields.relation[$scope.relationgrid_field.Field.DbColumnName] = grid_fields;
+            
+        });
+
+        $scope.save = function(){
+
+            //copy back to the actual row field
+            //$scope.link_row[$scope.link_field.DbColumnName] = angular.toJson($scope.currentLinks);
+            //console.dir($scope.relationgrid_row);
+            $scope.updatedRows.push($scope.relationgrid_row.Id);
+            $modalInstance.dismiss();
+        };
+
+        $scope.cancel = function(){
+            $modalInstance.dismiss();
+        };
+
+        $scope.addRow = function()
+        {
+            $scope.relationgrid_data.push(makeNewRow($scope.relationColDefs));
+        }
+
+    }
+]);
+
 
 
 //handles managing file controltypes
@@ -53,10 +127,10 @@ mod_fmc.controller('FileModalCtrl', ['$scope','$modalInstance', 'DataService','D
     	//note: file selected for upload are managed by onFileSelect from parent scope (dataeditcontroller, most likely)
 
     	//file_field and file_row
-    	console.dir($scope.file_row);
-    	console.dir($scope.file_field);
-    	console.log("Files!");
-    	console.dir($scope.filesToUpload);
+    	//console.dir($scope.file_row);
+    	//console.dir($scope.file_field);
+    	//console.log("Files!");
+    	//console.dir($scope.filesToUpload);
 
     	$scope.currentFiles = $scope.file_row[$scope.file_field.DbColumnName];
     	if($scope.currentFiles)
@@ -64,7 +138,7 @@ mod_fmc.controller('FileModalCtrl', ['$scope','$modalInstance', 'DataService','D
     	else
     		$scope.currentFiles = [];
 
-    	console.dir($scope.currentFiles);
+    	//console.dir($scope.currentFiles);
 
     	$scope.removeFile = function(file)
     	{
@@ -131,7 +205,7 @@ mod_fmc.controller('LinkModalCtrl', ['$scope','$modalInstance', 'DataService','D
         else
             $scope.currentLinks = [];
 
-        console.dir($scope.currentLinks);
+        //console.dir($scope.currentLinks);
 
         $scope.removeLink = function(link)
         {
@@ -306,7 +380,7 @@ mod_fmc.controller('ModalChooseSummaryImagesCtrl', ['$scope','$modalInstance', '
         imgmd_html.Values = the_html;
         imgmd.Values = selections.toString();
 
-        console.dir($scope.project.Metadata);
+        //console.dir($scope.project.Metadata);
 
         var promise = DataService.saveProject($scope.project);
             promise.$promise.then(function(){
